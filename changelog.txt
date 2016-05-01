@@ -1,0 +1,147 @@
+[0.1-0.3]
+Initial release
+
+[0.4]
+Removed some unuseful things when saving a profile
+
+[0.5]
+Based on last update (30/03/16)
+Integrated auto-sell
+Integrated and modified Selective Fishing from Ghostyweasel
+Added to inventory list, if an item can be sold at the trader manager
+
+[0.6a BETA]
+Integrated changes from default Fisher script (31/03)
+Fix for Epheria Fishing Rod don't being equipped (thanks to Akafist)
+
+[0.6b BETA]
+Double checked the new action files, seem to work... Report any issue
+New Settings.json, is recommended to delete the previous one. First to report any issue about this, check your new settings
+
+[0.6c BETA]
+Integrated the 02/04 update
+Resolved (?) problem with looting (green, blue, gold and trash items)
+Implemented loot for crystal shards (all) (need more testing before say: "It's works!")
+
+[0.6d BETA]
+Resolved (finally!!!) problem with looting (green, blue, gold, relics and trash items)
+
+[0.6f BETA]
+PlayerRadar can now be opened like a normal window instead to open automatically at every start of the script
+InventoryList can now be opened like a normal window instead to be a tab in the main window
+
+[0.6g BETA]
+PlayerRadar gets a major update with filters and colors.
+InventoryList gets a major update with colors and items usage.
+
+[0.6h BETA]
+Fix for the looting tab problems
+
+[0.6l BETA]
+Possibility to auto delete broken fishing rods
+Fixed some bug on InventoryList
+Fixed some rods not be auto equipped (like epheria rod) (PM me the ID and the name of the rod that don't being equipped)
+
+[0.6m BETA]
+Fix when equip/unequip rod...sorry for that!
+
+[0.6n BETA]
+Added separated options window for settings
+Added more rods to un/equip list: balenos, epheria and steel
+Renamed PlayerRadar to Radar, simple is better
+Trough Bot Settings window is possible to enable debug options, just to help me instead of open other scripts
+Fixed the bug when fishing rod (any) not being unequipped when moving to trader/vendor/warehouse
+Fixed minor problems
+
+[0.7 BETA]
+Added Consumable usage
+Added Baits usage
+Added vendor buying
+Fixed minor problems
+
+[0.7a BETA]
+Added option to loot orange and above
+Added option to loot (or not) shards
+Added option to show durability next to name in InventoryList
+Added option to manually delete rods in InventoryList, if DeleteUsedRods is not used
+Added option to disable delay, from default this option is disabled
+Fixed problems on Looting section, now all is looted if nothing is selected except trash items
+Fixed problems at first launch when settings.json is not present
+Fixed spam of "NeedToBuy" on console
+Some UI tweaks
+
+[0.7b BETA]
+Added option to loot egg, default is off
+Added option on Radar, to show meters or yards for the distance, default is meters
+Added option to play trade manager game
+Removed delete button on InventoryList, not working (for now...)
+Fixed loop when 2 and more items is looted
+
+[0.7c BETA]
+FSM library is now integrated, first step to make it standalone
+Removed from console a lot of actions, will re-added and formatted in the next release
+Added timestamp for some action in the console, is based on your os time and cannot be changed in the UI for now
+Fixed errors when in Radar window changing from meters to yards and viceversa
+Fixed loop when 2 and more items is looted (again...)
+Fixed looting keys when LootKeys is disabled and green and above is enabled
+
+[0.7d BETA]
+Integrated warehouse, repair and trade manager functions state, continue integration to standalone road
+Added Calpheon Rod +1 to equippable rod
+Added Credits window
+Added fishing rod repair function
+Added option to loot white and above, default is enabled. From now on if all the options is disabled, nothing is looted
+Changed partially some timers to make some actions more legit
+Print on console more information for any item looted or trashed
+Fixed minor bugs
+
+[0.7e BETA]
+Fix for repair rods (thanks tyty123)
+Added cheebah420 in the credits...thanks man!
+Some minor fixes
+
+[0.7f BETA]
+Reworked EquipFishingRod, UnequipFishingRod and StartFishing systems
+Reworked Loot system
+Removed Repair part, until a valid solution is found
+Removed play trade game option, is not working cause is only on client side
+Fixed some errors on Vendor, TradeManager and Warehouse
+Fixed missing quality of green fishes in console
+Minor fixes
+
+[0.7g BETA]
+Integrated Navigator and BuildNavigation
+Implemented the use of float, is all automatic and all the credits goes to borek24 and MrUnreal
+Re-implemented Repair, all the credits goes to borek24 and MrUnreal for the great work
+Most of rods is now recognized, remember than most not mean all
+From default Fishing Rod (the white one) is deleted when have 0 durability
+Removed some options, in the settings UI
+Fixed a lot of problems with looting
+Minor bugs fixed
+
+[0.8 BETA]
+UI rework, more compact with same functionality
+Integrate changes from Pyx 1.05a (22/04/16)
+Integrated InventoryDelete (now all the states is integrated)
+Added more floats into fallback checking
+Added a popup warning about Auto delete broken rods option, if the option is active
+Added hotkey for start and stop the script, thanks to Edan
+Fixed problems with repair, now working for equipped and inventory at the same time
+Fixed problems with forcing warehouse and options to deposit is unchecked
+Fixed some bugs
+
+[0.8a BETA]
+Stop fishing when inventory is full
+
+[0.8b BETA]
+Integrate changes from Pyx github repository (27/04/16)
+
+[0.8c BETA] 29-30 April
+Fixed warehouse don't deposit items, thanks to gklt [OK]
+Fixed Inv. Full stop bot option [OK?]
+Added new animations when fish hook [OK]
+Added option to fallback to old animations when fish hook [OK]
+Added option to enable sprint when move [OK]
+Added Repair section on settings, for now is a little empty [OK]
+Added some print debug [OK]
+Removed Loot Eggs option, until next year [OK]
