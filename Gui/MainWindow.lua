@@ -19,7 +19,7 @@ function MainWindow.DrawMainWindow()
 
 		if ImGui.BeginPopup("Confirm") then
 			ImGui.TextColored(ImVec4(1,0.20,0.20,1) ,"WARNING!")
-			ImGui.Text("From default all \"Fishing Rods\" (just the basic white one),\nis deleted when 0 durability is reached, because cannot be repaired.")
+			ImGui.Text("By default all \"Fishing Rods\" and \"Steel Fishing Rods\",\nwill be deleted on 0 durability because they can't be repaired.")
 			ImGui.Spacing()
 			if ImGui.Button("Continue##btn_ok_start_bot", ImVec2(ImGui.GetContentRegionAvailWidth() / 3, 20)) then
 				Bot.Start()

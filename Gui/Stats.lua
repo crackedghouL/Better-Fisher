@@ -12,13 +12,19 @@ Stats.Visible = false
 function Stats.DrawStats()
 	if Stats.Visible then
 		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 220), -1.0)
-
-		-- if Bot.Running then
-			-- t = Bot.FishingTime
-			-- s = math.fmod(t, 60)
-			-- m = math.fmod(t, 60 * 60) / 60
-			-- h = math.floor(t / 60 / 60)
-		-- end
+		
+		if h == nil then
+			h = 0
+			m = 0
+			s = 0
+		end
+		
+		if Bot.Running then
+			t = math.ceil((Bot.Stats.TotalSession + Pyx.System.TickCount - Bot.Stats.SessionStart) / 1000)
+			s = t % 60
+			m = math.floor(t / 60) % 60
+			h = math.floor(t / (60 * 60))
+		end
 
 		if Bot.Stats.Loots > 0 then
 			statsWhites = string.format("%i - %.02f%%%%", Bot.Stats.LootQuality[0] or 0, (Bot.Stats.LootQuality[0] or 0) / Bot.Stats.Loots * 100)
@@ -42,20 +48,12 @@ function Stats.DrawStats()
 			statsShards = "0 - 0.00%%"
 		end
 
-		ImGui.Columns(1) -- 2
-		ImGui.Text("Loot Taken: " .. string.format("%i", Bot.Stats.Loots))
-		-- ImGui.NextColumn()
-		-- if Bot.Running then
-		-- 	if s ~= 0 then
-		-- 		if h > 0 then
-		-- 			ImGui.Text("Fishing Time: " .. string.format("%.f:%02.f:%02.f", h, m, s))
-		-- 		else
-		-- 			ImGui.Text("Fishing Time: " .. string.format("%.f:%02.f", m, s))
-		-- 		end
-		-- 	end
-		-- else
-		-- 	ImGui.Text("Fishing Time: 0:00")
-		-- end
+		ImGui.Columns(3)
+		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", h, m, s))	
+		ImGui.NextColumn()
+		ImGui.Text("Loots: " .. string.format("%i", Bot.Stats.Loots))
+		ImGui.NextColumn()
+		ImGui.Text("Avg.: " .. Bot.Stats.AverageLootTime .. "s")
 
 		ImGui.Columns(1)
 		ImGui.Separator()

@@ -35,9 +35,29 @@ else
 	Bot.UsedTimezone = "%X"
 end
 
+function Bot.ResetStats()
+	Bot.Stats = {
+		Loots = 0,
+		AverageLootTime = 0,
+		LootQuality = {},
+		Fishes = 0,
+		Shards = 0,
+		Keys = 0,
+		Trashs = 0,
+		LootTimeCount = 0,
+		LastLootTick = 0,
+		TotalLootTime = 0,
+		SessionStart = 0,
+		TotalSession = 0,
+	}
+end
+
+Bot.ResetStats()
+
 function Bot.Start()
 	if not Bot.Running then
-		Bot.ResetStats()
+		Bot.Stats.SessionStart = Pyx.System.TickCount
+		-- Bot.ResetStats() --Only manual reset for long time stats with player interactions ?
 		Bot.SaveSettings()
 
 		Bot.RepairState.Forced = false
@@ -66,7 +86,7 @@ function Bot.Start()
 		Bot.InventoryDeleteState.ItemCheckFunction = Bot.DeleteItemCheck
 
 		Bot.ConsumablesState.CustomCondition = Bot.ConsumablesCustomRunCheck
-		Bot.ConsumablesState:ClearTimers()
+		-- Bot.ConsumablesState:ClearTimers() --In case timer is set at more than 30min, the bot will use an other food while the buff is still active.
 		Bot.ConsumablesState.Settings.PreConsumeWait = 2
 		Bot.ConsumablesState.Settings.ConsumeWait = 8
 		Bot.ConsumablesState.ValidActions = { "WAIT" }
@@ -139,18 +159,7 @@ function Bot.Stop()
 	Bot.WarehouseState:Reset()
 	Bot.VendorState:Reset()
 	Bot.TradeManagerState:Reset()
-end
-
-function Bot.ResetStats()
-	Bot.Stats = {
-		Loots = 0,
-		AverageLootTime = 0,
-		LootQuality = {},
-		Fishes = 0,
-		Shards = 0,
-		Keys = 0,
-		Trashs = 0,
-	}
+	Bot.Stats.TotalSession = Bot.Stats.TotalSession + (Pyx.System.TickCount - Bot.Stats.SessionStart)
 end
 
 function Bot.OnPulse()

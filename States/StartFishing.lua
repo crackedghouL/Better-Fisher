@@ -136,10 +136,11 @@ function StartFishingState:NeedToRun()
 		Bot.Stop()
 	end
 
-	return selfPlayer.CurrentActionName == "WAIT"
+	return selfPlayer.CurrentActionName == "WAIT" and not Looting.IsLooting
 end
 
 function StartFishingState:Run()
+	Bot.Stats.LastLootTick = Pyx.System.TickCount
 	local selfPlayer = GetSelfPlayer()
 
 	if Bot.Settings.OnBoat and selfPlayer.Inventory.FreeSlots == 0 then
