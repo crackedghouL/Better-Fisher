@@ -203,7 +203,6 @@ function WarehouseState:Run()
 				self.DepositedMoney = true
 				self.SleepTimer = PyxTimer:New(3)
 				self.SleepTimer:Start()
-				return
 			end
 
 			self.DepositedMoney = true

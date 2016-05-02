@@ -98,7 +98,7 @@ function BotSettings.DrawBotSettings()
 		if ImGui.CollapsingHeader("Inventory Management", "id_gui_inv_manage", true, false) then
 			_, Bot.Settings.DeleteUsedRods = ImGui.Checkbox("##id_guid_inv_manage_autodelete_broken_rods", Bot.Settings.DeleteUsedRods)
 			ImGui.SameLine()
-			ImGui.Text("Auto delete broken Fishing Rods")
+			ImGui.Text("Auto delete broken (Steel) Fishing Rods")
 
 			ImGui.Text("Always delete these items")
 			valueChanged, BotSettings.InventoryComboSelectedIndex = ImGui.Combo("##id_guid_inv_manage_inventory_combo_select", BotSettings.InventoryComboSelectedIndex, BotSettings.InventoryName)

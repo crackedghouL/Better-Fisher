@@ -46,7 +46,7 @@ function LootState:NeedToRun()
 		return false
 	end
 
-	return Looting.IsLooting
+	return Looting.IsLooting and selfPlayer.CurrentActionName == "WAIT"
 end
 
 function LootState:Run()
@@ -64,6 +64,9 @@ function LootState:Run()
 		for i = 0, numLoots -1, x do -- for i = 0, numLoots -1 do
 			local lootItem = Looting.GetItemByIndex(i)
 			local lootItemName = lootItem.ItemEnchantStaticStatus.Name
+			if string.find(lootItemName,"Moray") then --Fix because some names contains weird characters
+				lootItemName = "Moray"
+			end
 			local lootItemType = "Trash"
 			local lootItemQuality = nil
 
@@ -199,13 +202,22 @@ function LootState:Run()
 				end
 			end
 
+			local FishGameTime = "- "
+			if Bot.Stats.LastLootTick ~= 0 then
+				Bot.Stats.LootTimeCount = Bot.Stats.LootTimeCount + 1
+				FishGameTime = Pyx.System.TickCount - Bot.Stats.LastLootTick
+				Bot.Stats.TotalLootTime = Bot.Stats.TotalLootTime + FishGameTime
+				FishGameTime = math.ceil(FishGameTime/1000)
+				Bot.Stats.AverageLootTime = math.ceil((Bot.Stats.TotalLootTime/Bot.Stats.LootTimeCount)/1000)
+			end
+			
 			if self.LootingState == 4 then -- 4 = loot the item
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ")")
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ") Time : " .. FishGameTime .. "s")
 				Looting.Take(i)
 			end
 
 			if self.LootingState == 5 then -- 5 = don't loot the item
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Not looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ")")
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Not looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ") Time : " .. FishGameTime .. "s")
 			end
 		end
 	--end

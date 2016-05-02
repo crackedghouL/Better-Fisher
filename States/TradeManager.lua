@@ -65,7 +65,9 @@ function TradeManagerState:NeedToRun()
 		return false
 	end
 
-	if 	self.Settings.TradeManagerOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3 and table.length(self:GetItems()) > 0 and Navigator.CanMoveTo(self:GetPosition()) then
+	if 	self.Settings.TradeManagerOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3 and 
+			table.length(self:GetItems()) > 0 and Navigator.CanMoveTo(self:GetPosition()) and not Looting.IsLooting
+	then
 		self.Forced = true
 		return true
 	end
