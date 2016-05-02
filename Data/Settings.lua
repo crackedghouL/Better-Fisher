@@ -1,6 +1,9 @@
 Settings = { }
 Settings.__index = Settings
 
+Settings.SETTINGS_ON_NORMAL_FISHING = 0
+Settings.SETTINGS_ON_BOAT_FISHING = 1
+
 setmetatable(Settings, {
 	__call = function (cls, ...)
 		return cls.new(...)
@@ -18,6 +21,7 @@ function Settings.new()
 	self.LibConsumablesSettings = {}
 	self.InventoryDeleteSettings = {}
 	self.StartFishingSettings = {}
+	self.FishingMethod = Settings.SETTINGS_ON_NORMAL_FISHING
 	self.PlayerRun = false
 	self.DeleteUsedRods = true
 	self.OnBoat = false

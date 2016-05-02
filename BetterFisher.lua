@@ -3,7 +3,6 @@ Bot.Settings = Settings()
 
 Bot.Running = false
 Bot.PrintConsoleState = false
--- Bot.FishingTime = 0
 Bot.EnableDebug = false
 Bot.EnableDebugMainWindow = false
 Bot.EnableDebugInventory = false
@@ -86,7 +85,7 @@ function Bot.Start()
 		Bot.InventoryDeleteState.ItemCheckFunction = Bot.DeleteItemCheck
 
 		Bot.ConsumablesState.CustomCondition = Bot.ConsumablesCustomRunCheck
-		-- Bot.ConsumablesState:ClearTimers() --In case timer is set at more than 30min, the bot will use an other food while the buff is still active.
+		-- Bot.ConsumablesState:ClearTimers() -- In case timer is set at more than 30min, the bot will use an other food while the buff is still active.
 		Bot.ConsumablesState.Settings.PreConsumeWait = 2
 		Bot.ConsumablesState.Settings.ConsumeWait = 8
 		Bot.ConsumablesState.ValidActions = { "WAIT" }
@@ -180,26 +179,14 @@ function Bot.OnPulse()
 		end
 	end
 
-	-- if Bot.Running then
-	-- 	if Bot.PulseTimer == nil or Bot.PulseTimer:Expired() then
-	-- 		Bot.FishingTime = Bot.FishingTime + 1
-	-- 		Bot.PulseTimer = PyxTimer:New(1)
-	-- 		Bot.PulseTimer:Start()
-	-- 	else
-	-- 		return
-	-- 	end
-	-- end
-
 	if Bot.Running then
 		Bot.Fsm:Pulse()
 	end
-
-	-- return Bot.FishingTime
 end
 
 function Bot.SaveSettings()
 	local json = JSON:new()
-	Pyx.FileSystem.WriteFile("Settings.json", json:encode_pretty(Bot.Settings))
+	Pyx.FileSystem.WriteFile("settings.json", json:encode_pretty(Bot.Settings))
 end
 
 function Bot.LoadSettings()
@@ -217,7 +204,7 @@ function Bot.LoadSettings()
 	Bot.Settings.HookFishHandleGameSettings = Bot.HookFishHandleGameState.Settings
 	Bot.Settings.StartFishingSettigs = Bot.StartFishingState.Settings
 
-	table.merge(Bot.Settings, json:decode(Pyx.FileSystem.ReadFile("Settings.json")))
+	table.merge(Bot.Settings, json:decode(Pyx.FileSystem.ReadFile("settings.json")))
 	if string.len(Bot.Settings.LastProfileName) > 0 then
 		ProfileEditor.LoadProfile(Bot.Settings.LastProfileName)
 	end
@@ -240,23 +227,23 @@ end
 
 function Bot.StateComplete(state)
 	if state == Bot.TradeManagerState then
-		if Bot.Settings.WarehouseSettings.DepositAfterTradeManager == true then
+		if Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then
 			Bot.WarehouseState.Forced = true
 		end
-	elseif state == Bot.DepositAfterVendor then
-		if Bot.Settings.WarehouseSettings.DepositAfterVendor == true then
+	elseif state == Bot.VendorState then
+		if Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then
 			Bot.WarehouseState.Forced = true
 		end
-	elseif state == Bot.DepositAfterRepair then
-		if Bot.Settings.WarehouseSettings.DepositAfterRepair == true then
+	elseif state == Bot.RepairState then
+		if Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then
 			Bot.WarehouseState.Forced = true
 		end
 	elseif state == Bot.WarehouseState then
-		if Bot.Settings.RepairSettings.RepairAfterWarehouse == true then
+		if Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then
 			Bot.RepairState.Forced = true
 		end
 	elseif state == Bot.WarehouseState then
-		if Bot.Settings.RepairSettings.RepairAfterTrader == true then
+		if Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then
 			Bot.RepairState.Forced = true
 		end
 	end
@@ -300,7 +287,7 @@ function Bot.RepairCheck()
 
 	for k,v in pairs(selfPlayer.EquippedItems) do
 		if Bot.EnableDebug then
-			print ("[" .. os.date(Bot.UsedTimezone) .. "] Eq : " .. tostring(v.HasEndurance) .. " " .. tostring(v.EndurancePercent) .. " " .. tostring(v.ItemEnchantStaticStatus.IsFishingRod))
+			print ("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. tostring(v.HasEndurance) .. " " .. tostring(v.EndurancePercent) .. " " .. tostring(v.ItemEnchantStaticStatus.IsFishingRod))
 		end
 		if v.HasEndurance and v.EndurancePercent <= 0 and v.ItemEnchantStaticStatus.IsFishingRod == true then
 			if Bot.EnableDebug then

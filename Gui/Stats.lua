@@ -11,7 +11,7 @@ Stats.Visible = false
 
 function Stats.DrawStats()
 	if Stats.Visible then
-		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 220), -1.0)
+		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 225), -1.0)
 		
 		if h == nil then
 			h = 0
@@ -66,52 +66,61 @@ function Stats.DrawStats()
 		ImGui.Columns(1)
 		ImGui.Separator()
 
-		ImGui.Columns(2)
-		if Bot.Settings.LootSettings.LootKeys == true then
-			ImGui.Text("Keys: " .. statsKeys)
-		end
-		ImGui.NextColumn()
-		if Bot.Settings.LootSettings.LootShards == true then
-			ImGui.Text("Shards: " .. statsShards)
-		end
+		if Bot.Settings.LootSettings.LootKeys == true or Bot.Settings.LootSettings.LootShards == true then
+			ImGui.Columns(2)
+			if Bot.Settings.LootSettings.LootKeys == true then
+				ImGui.Text("Keys: " .. statsKeys)
+			end
+			ImGui.NextColumn()
+			if Bot.Settings.LootSettings.LootShards == true then
+				ImGui.Text("Shards: " .. statsShards)
+			end
 
-		ImGui.Columns(1)
-		ImGui.Separator()
+			ImGui.Columns(1)
+			ImGui.Separator()
+		end
 
 		ImGui.Columns(1)
 		if ImGui.CollapsingHeader("Fish quality", "id_gui_loot_quality", true, false) then
-			ImGui.Columns(2)
-			if Bot.Settings.LootSettings.LootWhite == true then
-				ImGui.Text("Whites: " .. statsWhites)
-			end
-			ImGui.NextColumn()
-			if Bot.Settings.LootSettings.LootGreen == true then
-				ImGui.Text("Greens: " .. statsGreens)
-			end
+			if Bot.Settings.LootSettings.LootWhite == true or Bot.Settings.LootSettings.LootGreen == true then
+				ImGui.Columns(2)
+				if Bot.Settings.LootSettings.LootWhite == true then
+					ImGui.Text("Whites: " .. statsWhites)
+				end
+				ImGui.NextColumn()
+				if Bot.Settings.LootSettings.LootGreen == true then
+					ImGui.Text("Greens: " .. statsGreens)
+				end
 
-			ImGui.Columns(1)
-			ImGui.Separator()
-
-			ImGui.Columns(2)
-			if Bot.Settings.LootSettings.LootBlue == true then
-				ImGui.Text("Blues: " .. statsBlues)
-			end
-			ImGui.NextColumn()
-			if Bot.Settings.LootSettings.LootGold == true then
-				ImGui.Text("Golds: " .. statsGolds)
+				ImGui.Columns(1)
+				ImGui.Separator()
 			end
 
-			ImGui.Columns(1)
-			ImGui.Separator()
+			if Bot.Settings.LootSettings.LootBlue == true or Bot.Settings.LootSettings.LootGold == true then
+				ImGui.Columns(2)
+				if Bot.Settings.LootSettings.LootBlue == true then
+					ImGui.Text("Blues: " .. statsBlues)
+				end
+				ImGui.NextColumn()
+				if Bot.Settings.LootSettings.LootGold == true then
+					ImGui.Text("Golds: " .. statsGolds)
+				end
 
-			ImGui.Columns(1)
+				ImGui.Columns(1)
+				ImGui.Separator()
+			end
+
 			if Bot.Settings.LootSettings.LootOrange == true then
+				ImGui.Columns(1)
 				ImGui.Text("Oranges: " .. statsOranges)
-			end
 
-			ImGui.Columns(1)
-			ImGui.Separator()
+				ImGui.Columns(1)
+				ImGui.Separator()
+			end
 		end
+
+		ImGui.Columns(1)
+		ImGui.Spacing()
 
 		if ImGui.Button("Reset Stats##id_guid_reset_stats", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 			Bot.ResetStats()

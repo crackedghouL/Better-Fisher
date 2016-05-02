@@ -43,6 +43,11 @@ function ExtraWindow.DrawExtraWindow()
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Go to trade manager")
 		end
 		ImGui.Spacing()
+		if ImGui.Button("Go to vendor", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+			Bot.VendorState.Forced = true
+			print("[" .. os.date(Bot.UsedTimezone) .. "] Go to vendor")
+		end
+		ImGui.Spacing()
 		if ImGui.Button("Go repair", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 			Bot.RepairState.Forced = true
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Go repair")
