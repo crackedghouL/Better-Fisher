@@ -200,7 +200,7 @@ function VendorState:Run()
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Buy list done")
 			end
 			self.State = 4 -- go right to buying
-			self.CurrentBuyList = self.GetBuyItems(self.Settings.BuyWhenAtVendor)
+			self.CurrentBuyList = self:GetBuyItems(self.Settings.BuyWhenAtVendor)
 		else
 			self.State = 5 -- how did we get here!
 		end

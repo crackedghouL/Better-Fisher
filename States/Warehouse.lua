@@ -2,6 +2,10 @@ WarehouseState = { }
 WarehouseState.__index = WarehouseState
 WarehouseState.Name = "Warehouse"
 
+WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR = 0
+WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER = 1
+WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR = 2
+
 setmetatable(WarehouseState, {
 	__call = function(cls, ...)
 		return cls.new(...)
@@ -14,9 +18,7 @@ function WarehouseState.new()
 	self.Settings = {
 		NpcName = "",
 		NpcPosition = { X = 0, Y = 0, Z = 0 },
-		DepositAfterVendor = false,
-		DepositAfterTradeManager = false,
-		DepositItems = false,
+		DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR,
 		DepositMoney = false,
 		MoneyToKeep = 10000,
 		IgnoreItemsNamed = { },

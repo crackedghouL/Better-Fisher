@@ -1,0 +1,2 @@
+FindPath called without navigation mesh ! (1) error
+Buy don't work, just stand idle

@@ -136,12 +136,24 @@ Stop fishing when inventory is full
 [0.8b BETA]
 Integrate changes from Pyx github repository (27/04/16)
 
-[0.8c BETA] 29-30 April
-Fixed warehouse don't deposit items, thanks to gklt [OK]
-Fixed Inv. Full stop bot option [OK?]
-Added new animations when fish hook [OK]
-Added option to fallback to old animations when fish hook [OK]
-Added option to enable sprint when move [OK]
-Added Repair section on settings, for now is a little empty [OK]
-Added some print debug [OK]
-Removed Loot Eggs option, until next year [OK]
+[0.8c BETA]
+Fixed warehouse don't deposit items, thanks to gklt
+Fixed Inv. Full stop bot option
+Added new animations when fish hook
+Added option to fallback to old animations when fish hook
+Added option to enable sprint when move
+Added Repair section on settings, for now is a little empty
+Added some print debug
+Removed Loot Eggs option, until next year
+
+[0.8d BETA] NO ETA
+Rewritten Bot settings UI [95%]
+Rewritten Bot settings [10%]
+Fixed warehouse deposit (something was omitted in the last commit, no item deposit after gold deposit) by gklt
+Smoother animation while fishing (added some delay before looting the items) by gklt
+Bot will not try to repair Steel Fishing Rods anymore by gklt
+Typos by gklt
+Disabled stats reset on start bot, you now have to reset it manually (Usefull to get stats on long fishing session where you have to pause/start the bot without loosing the stats) by gklt
+Disbled consumable timer reset on start bot. (If you have a 90min timer on food, the bot would use it after 30min if you had to pause/start the bot for any reason -> waste of $$) by gklt
+Added average time/loot in the stats and log by gklt
+Added total fishing time by gklt

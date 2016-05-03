@@ -212,12 +212,12 @@ function LootState:Run()
 			end
 			
 			if self.LootingState == 4 then -- 4 = loot the item
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ") Time : " .. FishGameTime .. "s")
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ")")
 				Looting.Take(i)
 			end
 
 			if self.LootingState == 5 then -- 5 = don't loot the item
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Not looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ") Time : " .. FishGameTime .. "s")
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Not looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ")")
 			end
 		end
 	--end

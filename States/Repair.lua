@@ -2,6 +2,9 @@ RepairState = { }
 RepairState.__index = RepairState
 RepairState.Name = "Repair"
 
+RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE = 0
+RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER = 1
+
 setmetatable(RepairState, {
 	__call = function(cls, ...)
 		return cls.new(...)
@@ -14,8 +17,7 @@ function RepairState.new()
 	self.Settings = {
 		NpcName = "",
 		NpcPosition = { X = 0, Y = 0, Z = 0 },
-		RepairAfterWarehouse = false,
-		RepairAfterTrader = false,
+		RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE,
 		SecondsBetweenTries = 300
 	}
 
@@ -70,8 +72,8 @@ function RepairState:NeedToRun()
 
 	if not equippedItem then
 		for k,v in pairs(selfPlayer.Inventory.Items) do
-			if v.HasEndurance and v.EndurancePercent <= 0 and 
-					(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16151)) 
+			if 	v.HasEndurance and v.EndurancePercent <= 0 and 
+				(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16151)) 
 			then
 				if Navigator.CanMoveTo(self:GetPosition()) then
 					self.Forced = true
@@ -84,8 +86,8 @@ function RepairState:NeedToRun()
 		end
 	else
 		for k,v in pairs(selfPlayer.EquippedItems) do
-			if v.HasEndurance and v.EndurancePercent <= 0 and
-					(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16151)) 
+			if 	v.HasEndurance and v.EndurancePercent <= 0 and
+				(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16151)) 
 			then
 				if Navigator.CanMoveTo(self:GetPosition()) then
 					self.Forced = true
