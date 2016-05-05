@@ -59,9 +59,9 @@ function Stats.DrawStats()
 		ImGui.Separator()
 
 		ImGui.Columns(2)
-		ImGui.Text("Fishs: " .. statsFishes)
+		ImGui.Text("Fishes: " .. statsFishes)
 		ImGui.NextColumn()
-		ImGui.Text("Trashs: " .. statsTrashs)
+		ImGui.Text("Trashes: " .. statsTrashs)
 
 		ImGui.Columns(1)
 		ImGui.Separator()
