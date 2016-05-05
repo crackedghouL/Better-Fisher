@@ -18,7 +18,7 @@ function Stats.DrawStats()
 			m = 0
 			s = 0
 		end
-		
+
 		if Bot.Running then
 			t = math.ceil((Bot.Stats.TotalSession + Pyx.System.TickCount - Bot.Stats.SessionStart) / 1000)
 			s = t % 60
@@ -61,7 +61,7 @@ function Stats.DrawStats()
 		ImGui.Columns(2)
 		ImGui.Text("Fishs: " .. statsFishes)
 		ImGui.NextColumn()
-		ImGui.Text("Trashs: " .. statsTrashs)
+		ImGui.Text("Trashs: " .. statsTrashes)
 
 		ImGui.Columns(1)
 		ImGui.Separator()
