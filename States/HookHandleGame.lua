@@ -66,6 +66,7 @@ function HookFishHandleGameState:Run()
 	else
 		if self.GameState == 0 and selfPlayer.CurrentActionName == "FISHING_HOOK_START" then -- Wait before starting first minigame
 			self.LastGameTick = Pyx.System.TickCount
+			self.RandomWaitTime = math.random(500,1200)
 			self.GameState = 1
 		elseif self.GameState == 1 and Pyx.System.TickCount - self.LastGameTick > self.RandomWaitTime then -- Time spacebar minigame
 			if self.Settings.NoDelay == true or self.Settings.AlwaysPerfect == true or math.random(10) == 10 then -- Make perfects from options or 10% chance
