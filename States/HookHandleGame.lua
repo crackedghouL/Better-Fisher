@@ -13,12 +13,14 @@ function HookFishHandleGameState.new()
 	self.Settings = { NoDelay = false, AlwaysPerfect = false, UseOldAnimations = false }
 	self.LastGameTick = 0
 	self.RandomWaitTime = 0
+	self.GameState = 0
 	return self
 end
 
 function HookFishHandleGameState:Reset()
 	self.LastGameTick = 0
 	self.RandomWaitTime = 0
+	self.GameState = 0
 end
 
 function HookFishHandleGameState:NeedToRun()
@@ -62,29 +64,29 @@ function HookFishHandleGameState:Run()
 			end
 		end
 	else
-		local fishResult = "FISHING_HOOK_PERFECT"
-		if self.Settings.AlwaysPerfect == false then
-			if math.random(10) > 1 then
-				fishResult = "FISHING_HOOK_GOOD"
+		if self.GameState == 0 and selfPlayer.CurrentActionName == "FISHING_HOOK_START" then -- Wait before starting first minigame
+			self.LastGameTick = Pyx.System.TickCount
+			self.RandomWaitTime = math.random(500,1200)
+			self.GameState = 1
+		elseif self.GameState == 1 and Pyx.System.TickCount - self.LastGameTick > self.RandomWaitTime then -- Time spacebar minigame
+			if self.Settings.NoDelay == true or self.Settings.AlwaysPerfect == true or math.random(10) == 10 then -- Make perfects from options or 10% chance
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Perfect timing !")
+				BDOLua.Execute("getSelfPlayer():get():SetMiniGameResult(3)")
+				BDOLua.Execute("Panel_Minigame_SinGauge_End()")
+				-- selfPlayer:DoAction("FISHING_HOOK_SUCCESS") -- Not needed, let the client handle it
+				self.GameState = 0
+			else -- Normal timing
+				BDOLua.Execute("getSelfPlayer():get():SetMiniGameResult(11)")
+				-- selfPlayer:DoAction("FISHING_HOOK_GOOD") -- Not needed, let the client handle it
+				self.RandomWaitTime = math.random(3300,4500) -- May need some tweaking ?
+				self.GameState = 2
 			end
-		end
-
-		if selfPlayer.CurrentActionName == "FISHING_HOOK_START" then
-			if self.Settings.NoDelay == true then
-				selfPlayer:DoAction(fishResult)
-			else
-				self.LastGameTick = Pyx.System.TickCount
-				self.RandomWaitTime = math.random(3000,6000)
-				selfPlayer:DoAction(fishResult)
-			end
-		elseif selfPlayer.CurrentActionName == "FISHING_HOOK_ING_HARDER" then
-			if not selfPlayer.CurrentActionName == "FISHING_HOOK_ING_HARDER" then
-				return
-			else
-				if Pyx.System.TickCount - self.LastGameTick > self.RandomWaitTime then
-					selfPlayer:DoAction("FISHING_HOOK_SUCCESS")
-				end
-			end
+			self.LastGameTick = Pyx.System.TickCount
+		elseif self.GameState == 2 and Pyx.System.TickCount - self.LastGameTick > self.RandomWaitTime then -- Letters minigame
+			BDOLua.Execute("getSelfPlayer():get():SetMiniGameResult(2)")
+			-- selfPlayer:DoAction("FISHING_HOOK_ING_SUCCESS") -- Not needed, let the client handle it
+			self.LastGameTick = Pyx.System.TickCount
+			self.GameState = 0
 		end
 	end
 end
