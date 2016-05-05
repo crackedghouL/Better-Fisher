@@ -12,29 +12,126 @@ MainWindow.ConfirmPopup = false
 -----------------------------------------------------------------------------
 
 function MainWindow.DrawMainWindow()
-	local _, shouldDisplay = ImGui.Begin("Better Fisher v0.8c BETA", true, ImVec2(350, 115), -1.0)
+	local _, shouldDisplay = ImGui.Begin("Better Fisher v0.8d BETA", true, ImVec2(320, 105), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
 
 	if shouldDisplay then
 		local selfPlayer = GetSelfPlayer()
 
-		if ImGui.BeginPopup("Confirm") then
-			ImGui.TextColored(ImVec4(1,0.20,0.20,1) ,"WARNING!")
-			ImGui.Text("By default all \"Fishing Rods\" and \"Steel Fishing Rods\",\nwill be deleted on 0 durability because they can't be repaired.")
-			ImGui.Spacing()
-			if ImGui.Button("Continue##btn_ok_start_bot", ImVec2(ImGui.GetContentRegionAvailWidth() / 3, 20)) then
-				Bot.Start()
-				ImGui.CloseCurrentPopup()
+		if h == nil then
+			h = 0
+			m = 0
+			s = 0
+		end
+
+		if Bot.Running then
+			t = math.ceil((Bot.Stats.TotalSession + Pyx.System.TickCount - Bot.Stats.SessionStart) / 1000)
+			s = t % 60
+			m = math.floor(t / 60) % 60
+			h = math.floor(t / (60 * 60))
+		end
+
+		if ImGui.BeginMenuBar() then
+			if ImGui.BeginMenu("Settings") then
+				if ImGui.MenuItem("Start/Stop", "") then
+					if not Bot.Running then
+						if Bot.Settings.DeleteUsedRods == true then
+							ConfirmWindow.Visible = true
+						else
+							Bot.Start()
+						end
+					else
+						Bot.Stop()
+					end
+				end
+				ImGui.Separator()
+				if ImGui.MenuItem("Open Profile Editor", "", ProfileEditor.Visible) then
+					if ProfileEditor.Visible == false then
+						ProfileEditor.Visible = true
+					elseif ProfileEditor.Visible == true then
+						ProfileEditor.Visible = false
+					end
+				end
+				if ImGui.MenuItem("Open Bot Settings", "", BotSettings.Visible) then
+					if BotSettings.Visible == false then
+						BotSettings.Visible = true
+					elseif BotSettings.Visible == true then
+						BotSettings.Visible = false
+					end
+				end
+			    ImGui.EndMenu()
 			end
-			ImGui.SameLine()
-			if ImGui.Button("Disable it##btn_change_option_start_bot", ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
-				Bot.Settings.DeleteUsedRods = false
-				ImGui.CloseCurrentPopup()
+			if ImGui.BeginMenu("Extra") then
+			    if ImGui.MenuItem("Radar", "", Radar.Visible) then
+					if Radar.Visible == false then
+						Radar.Visible = true
+					elseif Radar.Visible == true then
+						Radar.Visible = false
+					end
+				end
+			    if ImGui.MenuItem("Inventory", "", InventoryList.Visible) then
+					if InventoryList.Visible == false then
+						InventoryList.Visible = true
+					elseif InventoryList.Visible == true then
+						InventoryList.Visible = false
+					end
+				end
+			    if ImGui.MenuItem("Consumables", "", LibConsumableWindow.Visible) then
+					if LibConsumableWindow.Visible == false then
+						LibConsumableWindow.Visible = true
+					elseif LibConsumableWindow.Visible == true then
+						LibConsumableWindow.Visible = false
+					end
+				end
+			    if ImGui.MenuItem("Loot stats", "",Stats.Visible) then
+					if Stats.Visible == false then
+						Stats.Visible = true
+					elseif Stats.Visible == true then
+						Stats.Visible = false
+					end
+				end
+			    ImGui.EndMenu()
 			end
-			ImGui.SameLine()
-			if ImGui.Button("Cancel##btn_cancel_start_bot", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
-				ImGui.CloseCurrentPopup()
+			if ImGui.BeginMenu("Force") then
+				if ImGui.MenuItem("Go to Warehouse", "") then
+					if Bot.Running then
+						Bot.WarehouseState.Forced = true
+						Bot.WarehouseState.ManualForced = true
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Warehouse")
+					else
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+					end
+				end
+				if ImGui.MenuItem("Go to Trader", "") then
+					if Bot.Running then
+						Bot.TradeManagerState.Forced = true
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Trader")
+					else
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+					end
+				end
+				if ImGui.MenuItem("Go to Vendor", "") then
+					if Bot.Running then
+						Bot.VendorState.Forced = true
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Vendor")
+					else
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+					end
+				end
+				if ImGui.MenuItem("Go Repair", "") then
+					if Bot.Running then
+						Bot.RepairState.Forced = true
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Go Repair")
+					else
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+					end
+				end
+				ImGui.EndMenu()
 			end
-			ImGui.EndPopup()
+			if ImGui.BeginMenu("Info") then
+				if ImGui.MenuItem("Aboud BF", "") then print("[" .. os.date(Bot.UsedTimezone) .. "] Nothing here for now!") end
+				ImGui.EndMenu()
+			end
+			ImGui.EndMenuBar()
 		end
 
 		ImGui.Columns(2)
@@ -71,38 +168,14 @@ function MainWindow.DrawMainWindow()
 
 		ImGui.Columns(1)
 		ImGui.Separator()
-		ImGui.Spacing()
+
+		ImGui.Columns(2)
+		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", h, m, s))	
+		ImGui.NextColumn()
+		ImGui.Text("Loots: " .. string.format("%i", Bot.Stats.Loots))
 
 		ImGui.Columns(1)
-		if not Bot.Running then
-			if ImGui.Button("Start##btn_start_bot", ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
-				if Bot.Settings.DeleteUsedRods == true then
-					ImGui.OpenPopup("Confirm")
-				else
-					Bot.Start()
-				end
-			end
-			ImGui.SameLine()
-			if ImGui.Button("Profile editor", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
-				ProfileEditor.Visible = true
-			end
-		else
-			if ImGui.Button("Stop##btn_stop_bot", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
-				Bot.Stop()
-			end
-		end
-
-		ImGui.Columns(1)
-		ImGui.Spacing()
-
-		ImGui.Columns(1)
-		if ImGui.Button("Bot Settings", ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
-			BotSettings.Visible = true
-		end
-		ImGui.SameLine()
-		if ImGui.Button("Extra", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
-			ExtraWindow.Visible = true
-		end
+		ImGui.Separator()
 
 		ImGui.End()
 	end

@@ -8,24 +8,26 @@ Bot.EnableDebugMainWindow = false
 Bot.EnableDebugInventory = false
 Bot.EnableDebugRadar = false
 
+Bot.Counter = 0
+
 Bot.Fsm = FSM()
+Bot.DeathState = DeathState()
 Bot.BuildNavigationState = BuildNavigationState()
-Bot.RepairState = RepairState()
-Bot.WarehouseState = WarehouseState()
-Bot.VendorState = VendorState()
-Bot.TradeManagerState = TradeManagerState()
-Bot.InventoryDeleteState = InventoryDeleteState()
-Bot.ConsumablesState = ConsumablesState()
-Bot.LootState = LootState()
-Bot.HookFishHandleGameState = HookFishHandleGameState()
+Bot.MoveToFishingSpotState = MoveToFishingSpotState()
 Bot.EquipFishingRodState = EquipFishingRodState()
 Bot.EquipFloatState = EquipFloatState()
-Bot.HookFishState = HookFishState()
-Bot.MoveToFishingSpotState = MoveToFishingSpotState()
 Bot.StartFishingState = StartFishingState()
+Bot.HookFishHandleGameState = HookFishHandleGameState()
+Bot.HookFishState = HookFishState()
+Bot.LootState = LootState()
+Bot.InventoryDeleteState = InventoryDeleteState()
+Bot.ConsumablesState = ConsumablesState()
+Bot.TradeManagerState = TradeManagerState()
+Bot.RepairState = RepairState()
+Bot.VendorState = VendorState()
+Bot.WarehouseState = WarehouseState()
 Bot.UnequipFishingRodState = UnequipFishingRodState()
 Bot.UnequipFloatState = UnequipFloatState()
-Bot.RepairState = RepairState()
 
 -- more info at http://www.lua.org/pil/22.1.html
 if Bot.EnableDebug then
@@ -42,7 +44,7 @@ function Bot.ResetStats()
 		Fishes = 0,
 		Shards = 0,
 		Keys = 0,
-		Trashs = 0,
+		Trashes = 0,
 		LootTimeCount = 0,
 		LastLootTick = 0,
 		TotalLootTime = 0,
@@ -82,6 +84,8 @@ function Bot.Start()
 		Bot.TradeManagerState.CallWhenCompleted = Bot.StateComplete
 		Bot.TradeManagerState.CallWhileMoving = Bot.StateMoving
 
+		Bot.DeathState.CallWhenCompleted = Bot.Death
+
 		Bot.InventoryDeleteState.ItemCheckFunction = Bot.DeleteItemCheck
 
 		Bot.ConsumablesState.CustomCondition = Bot.ConsumablesCustomRunCheck
@@ -90,9 +94,11 @@ function Bot.Start()
 		Bot.ConsumablesState.Settings.ConsumeWait = 8
 		Bot.ConsumablesState.ValidActions = { "WAIT" }
 
-		Bot.RepairState.RepairCheck = Bot.RepairCheck
+		Bot.RepairState.ItemCheckFunction = Bot.RepairCheck
 		Bot.RepairState.Settings.NpcName = currentProfile.RepairNpcName
 		Bot.RepairState.Settings.NpcPosition = currentProfile.RepairNpcPosition
+
+		Bot.StartFishingState.PlayerNearby = Bot.PlayerNearby
 
 		if Bot.MeshDisabled ~= true then
 			ProfileEditor.Visible = false
@@ -115,6 +121,7 @@ function Bot.Start()
 		end
 
 		if Bot.Settings.OnBoat then
+			Bot.Fsm:AddState(Bot.DeathState)
 			Bot.Fsm:AddState(Bot.LootState)
 			Bot.Fsm:AddState(Bot.InventoryDeleteState)
 			Bot.Fsm:AddState(Bot.HookFishHandleGameState)
@@ -129,6 +136,7 @@ function Bot.Start()
 			Bot.Fsm:AddState(Bot.MoveToFishingSpotState)
 		else
 			Bot.Fsm:AddState(Bot.BuildNavigationState)
+			Bot.Fsm:AddState(Bot.DeathState)
 			Bot.Fsm:AddState(Bot.LootState)
 			Bot.Fsm:AddState(Bot.InventoryDeleteState)
 			Bot.Fsm:AddState(Bot.HookFishHandleGameState)
@@ -158,6 +166,7 @@ function Bot.Stop()
 	Bot.WarehouseState:Reset()
 	Bot.VendorState:Reset()
 	Bot.TradeManagerState:Reset()
+	Bot.DeathState:Reset()
 	Bot.Stats.TotalSession = Bot.Stats.TotalSession + (Pyx.System.TickCount - Bot.Stats.SessionStart)
 end
 
@@ -179,6 +188,10 @@ function Bot.OnPulse()
 		end
 	end
 
+	if Bot.Counter > 0 then
+		Bot.Counter = Bot.Counter-1
+	end
+
 	if Bot.Running then
 		Bot.Fsm:Pulse()
 	end
@@ -193,6 +206,7 @@ function Bot.LoadSettings()
 	local json = JSON:new()
 
 	Bot.Settings = Settings()
+	Bot.Settings.DeathSettings = Bot.DeathState.Settings
 	Bot.Settings.LootSettings = Bot.LootState.Settings
 	Bot.Settings.RepairSettings = Bot.RepairState.Settings
 	Bot.Settings.WarehouseSettings = Bot.WarehouseState.Settings
@@ -221,6 +235,31 @@ function Bot.StateMoving(state)
 	if equippedItem ~= nil then
 		if equippedItem.ItemEnchantStaticStatus.IsFishingRod then
 			selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
+		end
+	end
+end
+
+function Bot.PlayerNearby()
+	local me = GetSelfPlayer()
+	local players = GetCharacters()
+	local count = 0
+	for k,v in pairs(players) do
+		if v.IsPlayer and not string.match(me.Key, v.Key) then
+			count = count + 1
+		end
+	end
+	return (count > 0)
+end
+
+function Bot.Death(state)
+	if Bot.DeathState.Settings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED then
+		Bot.Stop()
+	else
+		if Bot.Settings.OnBoat == false then
+			Bot.TradeManagerState:Reset()
+			Bot.WarehouseState:Reset()
+			Bot.VendorState:Reset()
+			Bot.RepairState:Reset()
 		end
 	end
 end
@@ -264,7 +303,7 @@ function Bot.DeleteItemCheck(item)
 end
 
 function Bot.ConsumablesCustomRunCheck()
-local selfPlayer = GetSelfPlayer()
+	local selfPlayer = GetSelfPlayer()
 	if selfPlayer.CurrentActionName == "WAIT" then
 		local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
@@ -311,5 +350,3 @@ function Bot.RepairCheck()
 
 	return false
 end
-
-Bot.ResetStats()

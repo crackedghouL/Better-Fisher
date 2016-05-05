@@ -5,8 +5,8 @@
 InventoryList = { }
 InventoryList.Visible = false
 
-InventoryList.ShowDurability = false
-InventoryList.ShowDurabilityColor = false
+ShowDurability = false
+ShowDurabilityColor = false
 
 ---------------------------------------------
 -- InventoryList Functions
@@ -14,16 +14,27 @@ InventoryList.ShowDurabilityColor = false
 
 function InventoryList.DrawInventoryList()
 	if InventoryList.Visible then
-		_, InventoryList.Visible = ImGui.Begin("Inventory list", InventoryList.Visible, ImVec2(500, 400), -1.0)
+		_, InventoryList.Visible = ImGui.Begin("Inventory list", InventoryList.Visible, ImVec2(500, 400), -1.0, ImGuiWindowFlags_MenuBar)
 
-		if ImGui.CollapsingHeader("Settings", "id_gui_inv_list_settings", true, true) then
-			_, InventoryList.ShowDurability = ImGui.Checkbox("##id_guid_inv_list_settings_durability", InventoryList.ShowDurability)
-			ImGui.SameLine()
-			ImGui.Text("Show durability next to name")
-
-			_, InventoryList.ShowDurabilityColor = ImGui.Checkbox("##id_guid_inv_list_settings_durabilitycolor", InventoryList.ShowDurabilityColor)
-			ImGui.SameLine()
-			ImGui.Text("Change item name color based on durability")
+		if ImGui.BeginMenuBar() then
+			if ImGui.BeginMenu("Options") then
+				if ImGui.MenuItem("Show durability next to name", "", ShowDurability) then
+					if ShowDurability == true then
+						ShowDurability = false
+					else
+						ShowDurability = true
+					end
+				end
+				if ImGui.MenuItem("Change name color based on durability", "", ShowDurabilityColor) then
+					if ShowDurabilityColor == true then
+						ShowDurabilityColor = false
+					else
+						ShowDurabilityColor = true
+					end
+				end
+			    ImGui.EndMenu()
+			end
+			ImGui.EndMenuBar()
 		end
 
 		local selfPlayer = GetSelfPlayer()
@@ -47,7 +58,7 @@ function InventoryList.DrawInventoryList()
 				if v.ItemEnchantStaticStatus.Type == 1 then
 					local item = nil
 
-					if InventoryList.ShowDurability then
+					if ShowDurability then
 						item = v.ItemEnchantStaticStatus.Name .. " " .. v.Endurance .. "/" .. v.MaxEndurance
 					else
 						item = v.ItemEnchantStaticStatus.Name
@@ -58,7 +69,7 @@ function InventoryList.DrawInventoryList()
 					end
 					ImGui.SameLine()
 
-					if InventoryList.ShowDurabilityColor then
+					if ShowDurabilityColor then
 						if (v.Endurance == v.MaxEndurance) or v.EndurancePercent == 100 then
 							ImGui.TextColored(ImVec4(0.20,1,0.20,1), item) -- green
 						elseif (v.EndurancePercent > 50 and v.EndurancePercent < 100) then
