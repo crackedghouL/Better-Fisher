@@ -140,7 +140,7 @@ function LootState:Run()
 						lootItem.ItemEnchantStaticStatus.ItemId == 16193 	-- raindrop egg
 					then
 						lootItemType = "Egg"
-						Bot.Stats.Trashs = Bot.Stats.Trashs + 1
+						Bot.Stats.Trashes = Bot.Stats.Trashes + 1
 						self.LootingState = 4
 					end
 				end
@@ -188,7 +188,7 @@ function LootState:Run()
 				end
 
 				if lootItemType == "Trash" then
-					Bot.Stats.Trashs = Bot.Stats.Trashs + 1
+					Bot.Stats.Trashes = Bot.Stats.Trashes + 1
 					self.LootingState = 5
 				end
 
@@ -197,7 +197,7 @@ function LootState:Run()
 					not self.Settings.LootOrange and not self.Settings.LootShards and
 					not self.Settings.LootKeys and not self.Settings.LootEggs
 				then
-					Bot.Stats.Trashs = Bot.Stats.Trashs + 1
+					Bot.Stats.Trashes = Bot.Stats.Trashes + 1
 					self.LootingState = 5
 				end
 			end

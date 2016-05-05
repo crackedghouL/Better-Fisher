@@ -1,7 +1,7 @@
-#Better-Fisher For Pyx.BDO!!![Image of Fish2](http://i.imgur.com/G6jDdcE.png)
+#Better-Fisher For Pyx.BDO ![Image of Fish2](http://i.imgur.com/G6jDdcE.png)
 
-[link to Pyx Script Section](https://www.blackdesert-bot.com/forums/showthread.php/93-A-better-version-for-fishing-(included-profiles))
-git status
+[Homepage](https://www.blackdesert-bot.com/forums/showthread.php/93-A-better-version-for-fishing-(included-profiles))
+
 ##Features Include
 - [x] Auto sell to vendor and/or trade manager
 - [x] Auto buy from vendor

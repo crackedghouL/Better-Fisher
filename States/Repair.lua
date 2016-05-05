@@ -30,6 +30,8 @@ function RepairState.new()
 
 	self.RepairList = {}
 
+	self.ItemCheckFunction = nil
+
     self.RepairEquipped = true
     self.RepairInventory = true
 

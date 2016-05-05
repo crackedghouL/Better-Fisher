@@ -147,8 +147,12 @@ Added some print debug
 Removed Loot Eggs option, until next year
 
 [0.8d BETA] NO ETA
-Rewritten Bot settings UI [95%]
-Rewritten Bot settings [10%]
+Integrated the changes from Pyx git (05/05/16) [OK]
+Rewritten General UI [90%]
+Rewritten Bot settings [70%]
+Added Anti-PK [OK]
+Added Death state, from default is enabled [NO]
+Triangles for spot/npcs is more small [OK]
 Fixed warehouse deposit (something was omitted in the last commit, no item deposit after gold deposit) by gklt
 Smoother animation while fishing (added some delay before looting the items) by gklt
 Bot will not try to repair Steel Fishing Rods anymore by gklt
@@ -157,3 +161,5 @@ Disabled stats reset on start bot, you now have to reset it manually (Usefull to
 Disbled consumable timer reset on start bot. (If you have a 90min timer on food, the bot would use it after 30min if you had to pause/start the bot for any reason -> waste of $$) by gklt
 Added average time/loot in the stats and log by gklt
 Added total fishing time by gklt
+Revamped fishing animation with timers, and it is now the client that handle the game instead of the bot by gklt
+It should look like a real player and still has 10% chance to loot with a "perfect" by gklt

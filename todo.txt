@@ -1,4 +1,4 @@
-Make pink triangles more small
 Add some delay when fishing close to other peoples
 Add Place Saver from Edan, this make the high-sea fishing possible
-Add Auto /Escape from yok3r
+Lower the max distance for radar
+Test more the anti-pk

@@ -73,18 +73,18 @@ function HookFishHandleGameState:Run()
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Perfect timing !")
 				BDOLua.Execute("getSelfPlayer():get():SetMiniGameResult(3)")
 				BDOLua.Execute("Panel_Minigame_SinGauge_End()")
-				-- selfPlayer:DoAction("FISHING_HOOK_SUCCESS") -- Not needed, let the client handle it
+				-- selfPlayer:DoAction("FISHING_HOOK_SUCCESS") Not needed, let the client handle it
 				self.GameState = 0
 			else -- Normal timing
 				BDOLua.Execute("getSelfPlayer():get():SetMiniGameResult(11)")
-				-- selfPlayer:DoAction("FISHING_HOOK_GOOD") -- Not needed, let the client handle it
+				-- selfPlayer:DoAction("FISHING_HOOK_GOOD") Not needed, let the client handle it
 				self.RandomWaitTime = math.random(3300,4500) -- May need some tweaking ?
 				self.GameState = 2
 			end
 			self.LastGameTick = Pyx.System.TickCount
 		elseif self.GameState == 2 and Pyx.System.TickCount - self.LastGameTick > self.RandomWaitTime then -- Letters minigame
 			BDOLua.Execute("getSelfPlayer():get():SetMiniGameResult(2)")
-			-- selfPlayer:DoAction("FISHING_HOOK_ING_SUCCESS") -- Not needed, let the client handle it
+			-- selfPlayer:DoAction("FISHING_HOOK_ING_SUCCESS") Not needed, let the client handle it
 			self.LastGameTick = Pyx.System.TickCount
 			self.GameState = 0
 		end

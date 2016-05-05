@@ -13,12 +13,17 @@ function StartFishingState.new()
 	self.Settings = { MaxEnergyCheat = false }
 	self.LastStartFishTickcount = 0
 	self.EquippedState = 0
+	self.PlayerNearby = nil
+	self.LastActionTime = 0
+	self.State = 0
 	return self
 end
 
 function StartFishingState:Reset()
 	self.LastStartFishTickcount = 0
 	self.EquippedState = 0
+	self.LastActionTime = 0
+	self.State = 0
 end
 
 function StartFishingState:NeedToRun()
@@ -143,20 +148,36 @@ function StartFishingState:Run()
 	Bot.Stats.LastLootTick = Pyx.System.TickCount
 	local selfPlayer = GetSelfPlayer()
 
+	if not self.PlayerNearby() then
+		if selfPlayer.HealthPercent <= Bot.Settings.HealthPercent and Bot.Counter == 0 and Bot.Settings.escapeEnabled == true then
+			Navigator.Stop()
+			BDOLua.Execute("callRescue()")
+			Bot.Counter = 10000
+		end
+	end
+
 	if Bot.Settings.OnBoat and selfPlayer.Inventory.FreeSlots == 0 then
 		if Bot.Running then
 			Bot.Stop()
 		end
 	else
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing...")
-		selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
-		selfPlayer:DoAction("FISHING_START")
-		selfPlayer:DoAction("FISHING_ING_START")
-		if self.MaxEnergyCheat then
-			selfPlayer:DoAction("FISHING_START_END_Lv10")
-		else
-			selfPlayer:DoAction("FISHING_START_END_Lv0")
+		if self.State == 0 then
+			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
+			self.State = 1
+			self.LastActionTime = Pyx.System.TickCount
+		elseif self.State == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then        
+			print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing ...")    
+			selfPlayer:DoAction("FISHING_START")
+			selfPlayer:DoAction("FISHING_ING_START")
+
+			if self.Settings.MaxEnergyCheat == true then
+				selfPlayer:DoAction("FISHING_START_END_Lv10")
+			else
+				selfPlayer:DoAction("FISHING_START_END_Lv0")
+			end
+
+			self.State = 0
+			self.LastStartFishTickcount = Pyx.System.TickCount
 		end
-		self.LastStartFishTickcount = Pyx.System.TickCount
 	end
 end

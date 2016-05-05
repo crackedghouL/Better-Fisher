@@ -15,7 +15,7 @@ ProfileEditor.CurrentProfileSaveName = "Unamed"
 
 function ProfileEditor.DrawProfileEditor()
 	if ProfileEditor.Visible then
-		_, ProfileEditor.Visible = ImGui.Begin("Profile editor", ProfileEditor.Visible, ImVec2(300, 400), -1.0)
+		_, ProfileEditor.Visible = ImGui.Begin("Profile editor", ProfileEditor.Visible, ImVec2(300, 400), -1.0, ImGuiWindowFlags_NoResize)
 
 		_, ProfileEditor.CurrentProfileSaveName = ImGui.InputText("##id_guid_profile_save_name", ProfileEditor.CurrentProfileSaveName)
 		ImGui.SameLine()
@@ -234,7 +234,7 @@ function ProfileEditor.OnRender3D()
 	if Navigation.RenderMesh then
 		local selfPlayer = GetSelfPlayer()
 		if ProfileEditor.CurrentProfile:HasFishSpot() then
-			Renderer.Draw3DTrianglesList(GetInvertedTriangleList(ProfileEditor.CurrentProfile.FishSpotPosition.X, ProfileEditor.CurrentProfile.FishSpotPosition.Y + 100, ProfileEditor.CurrentProfile.FishSpotPosition.Z, 100, 150, 0xAAFF0000, 0xAAFF00FF))
+			Renderer.Draw3DTrianglesList(GetInvertedTriangleList(ProfileEditor.CurrentProfile.FishSpotPosition.X, ProfileEditor.CurrentProfile.FishSpotPosition.Y + 100, ProfileEditor.CurrentProfile.FishSpotPosition.Z, 20, 50, 0xAAFF0000, 0xAAFF00FF))
 		end
 	end
 end
