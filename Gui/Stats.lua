@@ -11,7 +11,7 @@ Stats.Visible = false
 
 function Stats.DrawStats()
 	if Stats.Visible then
-		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 225), -1.0)
+		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 200), -1.0)
 		
 		if h == nil then
 			h = 0
@@ -43,7 +43,7 @@ function Stats.DrawStats()
 			statsGolds = "0 - 0.00%%"
 			statsOranges = "0 - 0.00%%"
 			statsFishes = "0 - 0.00%%"
-			statsTrashs = "0 - 0.00%%"
+			statsTrashes = "0 - 0.00%%"
 			statsKeys = "0 - 0.00%%"
 			statsShards = "0 - 0.00%%"
 		end
@@ -59,9 +59,9 @@ function Stats.DrawStats()
 		ImGui.Separator()
 
 		ImGui.Columns(2)
-		ImGui.Text("Fishs: " .. statsFishes)
+		ImGui.Text("Fishes: " .. statsFishes)
 		ImGui.NextColumn()
-		ImGui.Text("Trashs: " .. statsTrashes)
+		ImGui.Text("Trashes: " .. statsTrashes)
 
 		ImGui.Columns(1)
 		ImGui.Separator()
