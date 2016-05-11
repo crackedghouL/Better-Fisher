@@ -12,7 +12,7 @@ MainWindow.ConfirmPopup = false
 -----------------------------------------------------------------------------
 
 function MainWindow.DrawMainWindow()
-	local _, shouldDisplay = ImGui.Begin("Better Fisher v0.8d BETA", true, ImVec2(320, 105), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
+	local _, shouldDisplay = ImGui.Begin("Better Fisher v0.9 BETA", true, ImVec2(320, 105), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
 
 	if shouldDisplay then
 		local selfPlayer = GetSelfPlayer()
@@ -32,7 +32,7 @@ function MainWindow.DrawMainWindow()
 
 		if ImGui.BeginMenuBar() then
 			if ImGui.BeginMenu("Settings") then
-				if ImGui.MenuItem("Start/Stop", "") then
+				if ImGui.MenuItem("Start/Stop", "ALT+S") then
 					if not Bot.Running then
 						if Bot.Settings.DeleteUsedRods == true then
 							ConfirmWindow.Visible = true
@@ -44,82 +44,81 @@ function MainWindow.DrawMainWindow()
 					end
 				end
 				ImGui.Separator()
-				if ImGui.MenuItem("Open Profile Editor", "", ProfileEditor.Visible) then
+				if ImGui.MenuItem("Open Profile Editor", "ALT+P", ProfileEditor.Visible) then
 					if ProfileEditor.Visible == false then
 						ProfileEditor.Visible = true
 					elseif ProfileEditor.Visible == true then
 						ProfileEditor.Visible = false
 					end
 				end
-				if ImGui.MenuItem("Open Bot Settings", "", BotSettings.Visible) then
+				if ImGui.MenuItem("Open Bot Settings", "ALT+O", BotSettings.Visible) then
 					if BotSettings.Visible == false then
 						BotSettings.Visible = true
 					elseif BotSettings.Visible == true then
 						BotSettings.Visible = false
 					end
 				end
-			    ImGui.EndMenu()
+				ImGui.EndMenu()
 			end
 			if ImGui.BeginMenu("Extra") then
-			    if ImGui.MenuItem("Radar", "", Radar.Visible) then
+				if ImGui.MenuItem("Radar", "ALT+R", Radar.Visible) then
 					if Radar.Visible == false then
 						Radar.Visible = true
 					elseif Radar.Visible == true then
 						Radar.Visible = false
 					end
 				end
-			    if ImGui.MenuItem("Inventory", "", InventoryList.Visible) then
+				if ImGui.MenuItem("Inventory", "ALT+B", InventoryList.Visible) then
 					if InventoryList.Visible == false then
 						InventoryList.Visible = true
 					elseif InventoryList.Visible == true then
 						InventoryList.Visible = false
 					end
 				end
-			    if ImGui.MenuItem("Consumables", "", LibConsumableWindow.Visible) then
+				if ImGui.MenuItem("Consumables", "ALT+C", LibConsumableWindow.Visible) then
 					if LibConsumableWindow.Visible == false then
 						LibConsumableWindow.Visible = true
 					elseif LibConsumableWindow.Visible == true then
 						LibConsumableWindow.Visible = false
 					end
 				end
-			    if ImGui.MenuItem("Loot stats", "",Stats.Visible) then
+				if ImGui.MenuItem("Loot stats", "ALT+L",Stats.Visible) then
 					if Stats.Visible == false then
 						Stats.Visible = true
 					elseif Stats.Visible == true then
 						Stats.Visible = false
 					end
 				end
-			    ImGui.EndMenu()
+				ImGui.EndMenu()
 			end
 			if ImGui.BeginMenu("Force") then
-				if ImGui.MenuItem("Go to Warehouse", "") then
+				if ImGui.MenuItem("Go to Warehouse", "ALT+W") then
 					if Bot.Running then
-						Bot.WarehouseState.Forced = true
 						Bot.WarehouseState.ManualForced = true
 						print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Warehouse")
 					else
 						print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
 					end
 				end
-				if ImGui.MenuItem("Go to Trader", "") then
+				if ImGui.MenuItem("Go to Trader", "ALT+T") then
 					if Bot.Running then
-						Bot.TradeManagerState.Forced = true
+						Bot.TradeManagerState.ManualForced = true
 						print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Trader")
 					else
 						print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
 					end
 				end
-				if ImGui.MenuItem("Go to Vendor", "") then
+				if ImGui.MenuItem("Go to Vendor", "ALT+V") then
 					if Bot.Running then
-						Bot.VendorState.Forced = true
+						Bot.VendorState.ManualForced = true
 						print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Vendor")
 					else
 						print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
 					end
 				end
-				if ImGui.MenuItem("Go Repair", "") then
+				if ImGui.MenuItem("Go Repair", "ALT+G") then
 					if Bot.Running then
-						Bot.RepairState.Forced = true
+						Bot.RepairState.ManualForced = true
 						print("[" .. os.date(Bot.UsedTimezone) .. "] Go Repair")
 					else
 						print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
@@ -170,7 +169,7 @@ function MainWindow.DrawMainWindow()
 		ImGui.Separator()
 
 		ImGui.Columns(2)
-		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", h, m, s))	
+		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", h, m, s))
 		ImGui.NextColumn()
 		ImGui.Text("Loots: " .. string.format("%i", Bot.Stats.Loots))
 

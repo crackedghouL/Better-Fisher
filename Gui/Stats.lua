@@ -5,6 +5,9 @@
 Stats = { }
 Stats.Visible = false
 
+SilverInitial = GetSelfPlayer().Inventory.Money
+SilverGained = 0
+
 ---------------------------------------------
 -- Stats Functions
 ---------------------------------------------
@@ -12,7 +15,7 @@ Stats.Visible = false
 function Stats.DrawStats()
 	if Stats.Visible then
 		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 200), -1.0)
-		
+
 		if h == nil then
 			h = 0
 			m = 0
@@ -49,7 +52,7 @@ function Stats.DrawStats()
 		end
 
 		ImGui.Columns(3)
-		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", h, m, s))	
+		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", h, m, s))
 		ImGui.NextColumn()
 		ImGui.Text("Loots: " .. string.format("%i", Bot.Stats.Loots))
 		ImGui.NextColumn()
@@ -58,8 +61,14 @@ function Stats.DrawStats()
 		ImGui.Columns(1)
 		ImGui.Separator()
 
+		ImGui.Columns(1)
+		ImGui.Text("Silver Gained: " .. Bot.comma_value(Bot.Stats.SilverGained))
+
+		ImGui.Columns(1)
+		ImGui.Separator()
+
 		ImGui.Columns(2)
-		ImGui.Text("Fishes: " .. statsFishes)
+		ImGui.Text("Fishs: " .. statsFishes)
 		ImGui.NextColumn()
 		ImGui.Text("Trashes: " .. statsTrashes)
 
@@ -122,9 +131,9 @@ function Stats.DrawStats()
 		ImGui.Columns(1)
 		ImGui.Spacing()
 
-		if ImGui.Button("Reset Stats##id_guid_reset_stats", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
-			Bot.ResetStats()
-		end
+		-- if ImGui.Button("Reset Stats##id_guid_reset_stats", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+		-- 	Bot.ResetStats()
+		-- end
 
 		ImGui.End()
 	end

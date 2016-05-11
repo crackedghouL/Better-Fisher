@@ -16,7 +16,7 @@ function LootState.new()
 		LootBlue = false,
 		LootGold = false,
 		LootOrange = false,
-		LootShards = false ,
+		LootShards = false,
 		LootKeys = false,
 		LootEggs = false
 	}
@@ -64,7 +64,7 @@ function LootState:Run()
 		for i = 0, numLoots -1, x do -- for i = 0, numLoots -1 do
 			local lootItem = Looting.GetItemByIndex(i)
 			local lootItemName = lootItem.ItemEnchantStaticStatus.Name
-			if string.find(lootItemName,"Moray") then --Fix because some names contains weird characters
+			if string.find(lootItemName,"Moray") then -- Fix because some names contains weird characters
 				lootItemName = "Moray"
 			end
 			local lootItemType = "Trash"
@@ -207,10 +207,10 @@ function LootState:Run()
 				Bot.Stats.LootTimeCount = Bot.Stats.LootTimeCount + 1
 				FishGameTime = Pyx.System.TickCount - Bot.Stats.LastLootTick
 				Bot.Stats.TotalLootTime = Bot.Stats.TotalLootTime + FishGameTime
-				FishGameTime = math.ceil(FishGameTime/1000)
-				Bot.Stats.AverageLootTime = math.ceil((Bot.Stats.TotalLootTime/Bot.Stats.LootTimeCount)/1000)
+				FishGameTime = math.ceil(FishGameTime / 1000)
+				Bot.Stats.AverageLootTime = math.ceil((Bot.Stats.TotalLootTime / Bot.Stats.LootTimeCount) / 1000)
 			end
-			
+
 			if self.LootingState == 4 then -- 4 = loot the item
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ")")
 				Looting.Take(i)

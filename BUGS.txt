@@ -1,1 +1,1 @@
-FindPath called without navigation mesh ! (1) error
+Reset button, on Stats window not work, report a strange time

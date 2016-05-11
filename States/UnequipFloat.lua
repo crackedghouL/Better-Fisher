@@ -22,6 +22,7 @@ end
 
 function UnequipFloatState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
+	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_LEFT_HAND)
 	self.EquippedState = 0 -- 0 = nothing
 
 	if not selfPlayer then
@@ -36,7 +37,6 @@ function UnequipFloatState:NeedToRun()
 		return false
 	end
 
-	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_LEFT_HAND)
 	if not equippedItem then
 		return false
 	else
