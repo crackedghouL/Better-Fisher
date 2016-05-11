@@ -201,6 +201,7 @@ function TradeManagerState:Run()
 				if energy >= 5 then
 					BDOLua.Execute("click_TradeGameStart()")
 					BDOLua.Execute("messageBox_YesButtonUp()")
+					self.BargainCount = 0
 					if math.random(2) == 2 then
 						self.BargainDice = 0
 					else
@@ -229,7 +230,6 @@ function TradeManagerState:Run()
 					self.CurrentSellList = self:GetItems()
 				elseif self.BargainCount >= 3 then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Bargain fail")
-					self.BargainCount = 0
 					BDOLua.Execute("Fglobal_TradeGame_Close()")
 					self.SleepTimer = PyxTimer:New(2)
 					self.SleepTimer:Start()
