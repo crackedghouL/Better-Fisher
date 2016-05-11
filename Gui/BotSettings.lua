@@ -104,8 +104,7 @@ function BotSettings.DrawBotSettings()
 			if ImGui.CollapsingHeader("NPCs options", "id_gui_npc_option", true, false) then
 				BotSettings.UpdateInventoryList()
 
-				if ImGui.TreeNode("Vendor") then
-				-- if ImGui.CollapsingHeader("Vendor", "id_gui_vendor", true, false) then
+				if ImGui.CollapsingHeader("Vendor", "id_gui_vendor", true, false) then
 					ImGui.Separator()
 					ImGui.TextWrapped("Buying")
 					ImGui.Separator()
@@ -228,11 +227,9 @@ function BotSettings.DrawBotSettings()
 							BotSettings.InventorySelectedIndex = 0
 						end
 					end
-					ImGui.TreePop();
 				end
 
-				if ImGui.TreeNode("Warehouse") then
-				-- if ImGui.CollapsingHeader("Warehouse", "id_gui_warehouse", true, false) then
+				if ImGui.CollapsingHeader("Warehouse", "id_gui_warehouse", true, false) then
 					if ImGui.RadioButton("Deposit after Vendor##id_guid_warehouse_after_vendor", Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR) then
 						Bot.Settings.WarehouseSettings.DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR
 					end
@@ -278,26 +275,21 @@ function BotSettings.DrawBotSettings()
 							BotSettings.WarehouseSelectedIndex = 0
 						end
 					end
-					ImGui.TreePop();
 				end
 
-				if ImGui.TreeNode("Repair") then
-				-- if ImGui.CollapsingHeader("Repair", "id_gui_repair", true, false) then
+				if ImGui.CollapsingHeader("Repair", "id_gui_repair", true, false) then
 					if ImGui.RadioButton("Repair after Warehouse##id_guid_repair_after_warehouse", Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE) then
 						Bot.Settings.RepairSettings.RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE
 					end
 					if ImGui.RadioButton("Repair after Trader##id_guid_repair_after_trader", Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER) then
 						Bot.Settings.RepairSettings.RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER
 					end
-					ImGui.TreePop();
 				end
 
-				if ImGui.TreeNode("Trade Manager") then
-				-- if ImGui.CollapsingHeader("Trade Manager", "id_gui_trademanager", true, false) then
+				if ImGui.CollapsingHeader("Trade Manager", "id_gui_trademanager", true, false) then
 					_, Bot.Settings.TradeManagerSettings.TradeManagerOnInventoryFull = ImGui.Checkbox("##id_guid_trademanager_full_inventory", Bot.Settings.TradeManagerSettings.TradeManagerOnInventoryFull)
 					ImGui.SameLine()
 					ImGui.Text("Sell at Trader when inventory is full")
-					ImGui.TreePop();
 				end
 			end
 		end
@@ -349,8 +341,7 @@ function BotSettings.DrawBotSettings()
 		end
 
 		if ImGui.CollapsingHeader("Advanced options", "id_gui_adv_option", true, false) then
-			if ImGui.TreeNode("Be very careful with options below") then
-			-- if ImGui.CollapsingHeader("Be very careful with options below", "id_gui_adv_option_fish_aloneboat", true, false) then
+			if ImGui.CollapsingHeader("Be very careful with options below", "id_gui_adv_option_fish_aloneboat", true, false) then
 				if Bot.Settings.FishingMethod == Settings.SETTINGS_ON_NORMAL_FISHING then
 					_, Bot.Settings.PlayerRun = ImGui.Checkbox("##id_guid_adv_option_fish_alone_boat_sprint", Bot.Settings.PlayerRun)
 					ImGui.SameLine()
@@ -364,15 +355,13 @@ function BotSettings.DrawBotSettings()
 				ImGui.Text("Stop fishing when the inventory is full")
 				_, Bot.Settings.HookFishHandleGameSettings.NoDelay = ImGui.Checkbox("##id_guid_adv_option_fish_alone_boat_nodelay", Bot.Settings.HookFishHandleGameSettings.NoDelay)
 				ImGui.SameLine()
-				ImGui.TextColored(ImVec4(1.0,0.0,0.0,1.0), "Disable delay when fish bite")
+				ImGui.Text("Disable delay when fish bite")
 				_, Bot.Settings.StartFishingSettings.MaxEnergyCheat = ImGui.Checkbox("##id_guid_adv_option_fish_alone_hook_fast_game", Bot.Settings.StartFishingSettings.MaxEnergyCheat)
 				ImGui.SameLine()
-				ImGui.TextColored(ImVec4(1.0,0.0,0.0,1.0), "Max Energy Cast (uses no energy)")
-				ImGui.TreePop();
+				ImGui.Text("Max Energy Cast (uses no energy)")
 			end
 
-			if ImGui.TreeNode("Debug") then
-			-- if ImGui.CollapsingHeader("Debug", "id_adv_option_debug", true, false) then
+			if ImGui.CollapsingHeader("Debug", "id_adv_option_debug", true, false) then
 				_, Bot.Settings.PrintConsoleState = ImGui.Checkbox("##id_guid_adv_option_printconsolestate", Bot.Settings.PrintConsoleState)
 				ImGui.SameLine()
 				ImGui.Text("Print bot state on console")
@@ -395,9 +384,9 @@ function BotSettings.DrawBotSettings()
 						ImGui.Text("Enable Inventory Debug")
 					end
 				end
-				ImGui.TreePop();
 			end
 		end
+
 		ImGui.End()
 	end
 end

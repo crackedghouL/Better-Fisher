@@ -15,7 +15,7 @@ ProfileEditor.CurrentProfileSaveName = "Unamed"
 
 function ProfileEditor.DrawProfileEditor()
 	if ProfileEditor.Visible then
-		_, ProfileEditor.Visible = ImGui.Begin("Profile editor", ProfileEditor.Visible, ImVec2(300, 400), -1.0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)
+		_, ProfileEditor.Visible = ImGui.Begin("Profile editor", ProfileEditor.Visible, ImVec2(300, 400), -1.0, ImGuiWindowFlags_NoResize)
 
 		_, ProfileEditor.CurrentProfileSaveName = ImGui.InputText("##id_guid_profile_save_name", ProfileEditor.CurrentProfileSaveName)
 		ImGui.SameLine()
