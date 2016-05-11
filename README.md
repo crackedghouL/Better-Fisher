@@ -6,10 +6,10 @@
 - [x] Auto sell to vendor and/or trade manager
 - [x] Auto buy from vendor
 - [x] Auto deposit money and/or items at warehouse
-- [x] Repair your rods and floats at the repair NCP of your choice. 
-- [x] Anti Pvp options
+- [x] Repair your rods and floats at the repair NCP of your choice
+- [x] Anti PvP options
 - [x] Selective Fishing
-- [x] PlayerRadar 
+- [x] PlayerRadar
 - [x] Free inventory slot on main window
 - [x] Inventory list on separate window
 - [x] Print console what is looting or not, with quality and quantity
@@ -21,7 +21,7 @@
 - [x] Statistics
 - [x] Sprinting
 - [x] Supports all rods and floats
-- [x] Force repair, storage,vendor,warehouse 
+- [x] Force repair, trader, vendor and warehouse
 
 ######How To Install
 ![Image of install](http://i.imgur.com/H1hEW0H.png)off GitHub [link to GitHub](https://github.com/Pookiemon/Better-Fisher/archive/master.zip)

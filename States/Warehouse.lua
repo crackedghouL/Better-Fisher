@@ -13,9 +13,10 @@ setmetatable(WarehouseState, {
 })
 
 function WarehouseState.new()
-	local self = setmetatable( { }, WarehouseState)
+	local self = setmetatable({}, WarehouseState)
 
 	self.Settings = {
+		Enabled = true,
 		NpcName = "",
 		NpcPosition = { X = 0, Y = 0, Z = 0 },
 		DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR,
@@ -25,18 +26,19 @@ function WarehouseState.new()
 		SecondsBetweenTries = 300
 	}
 
-	self.State = 0 -- 0 = Nothing, 1 = Moving, 2 = Arrived
-	self.DepositList = nil
-
-	self.LastUseTimer = nil
-	self.SleepTimer = nil
-	self.CurrentDepositList = { }
-	self.DepositedMoney = false
+	self.State = 0
 	self.Forced = false
 	self.ManualForced = false
 
-	-- Overideable functions
+	self.LastUseTimer = nil
+	self.SleepTimer = nil
+
+	self.DepositList = nil
+	self.CurrentDepositList = { }
+	self.DepositedMoney = false
+
 	self.ItemCheckFunction = nil
+
 	self.CallWhenCompleted = nil
 	self.CallWhileMoving = nil
 
@@ -59,20 +61,26 @@ function WarehouseState:NeedToRun()
 		return false
 	end
 
-	if not self:HasNpc() or Bot.Settings.OnBoat == true then
+	if Bot.Settings.EnableWarehouse == false then
 		self.Forced = false
 		return false
 	end
 
-	if self.Forced and not Navigator.CanMoveTo(self:GetPosition()) then
+	if not self:HasNpc() and Bot.Settings.OnBoat == true then
+		self.Forced = false
+		return false
+	end
+
+	if self.Forced == true and not Navigator.CanMoveTo(self:GetPosition()) then
 		self.Forced = false
 		return false
 	elseif self.Forced == true then
 		return true
 	end
 
-	if self.ManualForced and not Navigator.CanMoveTo(self:GetPosition()) then
+	if self.ManualForced == true and not Navigator.CanMoveTo(self:GetPosition()) then
 		self.ManualForced = false
+		self.Forced = false
 		return false
 	elseif self.ManualForced == true then
 		return true
@@ -107,11 +115,11 @@ end
 
 function WarehouseState:Reset()
 	self.State = 0
-	self.LastUseTimer = nil
-	self.SleepTimer = nil
 	self.Forced = false
 	self.ManualForced = false
 	self.DepositedMoney = false
+	self.LastUseTimer = nil
+	self.SleepTimer = nil
 end
 
 function WarehouseState:Exit()
@@ -144,7 +152,7 @@ function WarehouseState:Run()
 			self.CallWhileMoving(self)
 		end
 
-		Navigator.MoveTo(vendorPosition,nil,Bot.Settings.PlayerRun)
+		Navigator.MoveTo(vendorPosition, nil, Bot.Settings.PlayerRun)
 		if self.State > 1 then
 			self:Exit()
 			return
@@ -221,6 +229,7 @@ function WarehouseState:Run()
 				end
 			end
 
+			Bot.Stats.SilverGained = Bot.Stats.SilverGained + 1
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
 			self:Exit()

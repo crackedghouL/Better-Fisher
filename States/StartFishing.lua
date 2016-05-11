@@ -2,6 +2,9 @@ StartFishingState = { }
 StartFishingState.__index = StartFishingState
 StartFishingState.Name = "Start fishing"
 
+StartFishingState.SETTINGS_ON_NORMAL_FISHING = 0
+StartFishingState.SETTINGS_ON_BOAT_FISHING = 1
+
 setmetatable(StartFishingState, {
   __call = function (cls, ...)
 	return cls.new(...)
@@ -10,16 +13,20 @@ setmetatable(StartFishingState, {
 
 function StartFishingState.new()
 	local self = setmetatable({}, StartFishingState)
-	self.Settings = { MaxEnergyCheat = false }
+	self.Settings = {
+		MaxEnergyCheat = false,
+		FishingMethod = StartFishingState.SETTINGS_ON_NORMAL_FISHING
+	}
+	self.PlayerNearby = nil
 	self.LastStartFishTickcount = 0
 	self.EquippedState = 0
-	self.PlayerNearby = nil
 	self.LastActionTime = 0
 	self.State = 0
 	return self
 end
 
 function StartFishingState:Reset()
+	self.PlayerNearby = nil
 	self.LastStartFishTickcount = 0
 	self.EquippedState = 0
 	self.LastActionTime = 0
@@ -28,7 +35,7 @@ end
 
 function StartFishingState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
-	self.EquippedState = 0
+	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
 	if not selfPlayer then
 		return false
@@ -37,8 +44,6 @@ function StartFishingState:NeedToRun()
 	if not selfPlayer.IsAlive then
 		return false
 	end
-
-	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
 	if not equippedItem then
 		return false
@@ -146,6 +151,7 @@ end
 
 function StartFishingState:Run()
 	Bot.Stats.LastLootTick = Pyx.System.TickCount
+	Bot.SilverStats()
 	local selfPlayer = GetSelfPlayer()
 
 	if not self.PlayerNearby() then
@@ -165,8 +171,8 @@ function StartFishingState:Run()
 			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
 			self.State = 1
 			self.LastActionTime = Pyx.System.TickCount
-		elseif self.State == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then        
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing ...")    
+		elseif self.State == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then
+			print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing ...")
 			selfPlayer:DoAction("FISHING_START")
 			selfPlayer:DoAction("FISHING_ING_START")
 

@@ -23,30 +23,30 @@ BotSettings.BaitComboBoxSelected = 0
 function BotSettings.DrawBotSettings()
 	local valueChanged = false
 
-	if BotSettings.Visible then
+	if BotSettings.Visible == true then
 		_, BotSettings.Visible = ImGui.Begin("Bot Settings", BotSettings.Visible, ImVec2(350, 400), -1.0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)
 
 		if ImGui.Button("Save settings", ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
 			Bot.SaveSettings()
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Settings saved")
-			BotSettings.Visible = false
 		end
 		ImGui.SameLine()
 		if ImGui.Button("Load settings", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 			Bot.LoadSettings()
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Settings loaded")
-			BotSettings.Visible = false
 		end
 
 		ImGui.Spacing()
 
-		if ImGui.RadioButton("Normal settings", Bot.Settings.FishingMethod == Settings.SETTINGS_ON_NORMAL_FISHING) then
-			Bot.Settings.FishingMethod = Settings.SETTINGS_ON_NORMAL_FISHING
+		ImGui.Columns(2)
+		if ImGui.RadioButton("Normal settings", Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_NORMAL_FISHING) then
+			Bot.Settings.StartFishingSettings.FishingMethod = StartFishingState.SETTINGS_ON_NORMAL_FISHING
 		end
-		ImGui.SameLine()
-		if ImGui.RadioButton("Boat settings", Bot.Settings.FishingMethod == Settings.SETTINGS_ON_BOAT_FISHING) then
-			Bot.Settings.FishingMethod = Settings.SETTINGS_ON_BOAT_FISHING
+		ImGui.NextColumn()
+		if ImGui.RadioButton("Boat settings", Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_BOAT_FISHING) then
+			Bot.Settings.StartFishingSettings.FishingMethod = StartFishingState.SETTINGS_ON_BOAT_FISHING
 		end
+		ImGui.Columns(1)
 
 		ImGui.Spacing()
 
@@ -100,10 +100,11 @@ function BotSettings.DrawBotSettings()
 			-- ImGui.Text("Loot Eggs")
 		end
 
-		if Bot.Settings.FishingMethod == Settings.SETTINGS_ON_NORMAL_FISHING then
+		if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_NORMAL_FISHING then
 			if ImGui.CollapsingHeader("NPCs options", "id_gui_npc_option", true, false) then
 				BotSettings.UpdateInventoryList()
 
+<<<<<<< HEAD
 				if ImGui.CollapsingHeader("Vendor", "id_gui_vendor", true, false) then
 					ImGui.Separator()
 					ImGui.TextWrapped("Buying")
@@ -120,115 +121,87 @@ function BotSettings.DrawBotSettings()
 								found = true
 							end
 						end
+=======
+				ImGui.Columns(2)
+				_, Bot.Settings.TradeManagerSettings.Enabled = ImGui.Checkbox("##id_gui_npc_option_enable_trader", Bot.Settings.TradeManagerSettings.Enabled)
+				ImGui.SameLine()
+				ImGui.Text("Enable Trader")
+				_, Bot.Settings.WarehouseSettings.Enabled = ImGui.Checkbox("##id_gui_npc_option_enable_warehouse", Bot.Settings.WarehouseSettings.Enabled)
+				ImGui.SameLine()
+				ImGui.Text("Enable Warehouse")
+				ImGui.NextColumn()
+				_, Bot.Settings.VendorSettings.Enabled = ImGui.Checkbox("##id_gui_npc_option_enable_vendor", Bot.Settings.VendorSettings.Enabled)
+				ImGui.SameLine()
+				ImGui.Text("Enable Vendor")
+				_, Bot.Settings.RepairSettings.Enabled = ImGui.Checkbox("##id_gui_npc_option_enable_repair", Bot.Settings.RepairSettings.Enabled)
+				ImGui.SameLine()
+				ImGui.Text("Enable Repair")
+				ImGui.Columns(1)
+>>>>>>> 1f24f4460571b5fcb0d2051791445e0cf013ae37
 
-						if found == false then
-							table.insert(Bot.VendorState.Settings.BuyItems, { Name = inventoryName, BuyAt = 0, BuyMax = 1 })
-						end
+				ImGui.Separator()
 
-						BotSettings.InventoryComboSelectedIndex = 0
-					end
-
-					ImGui.Columns(3)
-					ImGui.Text("Name")
-					ImGui.NextColumn()
-					ImGui.Text("Buy at")
-					ImGui.NextColumn()
-					ImGui.Text("Total")
-					ImGui.NextColumn()
-
-					local count = table.length(Bot.VendorState.Settings.BuyItems)
-					for key = 1,count do
-						local value = Bot.VendorState.Settings.BuyItems[key]
-						local erase = false
-
-						if ImGui.SmallButton("x##id_guid_vendor_buy_del_items" .. key) then
-							erase = true
-						end
-
+				if Bot.Settings.TradeManagerSettings.Enabled == true then
+					if ImGui.TreeNode("Trade Manager") then
+						_, Bot.Settings.TradeManagerSettings.TradeManagerOnInventoryFull = ImGui.Checkbox("##id_guid_trademanager_full_inventory", Bot.Settings.TradeManagerSettings.TradeManagerOnInventoryFull)
 						ImGui.SameLine()
-
-						if value ~= nil then
-							ImGui.Text(value.Name)
-							ImGui.NextColumn()
-
-							valueChanged, Bot.VendorState.Settings.BuyItems[key].BuyAt = ImGui.InputFloat("Min##id_guid_vendor_buy_min_items" .. key, Bot.VendorState.Settings.BuyItems[key].BuyAt, 1,10,0,0)
-							if valueChanged then
-								if Bot.VendorState.Settings.BuyItems[key].BuyAt < 0 then
-									Bot.VendorState.Settings.BuyItems[key].BuyAt = 0
-								end
-
-								if Bot.VendorState.Settings.BuyItems[key].BuyAt > 5 then
-									Bot.VendorState.Settings.BuyItems[key].BuyAt = 5
-								end
-							end
-							ImGui.NextColumn()
-
-							valueChanged, Bot.VendorState.Settings.BuyItems[key].BuyMax = ImGui.InputFloat("Max##id_guid_vendor_buy_max_items" .. key, Bot.VendorState.Settings.BuyItems[key].BuyMax, 1,10,0,0)
-							if valueChanged then
-								if Bot.VendorState.Settings.BuyItems[key].BuyMax < 1 then
-									Bot.VendorState.Settings.BuyItems[key].BuyMax = 1
-								end
-
-								if Bot.VendorState.Settings.BuyItems[key].BuyMax > 20 then
-									Bot.VendorState.Settings.BuyItems[key].BuyMax = 20
-								end
-							end
-							ImGui.NextColumn()
-
-							if erase then
-								table.remove(Bot.VendorState.Settings.BuyItems,key)
-								count = count -1
-							end
-						end
-					end
-					ImGui.Columns(1)
-
-					ImGui.Spacing()
-					ImGui.Separator()
-					ImGui.TextWrapped("Selling")
-					ImGui.Separator()
-					_, Bot.Settings.VendorSettings.VendorOnInventoryFull = ImGui.Checkbox("##id_guid_vendor_sell_full_inventory", Bot.Settings.VendorSettings.VendorOnInventoryFull)
-					ImGui.SameLine()
-					ImGui.Text("Go to Vendor when inventory is full")
-
-					_, Bot.Settings.VendorSettings.VendorOnWeight = ImGui.Checkbox("##id_guid_vendor_sell_weight", Bot.Settings.VendorSettings.VendorOnWeight)
-					ImGui.SameLine()
-					ImGui.Text("Sell to Vendor when you are too heavy")
-
-					_, Bot.Settings.VendorSettings.VendorWhite = ImGui.Checkbox("##id_guid_vendor_sell_white", Bot.Settings.VendorSettings.VendorWhite)
-					ImGui.SameLine()
-					ImGui.TextColored(ImVec4(1,1,1,1), "Sell white")
-					ImGui.SameLine()
-					_, Bot.Settings.VendorSettings.VendorGreen = ImGui.Checkbox("##id_guid_vendor_sell_green", Bot.Settings.VendorSettings.VendorGreen)
-					ImGui.SameLine()
-					ImGui.TextColored(ImVec4(0.20,1,0.20,1), "Sell green")
-					ImGui.SameLine()
-					_, Bot.Settings.VendorSettings.VendorBlue = ImGui.Checkbox("##id_guid_vendor_sell_blue", Bot.Settings.VendorSettings.VendorBlue)
-					ImGui.SameLine()
-					ImGui.TextColored(ImVec4(0.40,0.60,1,1), "Sell blue")
-
-					ImGui.Spacing()
-
-					ImGui.Text("Items ignored")
-					valueChanged, BotSettings.InventoryComboSelectedIndex = ImGui.Combo("##id_guid_vendor_ignore_items", BotSettings.InventoryComboSelectedIndex, BotSettings.InventoryName)
-					if valueChanged then
-						local inventoryName = BotSettings.InventoryName[BotSettings.InventoryComboSelectedIndex]
-						if not table.find(Bot.Settings.VendorSettings.IgnoreItemsNamed, inventoryName) then
-							table.insert(Bot.Settings.VendorSettings.IgnoreItemsNamed, inventoryName)
-						end
-
-						BotSettings.InventoryComboSelectedIndex = 0
-					end
-
-					_, BotSettings.InventorySelectedIndex = ImGui.ListBox("##id_guid_vendor_neversell", BotSettings.InventorySelectedIndex, Bot.Settings.VendorSettings.IgnoreItemsNamed, 5)
-					if ImGui.Button("Remove Item##id_guid_vendor_neversell_remove", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
-						if BotSettings.InventorySelectedIndex > 0 and BotSettings.InventorySelectedIndex <= table.length(Bot.Settings.VendorSettings.IgnoreItemsNamed) then
-							table.remove(Bot.Settings.VendorSettings.IgnoreItemsNamed, BotSettings.InventorySelectedIndex)
-							BotSettings.InventorySelectedIndex = 0
-						end
+						ImGui.Text("Sell at Trader when inventory is full")
+						ImGui.TreePop()
 					end
 				end
 
+				if Bot.Settings.WarehouseSettings.Enabled == true then
+					if ImGui.TreeNode("Warehouse") then
+						if ImGui.RadioButton("Deposit after Vendor##id_guid_warehouse_after_vendor", Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR) then
+							Bot.Settings.WarehouseSettings.DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR
+						end
+						if ImGui.RadioButton("Deposit after Trader##id_guid_warehouse_after_trader", Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER) then
+							Bot.Settings.WarehouseSettings.DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER
+						end
+						if ImGui.RadioButton("Deposit after Repair##id_guid_warehouse_repair_after_trader", Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR) then
+							Bot.Settings.WarehouseSettings.DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR
+						end
+
+						_, Bot.Settings.WarehouseSettings.DepositMoney = ImGui.Checkbox("##id_guid_warehouse_deposit_money", Bot.Settings.WarehouseSettings.DepositMoney)
+						ImGui.SameLine()
+						ImGui.Text("Deposit money")
+
+						ImGui.Spacing()
+
+						ImGui.Text("Money to keep")
+						ImGui.SameLine()
+						_, Bot.Settings.WarehouseSettings.MoneyToKeep = ImGui.SliderInt("##id_gui_warehouse_keep_money", Bot.Settings.WarehouseSettings.MoneyToKeep, 0, 1000000)
+
+						_, Bot.Settings.WarehouseSettings.DepositItems = ImGui.Checkbox("##id_guid_warehouse_deposit_items", Bot.Settings.WarehouseSettings.DepositItems)
+						ImGui.SameLine()
+						ImGui.Text("Deposit items")
+
+						ImGui.Spacing()
+
+						ImGui.Text("Never deposit these items")
+						valueChanged, BotSettings.WarehouseComboSelectedIndex = ImGui.Combo("##id_guid_warehouse_inventory_combo_select", BotSettings.WarehouseComboSelectedIndex, BotSettings.InventoryName)
+						if valueChanged then
+							local inventoryName = BotSettings.InventoryName[BotSettings.WarehouseComboSelectedIndex]
+
+							if not table.find(Bot.Settings.WarehouseSettings.IgnoreItemsNamed, inventoryName) then
+								table.insert(Bot.Settings.WarehouseSettings.IgnoreItemsNamed, inventoryName)
+							end
+
+							BotSettings.WarehouseComboSelectedIndex = 0
+						end
+
+						_, BotSettings.WarehouseSelectedIndex = ImGui.ListBox("##id_guid_warehouse_neverdeposit", BotSettings.WarehouseSelectedIndex, Bot.Settings.WarehouseSettings.IgnoreItemsNamed, 5)
+						if ImGui.Button("Remove Item##id_guid_warehouse_neverdeposit_remove", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+							if BotSettings.WarehouseSelectedIndex > 0 and BotSettings.WarehouseSelectedIndex <= table.length(Bot.Settings.WarehouseSettings.IgnoreItemsNamed) then
+								table.remove(Bot.Settings.WarehouseSettings.IgnoreItemsNamed, BotSettings.WarehouseSelectedIndex)
+								BotSettings.WarehouseSelectedIndex = 0
+							end
+						end
+						ImGui.TreePop()
+					end
+				end
+
+<<<<<<< HEAD
 				if ImGui.CollapsingHeader("Warehouse", "id_gui_warehouse", true, false) then
 					if ImGui.RadioButton("Deposit after Vendor##id_guid_warehouse_after_vendor", Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR) then
 						Bot.Settings.WarehouseSettings.DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR
@@ -239,44 +212,141 @@ function BotSettings.DrawBotSettings()
 					if ImGui.RadioButton("Deposit after Repair##id_guid_warehouse_repair_after_trader", Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR) then
 						Bot.Settings.WarehouseSettings.DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR
 					end
+=======
+				if Bot.Settings.VendorSettings.Enabled == true then
+					if ImGui.TreeNode("Vendor") then
+						ImGui.Separator()
+						_, Bot.Settings.VendorSettings.BuyEnabled = ImGui.Checkbox("Enable Buying", Bot.Settings.VendorSettings.BuyEnabled)
+						ImGui.Separator()
+						if Bot.Settings.VendorSettings.BuyEnabled == true then
+							ImGui.Text("Select item")
+							ImGui.SameLine()
+							valueChanged, BotSettings.InventoryComboSelectedIndex = ImGui.Combo("##id_guid_vendor_buy_combo_select", BotSettings.InventoryComboSelectedIndex, BotSettings.InventoryName)
+							if valueChanged then
+								local inventoryName = BotSettings.InventoryName[BotSettings.InventoryComboSelectedIndex]
+								local found = false
+>>>>>>> 1f24f4460571b5fcb0d2051791445e0cf013ae37
 
-					_, Bot.Settings.WarehouseSettings.DepositMoney = ImGui.Checkbox("##id_guid_warehouse_deposit_money", Bot.Settings.WarehouseSettings.DepositMoney)
-					ImGui.SameLine()
-					ImGui.Text("Deposit money")
+								for key, value in pairs(Bot.VendorState.Settings.BuyItems) do
+									if value.Name == inventoryName then
+										found = true
+									end
+								end
 
-					ImGui.Spacing()
+								if found == false then
+									table.insert(Bot.VendorState.Settings.BuyItems, { Name = inventoryName, BuyAt = 0, BuyMax = 1 })
+								end
 
-					ImGui.Text("Money to keep")
-					ImGui.SameLine()
-					_, Bot.Settings.WarehouseSettings.MoneyToKeep = ImGui.SliderInt("##id_gui_warehouse_keep_money", Bot.Settings.WarehouseSettings.MoneyToKeep, 0, 1000000)
+								BotSettings.InventoryComboSelectedIndex = 0
+							end
 
-					_, Bot.Settings.WarehouseSettings.DepositItems = ImGui.Checkbox("##id_guid_warehouse_deposit_items", Bot.Settings.WarehouseSettings.DepositItems)
-					ImGui.SameLine()
-					ImGui.Text("Deposit items")
+							ImGui.Columns(3)
+							ImGui.Text("Name")
+							ImGui.NextColumn()
+							ImGui.Text("Buy at")
+							ImGui.NextColumn()
+							ImGui.Text("Total")
+							ImGui.NextColumn()
+							local count = table.length(Bot.VendorState.Settings.BuyItems)
+							for key = 1, count do
+								local value = Bot.VendorState.Settings.BuyItems[key]
+								local erase = false
 
-					ImGui.Spacing()
+								if ImGui.SmallButton("x##id_guid_vendor_buy_del_items" .. key) then
+									erase = true
+								end
 
-					ImGui.Text("Never deposit these items")
-					valueChanged, BotSettings.WarehouseComboSelectedIndex = ImGui.Combo("##id_guid_warehouse_inventory_combo_select", BotSettings.WarehouseComboSelectedIndex, BotSettings.InventoryName)
-					if valueChanged then
-						local inventoryName = BotSettings.InventoryName[BotSettings.WarehouseComboSelectedIndex]
+								ImGui.SameLine()
 
-						if not table.find(Bot.Settings.WarehouseSettings.IgnoreItemsNamed, inventoryName) then
-							table.insert(Bot.Settings.WarehouseSettings.IgnoreItemsNamed, inventoryName)
+								if value ~= nil then
+									ImGui.Text(value.Name)
+									ImGui.NextColumn()
+
+									valueChanged, Bot.VendorState.Settings.BuyItems[key].BuyAt = ImGui.InputFloat("Min##id_guid_vendor_buy_min_items" .. key, Bot.VendorState.Settings.BuyItems[key].BuyAt, 1,10,0,0)
+									if valueChanged then
+										if Bot.VendorState.Settings.BuyItems[key].BuyAt < 0 then
+											Bot.VendorState.Settings.BuyItems[key].BuyAt = 0
+										end
+
+										if Bot.VendorState.Settings.BuyItems[key].BuyAt > 5 then
+											Bot.VendorState.Settings.BuyItems[key].BuyAt = 5
+										end
+									end
+									ImGui.NextColumn()
+
+									valueChanged, Bot.VendorState.Settings.BuyItems[key].BuyMax = ImGui.InputFloat("Max##id_guid_vendor_buy_max_items" .. key, Bot.VendorState.Settings.BuyItems[key].BuyMax, 1,10,0,0)
+									if valueChanged then
+										if Bot.VendorState.Settings.BuyItems[key].BuyMax < 1 then
+											Bot.VendorState.Settings.BuyItems[key].BuyMax = 1
+										end
+
+										if Bot.VendorState.Settings.BuyItems[key].BuyMax > 20 then
+											Bot.VendorState.Settings.BuyItems[key].BuyMax = 20
+										end
+									end
+									ImGui.NextColumn()
+
+									if erase then
+										table.remove(Bot.VendorState.Settings.BuyItems,key)
+										count = count -1
+									end
+								end
+							end
+							ImGui.Columns(1)
+
+							ImGui.Spacing()
 						end
 
-						BotSettings.WarehouseComboSelectedIndex = 0
-					end
+						ImGui.Separator()
+						_, Bot.Settings.VendorSettings.SellEnabled = ImGui.Checkbox("Enable Selling", Bot.Settings.VendorSettings.SellEnabled)
+						ImGui.Separator()
+						if Bot.Settings.VendorSettings.SellEnabled == true then
+							_, Bot.Settings.VendorSettings.VendorOnInventoryFull = ImGui.Checkbox("##id_guid_vendor_sell_full_inventory", Bot.Settings.VendorSettings.VendorOnInventoryFull)
+							ImGui.SameLine()
+							ImGui.Text("Go to Vendor when inventory is full")
 
-					_, BotSettings.WarehouseSelectedIndex = ImGui.ListBox("##id_guid_warehouse_neverdeposit", BotSettings.WarehouseSelectedIndex, Bot.Settings.WarehouseSettings.IgnoreItemsNamed, 5)
-					if ImGui.Button("Remove Item##id_guid_warehouse_neverdeposit_remove", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
-						if BotSettings.WarehouseSelectedIndex > 0 and BotSettings.WarehouseSelectedIndex <= table.length(Bot.Settings.WarehouseSettings.IgnoreItemsNamed) then
-							table.remove(Bot.Settings.WarehouseSettings.IgnoreItemsNamed, BotSettings.WarehouseSelectedIndex)
-							BotSettings.WarehouseSelectedIndex = 0
+							_, Bot.Settings.VendorSettings.VendorOnWeight = ImGui.Checkbox("##id_guid_vendor_sell_weight", Bot.Settings.VendorSettings.VendorOnWeight)
+							ImGui.SameLine()
+							ImGui.Text("Sell to Vendor when you are too heavy")
+
+							_, Bot.Settings.VendorSettings.VendorWhite = ImGui.Checkbox("##id_guid_vendor_sell_white", Bot.Settings.VendorSettings.VendorWhite)
+							ImGui.SameLine()
+							ImGui.TextColored(ImVec4(1,1,1,1), "Sell white")
+							ImGui.SameLine()
+							_, Bot.Settings.VendorSettings.VendorGreen = ImGui.Checkbox("##id_guid_vendor_sell_green", Bot.Settings.VendorSettings.VendorGreen)
+							ImGui.SameLine()
+							ImGui.TextColored(ImVec4(0.20,1,0.20,1), "Sell green")
+							ImGui.SameLine()
+							_, Bot.Settings.VendorSettings.VendorBlue = ImGui.Checkbox("##id_guid_vendor_sell_blue", Bot.Settings.VendorSettings.VendorBlue)
+							ImGui.SameLine()
+							ImGui.TextColored(ImVec4(0.40,0.60,1,1), "Sell blue")
+
+							ImGui.Spacing()
+
+							ImGui.Text("Items ignored")
+							valueChanged, BotSettings.InventoryComboSelectedIndex = ImGui.Combo("##id_guid_vendor_ignore_items", BotSettings.InventoryComboSelectedIndex, BotSettings.InventoryName)
+							if valueChanged then
+								local inventoryName = BotSettings.InventoryName[BotSettings.InventoryComboSelectedIndex]
+								if not table.find(Bot.Settings.VendorSettings.IgnoreItemsNamed, inventoryName) then
+									table.insert(Bot.Settings.VendorSettings.IgnoreItemsNamed, inventoryName)
+								end
+
+								BotSettings.InventoryComboSelectedIndex = 0
+							end
+
+							_, BotSettings.InventorySelectedIndex = ImGui.ListBox("##id_guid_vendor_neversell", BotSettings.InventorySelectedIndex, Bot.Settings.VendorSettings.IgnoreItemsNamed, 5)
+							if ImGui.Button("Remove Item##id_guid_vendor_neversell_remove", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+								if BotSettings.InventorySelectedIndex > 0 and BotSettings.InventorySelectedIndex <= table.length(Bot.Settings.VendorSettings.IgnoreItemsNamed) then
+									table.remove(Bot.Settings.VendorSettings.IgnoreItemsNamed, BotSettings.InventorySelectedIndex)
+									BotSettings.InventorySelectedIndex = 0
+								end
+							end
 						end
+						ImGui.TreePop()
 					end
 				end
 
+<<<<<<< HEAD
 				if ImGui.CollapsingHeader("Repair", "id_gui_repair", true, false) then
 					if ImGui.RadioButton("Repair after Warehouse##id_guid_repair_after_warehouse", Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE) then
 						Bot.Settings.RepairSettings.RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE
@@ -290,6 +360,18 @@ function BotSettings.DrawBotSettings()
 					_, Bot.Settings.TradeManagerSettings.TradeManagerOnInventoryFull = ImGui.Checkbox("##id_guid_trademanager_full_inventory", Bot.Settings.TradeManagerSettings.TradeManagerOnInventoryFull)
 					ImGui.SameLine()
 					ImGui.Text("Sell at Trader when inventory is full")
+=======
+				if Bot.Settings.RepairSettings.Enabled == true then
+					if ImGui.TreeNode("Repair") then
+						if ImGui.RadioButton("Repair after Warehouse##id_guid_repair_after_warehouse", Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE) then
+							Bot.Settings.RepairSettings.RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE
+						end
+						if ImGui.RadioButton("Repair after Trader##id_guid_repair_after_trader", Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER) then
+							Bot.Settings.RepairSettings.RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER
+						end
+						ImGui.TreePop()
+					end
+>>>>>>> 1f24f4460571b5fcb0d2051791445e0cf013ae37
 				end
 			end
 		end
@@ -341,20 +423,31 @@ function BotSettings.DrawBotSettings()
 		end
 
 		if ImGui.CollapsingHeader("Advanced options", "id_gui_adv_option", true, false) then
+<<<<<<< HEAD
 			if ImGui.CollapsingHeader("Be very careful with options below", "id_gui_adv_option_fish_aloneboat", true, false) then
 				if Bot.Settings.FishingMethod == Settings.SETTINGS_ON_NORMAL_FISHING then
+=======
+			if ImGui.TreeNode("Be very careful with options below") then
+				if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_NORMAL_FISHING then
+>>>>>>> 1f24f4460571b5fcb0d2051791445e0cf013ae37
 					_, Bot.Settings.PlayerRun = ImGui.Checkbox("##id_guid_adv_option_fish_alone_boat_sprint", Bot.Settings.PlayerRun)
 					ImGui.SameLine()
 					ImGui.Text("Sprint when moving instead of walking")
 				end
-				_, Bot.Settings.HookFishHandleGameSettings.UseOldAnimations = ImGui.Checkbox("##id_guid_adv_option_fish_alone_boat_old_animations", Bot.Settings.HookFishHandleGameSettings.UseOldAnimations)
+				_, Bot.Settings.HookFishHandleGameSettings.UseOldAnimations = ImGui.Checkbox("##id_guid_adv_option_old_animations", Bot.Settings.HookFishHandleGameSettings.UseOldAnimations)
 				ImGui.SameLine()
 				ImGui.Text("Use old animations when fishing")
-				_, Bot.Settings.OnBoat = ImGui.Checkbox("##id_guid_adv_option_fish_alone_boat_onboat", Bot.Settings.OnBoat)
+				if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_BOAT_FISHING then
+					_, Bot.Settings.InvFullStop = ImGui.Checkbox("##id_guid_adv_option_invfullstop", Bot.Settings.InvFullStop)
+					ImGui.SameLine()
+					ImGui.Text("Stop fishing when the inventory is full")
+				end
+				_, Bot.Settings.HookFishHandleGameSettings.NoDelay = ImGui.Checkbox("##id_guid_adv_option_nodelay", Bot.Settings.HookFishHandleGameSettings.NoDelay)
 				ImGui.SameLine()
-				ImGui.Text("Stop fishing when the inventory is full")
-				_, Bot.Settings.HookFishHandleGameSettings.NoDelay = ImGui.Checkbox("##id_guid_adv_option_fish_alone_boat_nodelay", Bot.Settings.HookFishHandleGameSettings.NoDelay)
+				ImGui.TextColored(ImVec4(1,0,0,1), "Disable delay when fish bite")
+				_, Bot.Settings.StartFishingSettings.MaxEnergyCheat = ImGui.Checkbox("##id_guid_adv_option_hook_fast_game", Bot.Settings.StartFishingSettings.MaxEnergyCheat)
 				ImGui.SameLine()
+<<<<<<< HEAD
 				ImGui.Text("Disable delay when fish bite")
 				_, Bot.Settings.StartFishingSettings.MaxEnergyCheat = ImGui.Checkbox("##id_guid_adv_option_fish_alone_hook_fast_game", Bot.Settings.StartFishingSettings.MaxEnergyCheat)
 				ImGui.SameLine()
@@ -362,6 +455,16 @@ function BotSettings.DrawBotSettings()
 			end
 
 			if ImGui.CollapsingHeader("Debug", "id_adv_option_debug", true, false) then
+=======
+				ImGui.TextColored(ImVec4(1,0,0,1), "Max Energy Cast (uses no energy)")
+				_, Bot.StopWhenPeopleNearby = ImGui.Checkbox("##id_guid_adv_option_stop_bot_when_someone_nearby", Bot.StopWhenPeopleNearby)
+				ImGui.SameLine()
+				ImGui.TextColored(ImVec4(1,0,0,1), "Stop bot when someone is nearby you")
+				ImGui.TreePop()
+			end
+
+			if ImGui.TreeNode("Debug") then
+>>>>>>> 1f24f4460571b5fcb0d2051791445e0cf013ae37
 				_, Bot.Settings.PrintConsoleState = ImGui.Checkbox("##id_guid_adv_option_printconsolestate", Bot.Settings.PrintConsoleState)
 				ImGui.SameLine()
 				ImGui.Text("Print bot state on console")
@@ -370,7 +473,7 @@ function BotSettings.DrawBotSettings()
 				ImGui.Text("Enable Debug")
 
 				if Bot.EnableDebug then
-					if ImGui.CollapsingHeader("Debug options", "id_guid_adv_option_debug_options", true, false) then
+					if ImGui.TreeNode("Debug") then
 						_, Bot.EnableDebugMainWindow = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_mainwindow", Bot.EnableDebugMainWindow)
 						ImGui.SameLine()
 						ImGui.Text("Enable Main Window Debug")
@@ -384,6 +487,10 @@ function BotSettings.DrawBotSettings()
 						ImGui.Text("Enable Inventory Debug")
 					end
 				end
+<<<<<<< HEAD
+=======
+				ImGui.TreePop()
+>>>>>>> 1f24f4460571b5fcb0d2051791445e0cf013ae37
 			end
 		end
 
