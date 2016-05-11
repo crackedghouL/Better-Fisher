@@ -165,3 +165,7 @@ Revamped fishing animation with timers, and it is now the client that handle the
 It should look like a real player and still has 10% chance to loot with a "perfect" by gklt
 
 [0.9a BETA]
+Added full support for Thick Fishing Rods (bot won't try to repair them and will delete them once durability = 0) by gklt
+Fixed stats reset by gklt
+Fixed bot was going to a disabled NPC by gklt
+Typos by gklt

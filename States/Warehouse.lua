@@ -75,7 +75,6 @@ function WarehouseState:NeedToRun()
 		self.Forced = false
 		return false
 	elseif self.Forced == true then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Going to deposit to NPC :" .. self.Settings.NpcName .. "on force")
 		return true
 	end
 
@@ -84,7 +83,6 @@ function WarehouseState:NeedToRun()
 		self.Forced = false
 		return false
 	elseif self.ManualForced == true then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Going to deposit to NPC :" .. self.Settings.NpcName .. "on user demand")
 		return true
 	end
 
@@ -95,7 +93,6 @@ function WarehouseState:NeedToRun()
 	if self.Forced and selfPlayer.WeightPercent >= 95 then
 		if Navigator.CanMoveTo(self:GetPosition())	then
 			self.Forced = true
-			print("[" .. os.date(Bot.UsedTimezone) .. "] You are heavy! Going to deposit to NPC :" .. self.Settings.NpcName)
 			return true
 		else
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Deposit money! Can not find path to NPC: " .. self.Settings.NpcName)
@@ -106,7 +103,6 @@ function WarehouseState:NeedToRun()
 	if self.Forced and table.length(self:GetItems()) > 0 and (selfPlayer.Inventory.FreeSlots <= 3 or selfPlayer.WeightPercent >= 95) then
 		if Navigator.CanMoveTo(self:GetPosition()) then
 			self.Forced = true
-			print("[" .. os.date(Bot.UsedTimezone) .. "] You are heavy or inventory full! Going to deposit to NPC: " .. self.Settings.NpcName)
 			return true
 		else
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Deposit items! Can not find path to NPC: " .. self.Settings.NpcName)

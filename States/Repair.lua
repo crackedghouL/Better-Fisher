@@ -71,7 +71,6 @@ function RepairState:NeedToRun()
 		self.Forced = false
 		return false
 	elseif self.Forced == true then
-	print("[" .. os.date(Bot.UsedTimezone) .. "] Going to force repair. ")
 		return true
 	end
 
@@ -80,7 +79,6 @@ function RepairState:NeedToRun()
 		self.Forced = false
 		return false
 	elseif self.ManualForced == true then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Going to repair on user demand. ")
 		return true
 	end
 
@@ -95,7 +93,6 @@ function RepairState:NeedToRun()
 			then
 				if Navigator.CanMoveTo(self:GetPosition()) then
 					self.Forced = true
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Repair fishing rod in inventory: " .. v.ItemEnchantStaticStatus.Name)
 					return true
 				else
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Repair! Can not find path to NPC: " .. self.Settings.NpcName)
@@ -110,7 +107,6 @@ function RepairState:NeedToRun()
 			then
 				if Navigator.CanMoveTo(self:GetPosition()) then
 					self.Forced = true
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Repair equipped fishing rod: " .. self.ItemEnchantStaticStatus.Name)
 					return true
 				else
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Repair! Can not find path to NPC: " .. self.Settings.NpcName)
