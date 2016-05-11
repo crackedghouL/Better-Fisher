@@ -13,15 +13,18 @@ setmetatable(RepairState, {
 
 function RepairState.new()
 	local self = setmetatable( { }, RepairState)
-	self.State = 0
 	self.Settings = {
+		Enabled = true,
 		NpcName = "",
 		NpcPosition = { X = 0, Y = 0, Z = 0 },
 		RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE,
 		SecondsBetweenTries = 300
 	}
 
+	self.State = 0
 	self.Forced = false
+	self.ManualForced = false
+
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
 
@@ -29,7 +32,6 @@ function RepairState.new()
 	self.CallWhileMoving = nil
 
 	self.RepairList = {}
-
 	self.ItemCheckFunction = nil
 
     self.RepairEquipped = true
@@ -60,11 +62,23 @@ function RepairState:NeedToRun()
 		return false
 	end
 
+	if Bot.Settings.EnableRepair == false then
+		self.Forced = false
+		return false
+	end
+
 	if self.Forced == true and not Navigator.CanMoveTo(self:GetPosition()) then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Was told to go to Repair but Navigator.CanMoveTo returns false")
 		self.Forced = false
 		return false
 	elseif self.Forced == true then
+		return true
+	end
+
+	if self.ManualForced == true and not Navigator.CanMoveTo(self:GetPosition()) then
+		self.ManualForced = false
+		self.Forced = false
+		return false
+	elseif self.ManualForced == true then
 		return true
 	end
 
@@ -74,7 +88,7 @@ function RepairState:NeedToRun()
 
 	if not equippedItem then
 		for k,v in pairs(selfPlayer.Inventory.Items) do
-			if 	v.HasEndurance and v.EndurancePercent <= 0 and 
+			if 	v.HasEndurance and v.EndurancePercent <= 0 and
 				(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16151)) 
 			then
 				if Navigator.CanMoveTo(self:GetPosition()) then
@@ -117,6 +131,7 @@ function RepairState:Reset()
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
 	self.Forced = false
+	self.ManualForced = false
 	self.RepairList = {}
 end
 
@@ -131,6 +146,7 @@ function RepairState:Exit()
 		self.LastUseTimer:Start()
 		self.SleepTimer = nil
 		self.Forced = false
+		self.ManualForced = false
 		self.RepairList = {}
 	end
 end

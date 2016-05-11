@@ -11,6 +11,7 @@ setmetatable(TradeManagerState, {
 function TradeManagerState.new()
 	local self = setmetatable( { }, TradeManagerState)
 	self.Settings = {
+		Enabled = true,
 		NpcName = "",
 		NpcPosition = { X = 0, Y = 0, Z = 0 },
 		SellAll = true,
@@ -19,14 +20,17 @@ function TradeManagerState.new()
 		SecondsBetweenTries = 300
 	}
 
-	self.State = 0 -- 0 = Nothing, 1 = Moving, 2 = Arrived
+	self.State = 0
 	self.Forced = false
+	self.ManualForced = false
 
 	self.LastTradeUseTimer = nil
 	self.SleepTimer = nil
+
 	self.CurrentSellList = { }
 
 	self.ItemCheckFunction = nil
+
 	self.CallWhenCompleted = nil
 	self.CallWhileMoving = nil
 
@@ -49,15 +53,28 @@ function TradeManagerState:NeedToRun()
 		return false
 	end
 
-	if not self:HasNpc() or Bot.Settings.OnBoat == true then
+	if Bot.Settings.EnableTrader == false then
 		self.Forced = false
 		return false
 	end
 
-	if self.Forced and not Navigator.CanMoveTo(self:GetPosition()) then
+	if not self:HasNpc() and Bot.Settings.OnBoat == true then
+		self.Forced = false
+		return false
+	end
+
+	if self.Forced == true and not Navigator.CanMoveTo(self:GetPosition()) then
 		self.Forced = false
 		return false
 	elseif self.Forced == true then
+		return true
+	end
+
+	if self.ManualForced == true and not Navigator.CanMoveTo(self:GetPosition()) then
+		self.ManualForced = false
+		self.Forced = false
+		return false
+	elseif self.ManualForced == true then
 		return true
 	end
 
@@ -65,7 +82,7 @@ function TradeManagerState:NeedToRun()
 		return false
 	end
 
-	if 	self.Settings.TradeManagerOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3 and 
+	if 	self.Settings.TradeManagerOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3 and
 		table.length(self:GetItems()) > 0 and Navigator.CanMoveTo(self:GetPosition()) and not Looting.IsLooting
 	then
 		self.Forced = true
@@ -77,9 +94,10 @@ end
 
 function TradeManagerState:Reset()
 	self.State = 0
+	self.Forced = false
+	self.ManualForced = false
 	self.LastTradeUseTimer = nil
 	self.SleepTimer = nil
-	self.Forced = false
 end
 
 function TradeManagerState:Exit()
@@ -97,6 +115,7 @@ function TradeManagerState:Exit()
 		self.LastTradeUseTimer:Start()
 		self.SleepTimer = nil
 		self.Forced = false
+		self.ManualForced = false
 	end
 end
 
@@ -200,6 +219,7 @@ function TradeManagerState:Run()
 			self.CallWhenCompleted(self)
 		end
 
+		Bot.SilverStats()
 		self:Exit()
 		return
 	end

@@ -146,13 +146,13 @@ Added Repair section on settings, for now is a little empty
 Added some print debug
 Removed Loot Eggs option, until next year
 
-[0.8d BETA] NO ETA
-Integrated the changes from Pyx git (05/05/16) [OK]
-Rewritten General UI [90%]
-Rewritten Bot settings [70%]
-Added Anti-PK [OK]
-Added Death state, from default is enabled [NO]
-Triangles for spot/npcs is more small [OK]
+[0.9 BETA]
+Integrated the changes from Pyx git (05/05/16)
+Rewritten General UI
+Rewritten Bot settings, so the old settings can't be imported
+Added Anti-PK
+Added Death state, from default is enabled
+Triangles for spot/npcs is more small
 Fixed warehouse deposit (something was omitted in the last commit, no item deposit after gold deposit) by gklt
 Smoother animation while fishing (added some delay before looting the items) by gklt
 Bot will not try to repair Steel Fishing Rods anymore by gklt

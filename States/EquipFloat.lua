@@ -15,7 +15,6 @@ function EquipFloatState.new()
 	self.EquippedState = 0
 	self.EquipState = 0
 	self.EquippedState = 0
-	self.DebugCheck = 0
 	return self
 end
 
@@ -25,7 +24,6 @@ function EquipFloatState:Reset()
 	self.EquippedState = 0
 	self.EquipState = 0
 	self.EquippedState = 0
-	self.DebugCheck = 0
 end
 
 function EquipFloatState:NeedToRun()
@@ -53,45 +51,42 @@ function EquipFloatState:NeedToRun()
 
 	for k,v in pairs(selfPlayer.Inventory.Items, function(t,a,b) return t[a].Endurance < t[b].Endurance end) do
 		if v.HasEndurance then
-			if Bot.EnableDebug == true and self.DebugCheck == 0 then
+			if Bot.EnableDebug == true then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.ItemEnchantStaticStatus.Name .. " which have durability found")
 			end
 
 			self.EquipState = 1
-			self.DebugCheck = 1
 		end
 
 		if self.EquipState == 1 then -- 1 = item have endurance
 			if v.Endurance > 0 then
-				if Bot.EnableDebug == true and self.DebugCheck == 1 then
+				if Bot.EnableDebug == true then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.ItemEnchantStaticStatus.Name .. " have more than 0 durability left")
 				end
 
 				self.EquipState = 2
 			end
-			self.DebugCheck = 2
 		end
 
 
 		if self.EquipState == 2 then -- 2 = this is for enhanced float
 			if string.find(v.ItemEnchantStaticStatus.Name, "Float") then
-				if Bot.EnableDebug == true and self.DebugCheck == 2 then
+				if Bot.EnableDebug == true then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] The item have in the a '+' in the name, so is a enhanced float")
 				end
 
-				if Bot.EnableDebug == true and self.DebugCheck == 2 then
+				if Bot.EnableDebug == true then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
 				end
 				self.ItemToEquip = v
 				break
 			else
-				if Bot.EnableDebug == true and self.DebugCheck == 2 then
+				if Bot.EnableDebug == true then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Maybe " .. v.ItemEnchantStaticStatus.Name .. " is a know float?")
 				end
 
 				self.EquipState = 3
 			end
-			self.DebugCheck = 3
 		end
 
 		if self.EquipState == 3 then -- fallback for know Float using ids, just in case all the step don't work

@@ -8,6 +8,8 @@ Bot.EnableDebugMainWindow = false
 Bot.EnableDebugInventory = false
 Bot.EnableDebugRadar = false
 
+Bot.StopWhenPeopleNearby = false
+
 Bot.Counter = 0
 
 Bot.Fsm = FSM()
@@ -23,9 +25,9 @@ Bot.LootState = LootState()
 Bot.InventoryDeleteState = InventoryDeleteState()
 Bot.ConsumablesState = ConsumablesState()
 Bot.TradeManagerState = TradeManagerState()
-Bot.RepairState = RepairState()
-Bot.VendorState = VendorState()
 Bot.WarehouseState = WarehouseState()
+Bot.VendorState = VendorState()
+Bot.RepairState = RepairState()
 Bot.UnequipFishingRodState = UnequipFishingRodState()
 Bot.UnequipFloatState = UnequipFloatState()
 
@@ -36,8 +38,21 @@ else
 	Bot.UsedTimezone = "%X"
 end
 
+function Bot.comma_value(amount)
+	local formatted = amount
+	while true do
+		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1.%2')
+		if (k==0) then
+			break
+		end
+	end
+	return formatted
+end
+
 function Bot.ResetStats()
 	Bot.Stats = {
+		SilverInitial = GetSelfPlayer().Inventory.Money,
+		SilverGained = 0,
 		Loots = 0,
 		AverageLootTime = 0,
 		LootQuality = {},
@@ -53,6 +68,12 @@ function Bot.ResetStats()
 	}
 end
 
+function Bot.SilverStats()
+	if Bot.Stats.SilverInitial < GetSelfPlayer().Inventory.Money then
+		Bot.Stats.SilverGained = GetSelfPlayer().Inventory.Money - Bot.Stats.SilverInitial
+	end
+end
+
 Bot.ResetStats()
 
 function Bot.Start()
@@ -61,10 +82,14 @@ function Bot.Start()
 		-- Bot.ResetStats() --Only manual reset for long time stats with player interactions ?
 		Bot.SaveSettings()
 
-		Bot.RepairState.Forced = false
-		Bot.WarehouseState.Forced = false
+		Bot.TradeManagerState.Forced = false
+		Bot.TradeManagerState.ManualForced = false
 		Bot.VendorState.Forced = false
-		Bot.TradeManagerForced = false
+		Bot.VendorState.ManualForced = false
+		Bot.WarehouseState.Forced = false
+		Bot.WarehouseState.ManualForced = false
+		Bot.RepairState.Forced = false
+		Bot.RepairState.ManualForced = false
 
 		local currentProfile = ProfileEditor.CurrentProfile
 
@@ -183,17 +208,128 @@ function Bot.OnPulse()
 					Bot.Start()
 				end
 			end
+		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('P')) then
+			if Bot._profileHotKeyPressed ~= true then
+				Bot._profileHotKeyPressed = true
+				if ProfileEditor.Visible == false then
+					ProfileEditor.Visible = true
+				elseif ProfileEditor.Visible == true then
+					ProfileEditor.Visible = false
+				end
+			end
+		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('O')) then
+			if Bot._settingsHotKeyPressed ~= true then
+				Bot._settingsHotKeyPressed = true
+				if BotSettings.Visible == false then
+					BotSettings.Visible = true
+				elseif BotSettings.Visible == true then
+					BotSettings.Visible = false
+				end
+			end
+		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('R')) then
+			if Bot._radarHotKeyPressed ~= true then
+				Bot._radarHotKeyPressed = true
+				if Radar.Visible == false then
+					Radar.Visible = true
+				elseif Radar.Visible == true then
+					Radar.Visible = false
+				end
+			end
+		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('B')) then
+			if Bot._inventoryHotKeyPressed ~= true then
+				Bot._inventoryHotKeyPressed = true
+				if InventoryList.Visible == false then
+					InventoryList.Visible = true
+				elseif InventoryList.Visible == true then
+					InventoryList.Visible = false
+				end
+			end
+		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('C')) then
+			if Bot._consumableHotKeyPressed ~= true then
+				Bot._consumableHotKeyPressed = true
+				if LibConsumableWindow.Visible == false then
+					LibConsumableWindow.Visible = true
+				elseif LibConsumableWindow.Visible == true then
+					LibConsumableWindow.Visible = false
+				end
+			end
+		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('L')) then
+			if Bot._statsHotKeyPressed ~= true then
+				Bot._statsHotKeyPressed = true
+				if Stats.Visible == false then
+					Stats.Visible = true
+				elseif Stats.Visible == true then
+					Stats.Visible = false
+				end
+			end
+		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('W')) then
+			if Bot._warehouseHotKeyPressed ~= true then
+				Bot._warehouseHotKeyPressed = true
+				if Bot.Running then
+					Bot.WarehouseState.ManualForced = true
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Warehouse")
+				else
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+				end
+			end
+		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('T')) then
+			if Bot._traderHotKeyPressed ~= true then
+				Bot._traderHotKeyPressed = true
+				if Bot.Running then
+					Bot.TradeManagerState.ManualForced = true
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Trader")
+				else
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+				end
+			end
+		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('V')) then
+			if Bot._vendorHotKeyPressed ~= true then
+				Bot._vendorHotKeyPressed = true
+				if Bot.Running then
+					Bot.VendorState.ManualForced = true
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Vendor")
+				else
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+				end
+			end
+		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('G')) then
+			if Bot._repairHotKeyPressed ~= true then
+				Bot._repairHotKeyPressed = true
+				if Bot.Running then
+					Bot.RepairState.ManualForced = true
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Go Repair")
+				else
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+				end
+			end
 		else
 			Bot._startHotKeyPressed = false
+			Bot._profileHotKeyPressed = false
+			Bot._settingsHotKeyPressed = false
+			Bot._radarHotKeyPressed = false
+			Bot._inventoryHotKeyPressed = false
+			Bot._consumableHotKeyPressed = false
+			Bot._statsHotKeyPressed = false
+			Bot._warehouseHotKeyPressed = false
+			Bot._traderHotKeyPressed = false
+			Bot._vendorHotKeyPressed = false
+			Bot._repairHotKeyPressed = false
 		end
 	end
 
 	if Bot.Counter > 0 then
-		Bot.Counter = Bot.Counter-1
+		Bot.Counter = Bot.Counter - 1
 	end
 
 	if Bot.Running then
 		Bot.Fsm:Pulse()
+	end
+
+	if Bot.Running and Bot.StopWhenPeopleNearby then
+		if Bot.PlayerNearby then
+			print("[" .. os.date(Bot.UsedTimezone) .. "] Someone is near you, the bot is stopped for security.")
+			Bot.Stop()
+		end
 	end
 end
 
@@ -207,16 +343,16 @@ function Bot.LoadSettings()
 
 	Bot.Settings = Settings()
 	Bot.Settings.DeathSettings = Bot.DeathState.Settings
-	Bot.Settings.LootSettings = Bot.LootState.Settings
-	Bot.Settings.RepairSettings = Bot.RepairState.Settings
+	Bot.Settings.TradeManagerSettings = Bot.TradeManagerState.Settings
 	Bot.Settings.WarehouseSettings = Bot.WarehouseState.Settings
 	Bot.Settings.VendorSettings = Bot.VendorState.Settings
-	Bot.Settings.TradeManagerSettings = Bot.TradeManagerState.Settings
-	Bot.Settings.InventoryDeleteSettings = Bot.InventoryDeleteState.Settings
+	Bot.Settings.RepairSettings = Bot.RepairState.Settings
 	Bot.Settings.ConsumablesSettings = Bot.ConsumablesState.Settings
 	Bot.Settings.LibConsumablesSettings = LibConsumables.Settings
+	Bot.Settings.InventoryDeleteSettings = Bot.InventoryDeleteState.Settings
+	Bot.Settings.StartFishingSettings = Bot.StartFishingState.Settings
 	Bot.Settings.HookFishHandleGameSettings = Bot.HookFishHandleGameState.Settings
-	Bot.Settings.StartFishingSettigs = Bot.StartFishingState.Settings
+	Bot.Settings.LootSettings = Bot.LootState.Settings
 
 	table.merge(Bot.Settings, json:decode(Pyx.FileSystem.ReadFile("settings.json")))
 	if string.len(Bot.Settings.LastProfileName) > 0 then
@@ -252,10 +388,10 @@ function Bot.PlayerNearby()
 end
 
 function Bot.Death(state)
-	if Bot.DeathState.Settings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED then
+	if Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED then
 		Bot.Stop()
 	else
-		if Bot.Settings.OnBoat == false then
+		if Bot.Settings.InvFullStop == false then
 			Bot.TradeManagerState:Reset()
 			Bot.WarehouseState:Reset()
 			Bot.VendorState:Reset()
@@ -266,23 +402,23 @@ end
 
 function Bot.StateComplete(state)
 	if state == Bot.TradeManagerState then
-		if Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then
+		if Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then -- DepositMethod = 1
 			Bot.WarehouseState.Forced = true
 		end
 	elseif state == Bot.VendorState then
-		if Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then
+		if Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then -- DepositMethod = 0
 			Bot.WarehouseState.Forced = true
 		end
 	elseif state == Bot.RepairState then
-		if Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then
+		if Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then -- DepositMethod = 2
 			Bot.WarehouseState.Forced = true
 		end
 	elseif state == Bot.WarehouseState then
-		if Bot.Settings.RepairSettings.Settings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then
+		if Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then -- RepairMethod = 0
 			Bot.RepairState.Forced = true
 		end
 	elseif state == Bot.WarehouseState then
-		if Bot.Settings.RepairSettings.Settings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then
+		if Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then -- RepairMethod = 1
 			Bot.RepairState.Forced = true
 		end
 	end
@@ -293,7 +429,7 @@ function Bot.StateComplete(state)
 end
 
 function Bot.DeleteItemCheck(item)
-	if table.find(Bot.InventoryDeleteState.Settings.DeleteItems, item.ItemEnchantStaticStatus.Name) then
+	if table.find(Bot.Settings.InventoryDeleteSettings.DeleteItems, item.ItemEnchantStaticStatus.Name) then
 		return true
 	elseif Bot.Settings.DeleteUsedRods and item.HasEndurance and item.Endurance == 0 and
 		   (item.ItemEnchantStaticStatus.ItemId == 16141 or item.ItemEnchantStaticStatus.ItemId == 16151)
@@ -315,7 +451,7 @@ function Bot.ConsumablesCustomRunCheck()
 end
 
 function Bot.CustomWarehouseCheck(item)
-	if not table.find(Bot.WarehouseState.Settings.IgnoreItemsNamed, item.ItemEnchantStaticStatus.Name) and item.Type ~= 8 then
+	if not table.find(Bot.Settings.WarehouseSettings.IgnoreItemsNamed, item.ItemEnchantStaticStatus.Name) and item.Type ~= 8 then
 		return true
 	end
 	return false
