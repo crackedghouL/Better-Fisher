@@ -266,23 +266,23 @@ end
 
 function Bot.StateComplete(state)
 	if state == Bot.TradeManagerState then
-		if Bot.WarehouseState.Settings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then
+		if Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then
 			Bot.WarehouseState.Forced = true
 		end
 	elseif state == Bot.VendorState then
-		if Bot.WarehouseState.Settings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then
+		if Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then
 			Bot.WarehouseState.Forced = true
 		end
 	elseif state == Bot.RepairState then
-		if Bot.WarehouseState.Settings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then
+		if Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then
 			Bot.WarehouseState.Forced = true
 		end
 	elseif state == Bot.WarehouseState then
-		if Bot.WarehouseState.Settings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then
+		if Bot.Settings.RepairSettings.Settings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then
 			Bot.RepairState.Forced = true
 		end
 	elseif state == Bot.WarehouseState then
-		if Bot.WarehouseState.Settings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then
+		if Bot.Settings.RepairSettings.Settings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then
 			Bot.RepairState.Forced = true
 		end
 	end
