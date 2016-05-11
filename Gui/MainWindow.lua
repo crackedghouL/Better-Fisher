@@ -127,7 +127,14 @@ function MainWindow.DrawMainWindow()
 				ImGui.EndMenu()
 			end
 			if ImGui.BeginMenu("Info") then
-				if ImGui.MenuItem("Aboud BF", "") then print("[" .. os.date(Bot.UsedTimezone) .. "] Nothing here for now!") end
+				if ImGui.MenuItem("Aboud BF", "") then 
+					print("[" .. os.date(Bot.UsedTimezone) .. "] ####################################") 
+					print("[" .. os.date(Bot.UsedTimezone) .. "] #  Made with love by spearmint <3  #") 
+					print("[" .. os.date(Bot.UsedTimezone) .. "] #     Thanks to: gklt, Akafist,    #") 
+					print("[" .. os.date(Bot.UsedTimezone) .. "] #  tyty123, borek24 and MrUnreal.  #")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] #~Fishing is love, fishing is life~#")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] ####################################") 
+				end
 				ImGui.EndMenu()
 			end
 			ImGui.EndMenuBar()

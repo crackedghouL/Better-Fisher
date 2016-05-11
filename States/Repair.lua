@@ -89,7 +89,7 @@ function RepairState:NeedToRun()
 	if not equippedItem then
 		for k,v in pairs(selfPlayer.Inventory.Items) do
 			if 	v.HasEndurance and v.EndurancePercent <= 0 and
-				(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16151)) 
+				(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151)) 
 			then
 				if Navigator.CanMoveTo(self:GetPosition()) then
 					self.Forced = true
@@ -103,7 +103,7 @@ function RepairState:NeedToRun()
 	else
 		for k,v in pairs(selfPlayer.EquippedItems) do
 			if 	v.HasEndurance and v.EndurancePercent <= 0 and
-				(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16151)) 
+				(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151)) 
 			then
 				if Navigator.CanMoveTo(self:GetPosition()) then
 					self.Forced = true

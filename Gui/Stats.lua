@@ -14,7 +14,7 @@ SilverGained = 0
 
 function Stats.DrawStats()
 	if Stats.Visible then
-		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 200), -1.0)
+		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 223), -1.0)
 
 		if h == nil then
 			h = 0
@@ -68,7 +68,7 @@ function Stats.DrawStats()
 		ImGui.Separator()
 
 		ImGui.Columns(2)
-		ImGui.Text("Fishs: " .. statsFishes)
+		ImGui.Text("Fishes: " .. statsFishes)
 		ImGui.NextColumn()
 		ImGui.Text("Trashes: " .. statsTrashes)
 
@@ -131,9 +131,9 @@ function Stats.DrawStats()
 		ImGui.Columns(1)
 		ImGui.Spacing()
 
-		-- if ImGui.Button("Reset Stats##id_guid_reset_stats", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
-		-- 	Bot.ResetStats()
-		-- end
+		if ImGui.Button("Reset Stats##id_guid_reset_stats", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+			Bot.ResetStats()
+		end
 
 		ImGui.End()
 	end

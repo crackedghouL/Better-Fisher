@@ -56,7 +56,8 @@ function UnequipFishingRodState:NeedToRun()
 	end
 
 	if self.EquippedState == 3 then -- 3 fallback to know rod using ids
-		if 	not equippedItem.ItemEnchantStaticStatus.ItemId == 16151 or  -- Steel Rod
+		if 	not equippedItem.ItemEnchantStaticStatus.ItemId == 16147 or  -- Thick Rod
+			not equippedItem.ItemEnchantStaticStatus.ItemId == 16151 or  -- Steel Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 16152 or  -- Gold Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 16153 or  -- Triple Float Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 16162 or  -- Balenos Rod

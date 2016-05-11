@@ -397,7 +397,7 @@ function BotSettings.DrawBotSettings()
 				ImGui.TextColored(ImVec4(1,0,0,1), "Max Energy Cast (uses no energy)")
 				_, Bot.StopWhenPeopleNearby = ImGui.Checkbox("##id_guid_adv_option_stop_bot_when_someone_nearby", Bot.StopWhenPeopleNearby)
 				ImGui.SameLine()
-				ImGui.TextColored(ImVec4(1,0,0,1), "Stop bot when someone is nearby you")
+				ImGui.TextColored(ImVec4(1,0,0,1), "Stop bot when someone is nearby")
 				ImGui.TreePop()
 			end
 
