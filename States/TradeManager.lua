@@ -16,6 +16,7 @@ function TradeManagerState.new()
 		NpcPosition = { X = 0, Y = 0, Z = 0 },
 		SellAll = true,
 		TradeManagerOnInventoryFull = true,
+		DoBargainGame = true,
 		IgnoreItemsNamed = { },
 		SecondsBetweenTries = 300
 	}
@@ -33,6 +34,10 @@ function TradeManagerState.new()
 
 	self.CallWhenCompleted = nil
 	self.CallWhileMoving = nil
+	
+	self.BargainState = 0
+	self.BargainCount = 0
+	self.BargainDice = 0 -- Last dice, 0=high 1=low
 
 	return self
 end
@@ -188,33 +193,93 @@ function TradeManagerState:Run()
 		self.CurrentSellList = self:GetItems()
 		return
 	end
-
+	
 	if self.State == 4 then
+		if self.Settings.DoBargainGame == true then
+			if self.BargainState == 0 then
+				local energy = tonumber(BDOLua.Execute("return getSelfPlayer():getWp()"))
+				if energy >= 5 then
+					BDOLua.Execute("click_TradeGameStart()")
+					BDOLua.Execute("messageBox_YesButtonUp()")
+					if math.random(2) == 2 then
+						self.BargainDice = 0
+					else
+						self.BargainDice = 1
+					end
+					self.SleepTimer = PyxTimer:New(2)
+					self.SleepTimer:Start()
+					self.BargainState = 1
+				else
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Not enought energy. Skipping bargain minigame")
+					self.SleepTimer = PyxTimer:New(2)
+					self.SleepTimer:Start()
+					self.BargainState = 0
+					self.State = 5
+				end
+			elseif self.BargainState == 1 then
+				if BDOLua.Execute("return isTradeGameSuccess()") == true then
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Bargain succes!")
+					self.SleepTimer = PyxTimer:New(1)
+					self.SleepTimer:Start()
+					BDOLua.Execute("Fglobal_TradeGame_Close()")
+					self.SleepTimer = PyxTimer:New(2)
+					self.SleepTimer:Start()
+					self.BargainState = 0
+					self.State = 5
+					self.CurrentSellList = self:GetItems()
+				elseif self.BargainCount >= 3 then
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Bargain fail")
+					self.BargainCount = 0
+					BDOLua.Execute("Fglobal_TradeGame_Close()")
+					self.SleepTimer = PyxTimer:New(2)
+					self.SleepTimer:Start()
+					self.BargainState = 0
+				else
+					if self.BargainDice == 0 then
+						-- print("[" .. os.date(Bot.UsedTimezone) .. "] Low dice")
+						BDOLua.Execute("tradeGame_LowDice()")
+						self.BargainDice = 1
+					else
+						-- print("[" .. os.date(Bot.UsedTimezone) .. "] High dice")
+						BDOLua.Execute("tradeGame_HighDice()")
+						self.BargainDice = 0
+					end
+					self.SleepTimer = PyxTimer:New(2)
+					self.SleepTimer:Start()
+					self.BargainCount = self.BargainCount + 1
+				end
+			end
+		else
+			self.State = 5
+		end
+		return
+	end
+
+	if self.State == 5 then
 		if table.length(self.CurrentSellList) < 1 then
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Sell list created")
 			self:Exit()
 			return
 		end
-
 		TradeMarket.SellAll() -- Currently only Sell All is supported
 		self.SleepTimer = PyxTimer:New(5)
-		self.SleepTimer:Start()
-		self.State = 5
-		return
-	end
-
-	if self.State == 5 then
-		if TradeMarket.IsTrading then
-			TradeMarket.Close()
-		end
-
-		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
 		self.State = 6
 		return
 	end
 
 	if self.State == 6 then
+		if TradeMarket.IsTrading then
+			TradeMarket.Close()
+		end
+
+		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer:Start()
+		self.State = 7
+		return
+	end
+
+	if self.State == 7 then
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end

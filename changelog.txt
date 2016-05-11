@@ -165,6 +165,7 @@ Revamped fishing animation with timers, and it is now the client that handle the
 It should look like a real player and still has 10% chance to loot with a "perfect" by gklt
 
 [0.9a BETA]
+Added bargain minigame support by gklt
 Added full support for Thick Fishing Rods (bot won't try to repair them and will delete them once durability = 0) by gklt
 Added some sort of credits <3 by gklt
 Fixed stats reset by gklt
