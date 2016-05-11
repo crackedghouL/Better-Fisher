@@ -1,4 +1,0 @@
-Add some delay when fishing close to other peoples
-Add Place Saver from Edan, this make the high-sea fishing possible
-Lower the max distance for radar
-Test more the anti-pk

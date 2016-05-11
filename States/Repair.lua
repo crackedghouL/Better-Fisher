@@ -57,7 +57,7 @@ function RepairState:NeedToRun()
 		return false
 	end
 
-	if not self:HasNpc() and Bot.Settings.OnBoat == true then
+	if not self:HasNpc() and Bot.Settings.InvFullStop == true then
 		self.Forced = false
 		return false
 	end
