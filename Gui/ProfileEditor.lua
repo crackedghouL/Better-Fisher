@@ -22,11 +22,7 @@ function ProfileEditor.DrawProfileEditor()
 	end
 
 	if ProfileEditor.Visible then
-<<<<<<< HEAD
-		_, ProfileEditor.Visible = ImGui.Begin("Profile editor", ProfileEditor.Visible, ImVec2(300, 400), -1.0, ImGuiWindowFlags_NoResize)
-=======
 		_, ProfileEditor.Visible = ImGui.Begin(ProfileEditor.WindowName, ProfileEditor.Visible, ImVec2(300, 400), -1.0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)
->>>>>>> 1f24f4460571b5fcb0d2051791445e0cf013ae37
 
 		if not Bot.Running then
 			_, ProfileEditor.CurrentProfileSaveName = ImGui.InputText("##id_guid_profile_save_name", ProfileEditor.CurrentProfileSaveName)

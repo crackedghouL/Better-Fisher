@@ -67,6 +67,7 @@ function TradeManagerState:NeedToRun()
 		self.Forced = false
 		return false
 	elseif self.Forced == true then
+		print("[" .. os.date(Bot.UsedTimezone) .. "] Going to trader NPC " .. self.Settings.NpcName .. " on force")
 		return true
 	end
 
@@ -75,6 +76,7 @@ function TradeManagerState:NeedToRun()
 		self.Forced = false
 		return false
 	elseif self.ManualForced == true then
+		print("[" .. os.date(Bot.UsedTimezone) .. "] Going to trader NPC " .. self.Settings.NpcName .. " on player demand")
 		return true
 	end
 
@@ -86,6 +88,7 @@ function TradeManagerState:NeedToRun()
 		table.length(self:GetItems()) > 0 and Navigator.CanMoveTo(self:GetPosition()) and not Looting.IsLooting
 	then
 		self.Forced = true
+		print("[" .. os.date(Bot.UsedTimezone) .. "] Going to trader NPC " .. self.Settings.NpcName .. " because inventory is full")
 		return true
 	end
 

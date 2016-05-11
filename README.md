@@ -6,7 +6,7 @@
 - [x] Auto sell to vendor and/or trade manager
 - [x] Auto buy from vendor
 - [x] Auto deposit money and/or items at warehouse
-- [x] Repair your rods and floats at the repair NCP of your choice
+- [x] Repair your rods and floats at the repair NPC of your choice
 - [x] Anti PvP options
 - [x] Selective Fishing
 - [x] PlayerRadar

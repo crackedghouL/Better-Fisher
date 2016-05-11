@@ -63,7 +63,7 @@ function Bot.ResetStats()
 		LootTimeCount = 0,
 		LastLootTick = 0,
 		TotalLootTime = 0,
-		SessionStart = 0,
+		SessionStart = Pyx.System.TickCount,
 		TotalSession = 0,
 	}
 end
@@ -402,23 +402,23 @@ end
 
 function Bot.StateComplete(state)
 	if state == Bot.TradeManagerState then
-		if Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then -- DepositMethod = 1
+		if Bot.Settings.WarehouseSettings.Enabled == true and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then -- DepositMethod = 1
 			Bot.WarehouseState.Forced = true
 		end
 	elseif state == Bot.VendorState then
-		if Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then -- DepositMethod = 0
+		if Bot.Settings.WarehouseSettings.Enabled == true and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then -- DepositMethod = 0
 			Bot.WarehouseState.Forced = true
 		end
 	elseif state == Bot.RepairState then
-		if Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then -- DepositMethod = 2
+		if Bot.Settings.WarehouseSettings.Enabled == true and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then -- DepositMethod = 2
 			Bot.WarehouseState.Forced = true
 		end
 	elseif state == Bot.WarehouseState then
-		if Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then -- RepairMethod = 0
+		if Bot.Settings.RepairSettings.Enabled == true and Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then -- RepairMethod = 0
 			Bot.RepairState.Forced = true
 		end
 	elseif state == Bot.WarehouseState then
-		if Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then -- RepairMethod = 1
+		if Bot.Settings.RepairSettings.Enabled == true and Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then -- RepairMethod = 1
 			Bot.RepairState.Forced = true
 		end
 	end
@@ -432,7 +432,7 @@ function Bot.DeleteItemCheck(item)
 	if table.find(Bot.Settings.InventoryDeleteSettings.DeleteItems, item.ItemEnchantStaticStatus.Name) then
 		return true
 	elseif Bot.Settings.DeleteUsedRods and item.HasEndurance and item.Endurance == 0 and
-		   (item.ItemEnchantStaticStatus.ItemId == 16141 or item.ItemEnchantStaticStatus.ItemId == 16151)
+		   (item.ItemEnchantStaticStatus.ItemId == 16141 or item.ItemEnchantStaticStatus.ItemId == 16147 or item.ItemEnchantStaticStatus.ItemId == 16151)
 	then
 		return true
 	end

@@ -163,3 +163,5 @@ Added average time/loot in the stats and log by gklt
 Added total fishing time by gklt
 Revamped fishing animation with timers, and it is now the client that handle the game instead of the bot by gklt
 It should look like a real player and still has 10% chance to loot with a "perfect" by gklt
+
+[0.9a BETA]

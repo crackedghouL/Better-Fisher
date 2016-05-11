@@ -37,5 +37,6 @@ function MoveToFishingSpotState:NeedToRun()
 end
 
 function MoveToFishingSpotState:Run()
+	print("[" .. os.date(Bot.UsedTimezone) .. "] Moving to fishing spot")
 	Navigator.MoveTo(ProfileEditor.CurrentProfile:GetFishSpotPosition())
 end

@@ -14,13 +14,8 @@ SilverGained = 0
 
 function Stats.DrawStats()
 	if Stats.Visible then
-<<<<<<< HEAD
-		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 225), -1.0)
-		
-=======
-		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 200), -1.0)
+		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 223), -1.0)
 
->>>>>>> 1f24f4460571b5fcb0d2051791445e0cf013ae37
 		if h == nil then
 			h = 0
 			m = 0
@@ -51,7 +46,7 @@ function Stats.DrawStats()
 			statsGolds = "0 - 0.00%%"
 			statsOranges = "0 - 0.00%%"
 			statsFishes = "0 - 0.00%%"
-			statsTrashs = "0 - 0.00%%"
+			statsTrashes = "0 - 0.00%%"
 			statsKeys = "0 - 0.00%%"
 			statsShards = "0 - 0.00%%"
 		end
@@ -73,9 +68,9 @@ function Stats.DrawStats()
 		ImGui.Separator()
 
 		ImGui.Columns(2)
-		ImGui.Text("Fishs: " .. statsFishes)
+		ImGui.Text("Fishes: " .. statsFishes)
 		ImGui.NextColumn()
-		ImGui.Text("Trashs: " .. statsTrashes)
+		ImGui.Text("Trashes: " .. statsTrashes)
 
 		ImGui.Columns(1)
 		ImGui.Separator()
@@ -136,9 +131,9 @@ function Stats.DrawStats()
 		ImGui.Columns(1)
 		ImGui.Spacing()
 
-		-- if ImGui.Button("Reset Stats##id_guid_reset_stats", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
-		-- 	Bot.ResetStats()
-		-- end
+		if ImGui.Button("Reset Stats##id_guid_reset_stats", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+			Bot.ResetStats()
+		end
 
 		ImGui.End()
 	end

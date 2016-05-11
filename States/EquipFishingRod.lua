@@ -113,7 +113,8 @@ function EquipFishingRodState:NeedToRun()
 		end
 
 		if self.EquipState == 4 then -- fallback for know rods using ids, just in case all the step don't work
-			if  v.ItemEnchantStaticStatus.ItemId == 16151 or  -- Steel Rod
+			if  v.ItemEnchantStaticStatus.ItemId == 16147 or  -- Thick Rod
+				v.ItemEnchantStaticStatus.ItemId == 16151 or  -- Steel Rod
 				v.ItemEnchantStaticStatus.ItemId == 16152 or  -- Gold Rod
 				v.ItemEnchantStaticStatus.ItemId == 16153 or  -- Triple Float Rod
 				v.ItemEnchantStaticStatus.ItemId == 16162 or  -- Balenos Rod
@@ -203,7 +204,8 @@ function EquipFishingRodState:NeedToRun()
 	end
 
 	if self.EquippedState == 3 then -- 3 fallback to know rod using ids
-		if 	not equippedItem.ItemEnchantStaticStatus.ItemId == 16151 or  -- Steel Rod
+		if 	not equippedItem.ItemEnchantStaticStatus.ItemId == 16147 or  -- Thick Rod
+			not equippedItem.ItemEnchantStaticStatus.ItemId == 16151 or  -- Steel Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 16152 or  -- Gold Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 16153 or  -- Triple Float Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 16162 or  -- Balenos Rod
