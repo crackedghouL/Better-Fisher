@@ -12,7 +12,7 @@ MainWindow.ConfirmPopup = false
 -----------------------------------------------------------------------------
 
 function MainWindow.DrawMainWindow()
-	local _, shouldDisplay = ImGui.Begin("Better Fisher v0.9 BETA", true, ImVec2(320, 105), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
+	local _, shouldDisplay = ImGui.Begin("Better Fisher v0.9b BETA", true, ImVec2(320, 105), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
 
 	if shouldDisplay then
 		local selfPlayer = GetSelfPlayer()
@@ -127,13 +127,19 @@ function MainWindow.DrawMainWindow()
 				ImGui.EndMenu()
 			end
 			if ImGui.BeginMenu("Info") then
-				if ImGui.MenuItem("Aboud BF", "") then 
-					print("[" .. os.date(Bot.UsedTimezone) .. "] ####################################") 
-					print("[" .. os.date(Bot.UsedTimezone) .. "] #  Made with love by spearmint <3  #") 
-					print("[" .. os.date(Bot.UsedTimezone) .. "] #     Thanks to: gklt, Akafist,    #") 
-					print("[" .. os.date(Bot.UsedTimezone) .. "] #  tyty123, borek24 and MrUnreal.  #")
-					print("[" .. os.date(Bot.UsedTimezone) .. "] #~Fishing is love, fishing is life~#")
-					print("[" .. os.date(Bot.UsedTimezone) .. "] ####################################") 
+				if ImGui.MenuItem("Aboud BF", "") then
+					local motto = {
+						'   ~Fishing is love, fishing is life~   ',
+						' ~So Long, and Thanks for All the Fish~ ',
+						'     ~The whole world is my hotspot~    '
+					}
+
+					print("[" .. os.date(Bot.UsedTimezone) .. "] ##########################################")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] #     Made with love by spearmint <3     #")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] #   Thanks to: gklt, Akafist, tyty123    #")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] #   pat, Pookie, borek24 and MrUnreal.   #")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] #" .. motto[math.random(#motto)] .. "#")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] ##########################################")
 				end
 				ImGui.EndMenu()
 			end

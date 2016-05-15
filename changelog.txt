@@ -171,3 +171,9 @@ Added some sort of credits <3 by gklt
 Fixed stats reset by gklt
 Fixed bot was going to a disabled NPC by gklt
 Typos by gklt
+
+[0.9b BETA]
+Added option "Stop bot when peoples is nearby"
+Fixed vendor don't buying items
+Fixed for facing wrong when fishing
+Minor fixes

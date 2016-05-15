@@ -1,0 +1,32 @@
+{
+  "FishSpotPosition": {
+    "X": 39480.171875,
+    "Y": -4001.3081054688,
+    "Z": -51117.41796875
+  },
+  "FishSpotRotation": 0.44998875260353,
+  "RepairNpcName": "Techthon",
+  "RepairNpcPosition": {
+    "X": 35791.5,
+    "Y": -2668.7700195313,
+    "Z": -40366.6015625
+  },
+  "TradeManagerNpcName": "Siuta",
+  "TradeManagerNpcPosition": {
+    "X": 38530.8984375,
+    "Y": -995.85009765625,
+    "Z": -29238.19921875
+  },
+  "VendorNpcName": "Silen",
+  "VendorNpcPosition": {
+    "X": 37254.0,
+    "Y": -3820.2199707031,
+    "Z": -50722.3984375
+  },
+  "WarehouseNpcName": "Amerigo",
+  "WarehouseNpcPosition": {
+    "X": 40853.19921875,
+    "Y": -3474.330078125,
+    "Z": -50928.0
+  }
+}

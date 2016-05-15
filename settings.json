@@ -1,0 +1,118 @@
+{
+  "AutoEscape": false,
+  "ConsumablesSettings": {
+    "Consumables": [ {
+      "ConditionName": "Time",
+      "ConditionValue": 3,
+      "Name": "None"
+    } ],
+    "ConsumeWait": 8,
+    "PreConsumeWait": 2,
+    "SecondsBetweenTries": 0.25
+  },
+  "DeathSettings": {
+    "ReviveMethod": 0
+  },
+  "DeleteUsedRods": true,
+  "HealthPercent": 80,
+  "HookFishHandleGameSettings": {
+    "AlwaysPerfect": false,
+    "NoDelay": false,
+    "UseOldAnimations": false
+  },
+  "InvFullStop": false,
+  "InventoryDeleteSettings": {
+    "DeleteDepletedItems": [],
+    "DeleteItems": [],
+    "SecondsBetweenTries": 60
+  },
+  "LastProfileName": "Heidel",
+  "LibConsumablesSettings": {
+    "Consumables": [],
+    "ConsumeWait": 1,
+    "PreConsumeWait": 0,
+    "SecondsBetweenTries": 0.25
+  },
+  "LootSettings": {
+    "LootBlue": true,
+    "LootEggs": false,
+    "LootGold": true,
+    "LootGreen": true,
+    "LootKeys": false,
+    "LootOrange": true,
+    "LootShards": true,
+    "LootWhite": false
+  },
+  "PlayerRun": true,
+  "PrintConsoleState": false,
+  "RadarMeasure": 0,
+  "RepairSettings": {
+    "Enabled": false,
+    "NpcName": "Techthon",
+    "NpcPosition": {
+      "X": 35791.5,
+      "Y": -2668.7700195313,
+      "Z": -40366.6015625
+    },
+    "RepairMethod": 0,
+    "SecondsBetweenTries": 300
+  },
+  "StartFishingSettings": {
+    "FishingMethod": 0,
+    "MaxEnergyCheat": false
+  },
+  "StopWhenPeopleNearby": false,
+  "TradeManagerSettings": {
+    "DoBargainGame": true,
+    "Enabled": true,
+    "IgnoreItemsNamed": [],
+    "NpcName": "Siuta",
+    "NpcPosition": {
+      "X": 38530.8984375,
+      "Y": -995.85009765625,
+      "Z": -29238.19921875
+    },
+    "SecondsBetweenTries": 300,
+    "SellAll": true,
+    "TradeManagerOnInventoryFull": true
+  },
+  "VendorSettings": {
+    "BuyEnabled": true,
+    "BuyItems": [ {
+      "BuyAt": 0.0,
+      "BuyMax": 3.0,
+      "Name": "Fishing Rod"
+    } ],
+    "Enabled": true,
+    "IgnoreItemsNamed": [],
+    "NpcName": "Silen",
+    "NpcPosition": {
+      "X": 37254.0,
+      "Y": -3820.2199707031,
+      "Z": -50722.3984375
+    },
+    "SecondsBetweenTries": 300,
+    "SellEnabled": false,
+    "VendorBlue": false,
+    "VendorGold": false,
+    "VendorGreen": false,
+    "VendorOnInventoryFull": false,
+    "VendorOnWeight": false,
+    "VendorWhite": false
+  },
+  "WarehouseSettings": {
+    "DepositItems": false,
+    "DepositMethod": 0,
+    "DepositMoney": false,
+    "Enabled": false,
+    "IgnoreItemsNamed": [ "Fishing Rod", "HP Potion (Beginner)" ],
+    "MoneyToKeep": 10000,
+    "NpcName": "Amerigo",
+    "NpcPosition": {
+      "X": 40853.19921875,
+      "Y": -3474.330078125,
+      "Z": -50928.0
+    },
+    "SecondsBetweenTries": 300
+  }
+}

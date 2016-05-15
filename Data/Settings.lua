@@ -19,6 +19,7 @@ function Settings.new()
 	self.PlayerRun = false
 	self.DeleteUsedRods = true
 	self.InvFullStop = false
+	self.StopWhenPeopleNearby = false
 	self.TradeManagerSettings = {}
 	self.WarehouseSettings = {}
 	self.VendorSettings = {}
