@@ -5,6 +5,8 @@ StartFishingState.Name = "Start fishing"
 StartFishingState.SETTINGS_ON_NORMAL_FISHING = 0
 StartFishingState.SETTINGS_ON_BOAT_FISHING = 1
 
+StartFishingState.good_position = false
+
 setmetatable(StartFishingState, {
   __call = function (cls, ...)
 	return cls.new(...)
@@ -169,10 +171,16 @@ function StartFishingState:Run()
 		end
 	else
 		if self.State == 0 then
-			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
-			self.State = 1
 			self.LastActionTime = Pyx.System.TickCount
+			self.State = 1
 		elseif self.State == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then
+			if StartFishingState.good_position == false then
+				selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
+				selfPlayer:SetActionState(ACTION_FLAG_MOVE_FORWARD, 100)
+				StartFishingState.good_position = true
+				self.State = 0
+			end
+
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing ...")
 			selfPlayer:DoAction("FISHING_START")
 			selfPlayer:DoAction("FISHING_ING_START")

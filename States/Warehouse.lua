@@ -66,7 +66,7 @@ function WarehouseState:NeedToRun()
 		return false
 	end
 
-	if not self:HasNpc() and Bot.Settings.OnBoat == true then
+	if not self:HasNpc() and Bot.Settings.InvFullStop == true then
 		self.Forced = false
 		return false
 	end
@@ -142,6 +142,7 @@ function WarehouseState:Run()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
+	StartFishingState.good_position = false
 
 	if equippedItem then
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)

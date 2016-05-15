@@ -23,7 +23,7 @@ function Profile.new()
 end
 
 function Profile:HasFishSpot()
-    if  self.FishSpotPosition.X ~= 0 and self.FishSpotPosition.Y ~= 0 and self.FishSpotPosition.Z ~= 0 then
+    if self.FishSpotPosition.X ~= 0 and self.FishSpotPosition.Y ~= 0 and self.FishSpotPosition.Z ~= 0 then
         return true
     else
         return false

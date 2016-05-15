@@ -34,7 +34,7 @@ function TradeManagerState.new()
 
 	self.CallWhenCompleted = nil
 	self.CallWhileMoving = nil
-	
+
 	self.BargainState = 0
 	self.BargainCount = 0
 	self.BargainDice = 0 -- Last dice, 0=high 1=low
@@ -63,9 +63,12 @@ function TradeManagerState:NeedToRun()
 		return false
 	end
 
-	if not self:HasNpc() and Bot.Settings.OnBoat == true then
+	if not self:HasNpc() and Bot.Settings.InvFullStop == true then
 		self.Forced = false
 		return false
+	elseif Bot.Settings.InvFullStop == true and selfPlayer.Inventory.FreeSlots == 0 then
+		print("[" .. os.date(Bot.UsedTimezone) .. "] Inventory full and the bot is stopped!")
+		Bot.Stop()
 	end
 
 	if self.Forced == true and not Navigator.CanMoveTo(self:GetPosition()) then
@@ -87,9 +90,7 @@ function TradeManagerState:NeedToRun()
 		return false
 	end
 
-	if 	self.Settings.TradeManagerOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3 and
-		table.length(self:GetItems()) > 0 and Navigator.CanMoveTo(self:GetPosition()) and not Looting.IsLooting
-	then
+	if self.Settings.TradeManagerOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3 and table.length(self:GetItems()) > 0 and Navigator.CanMoveTo(self:GetPosition()) and not Looting.IsLooting then
 		self.Forced = true
 		return true
 	end
@@ -128,6 +129,7 @@ function TradeManagerState:Run()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
+	StartFishingState.good_position = false
 
 	if equippedItem then
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
@@ -193,7 +195,7 @@ function TradeManagerState:Run()
 		self.CurrentSellList = self:GetItems()
 		return
 	end
-	
+
 	if self.State == 4 then
 		if self.Settings.DoBargainGame == true then
 			if self.BargainState == 0 then

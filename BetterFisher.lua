@@ -8,8 +8,6 @@ Bot.EnableDebugMainWindow = false
 Bot.EnableDebugInventory = false
 Bot.EnableDebugRadar = false
 
-Bot.StopWhenPeopleNearby = false
-
 Bot.Counter = 0
 
 Bot.Fsm = FSM()
@@ -323,12 +321,31 @@ function Bot.OnPulse()
 
 	if Bot.Running then
 		Bot.Fsm:Pulse()
-	end
 
-	if Bot.Running and Bot.StopWhenPeopleNearby then
-		if Bot.PlayerNearby then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Someone is near you, the bot is stopped for security.")
-			Bot.Stop()
+		if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe < 500 then
+			if GetSelfPlayer().IsSwimming then
+				GetSelfPlayer():DoAction("JUMP_F_A")
+			end
+		end
+
+		if Bot.Settings.StopWhenPeopleNearby then
+			local me = GetSelfPlayer()
+			local players = GetCharacters()
+			local count = 0
+			local SafeDistance = 5000
+
+			for k,v in pairs(players, function(t,a,b) return t[a].Position.Distance3DFromMe < t[b].Position.Distance3DFromMe end) do
+				if (v.IsPlayer and v.Name ~= me.Name) and math.floor(me.Position.Distance3DFromMe) <= SafeDistance then -- not string.match(me.Key, v.Key)
+					count = count + 1
+				end
+			end
+
+			if count > 0 then
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Someone is near you, the bot is stopped for security.")
+				Bot.Stop()
+			end
+
+			return count
 		end
 	end
 end
@@ -379,11 +396,13 @@ function Bot.PlayerNearby()
 	local me = GetSelfPlayer()
 	local players = GetCharacters()
 	local count = 0
+
 	for k,v in pairs(players) do
-		if v.IsPlayer and not string.match(me.Key, v.Key) then
+		if v.IsPlayer and v.Name ~= me.Name then -- not string.match(me.Key, v.Key)
 			count = count + 1
 		end
 	end
+
 	return (count > 0)
 end
 
@@ -447,6 +466,7 @@ function Bot.ConsumablesCustomRunCheck()
 			return true
 		end
 	end
+
 	return false
 end
 
@@ -454,6 +474,7 @@ function Bot.CustomWarehouseCheck(item)
 	if not table.find(Bot.Settings.WarehouseSettings.IgnoreItemsNamed, item.ItemEnchantStaticStatus.Name) and item.Type ~= 8 then
 		return true
 	end
+
 	return false
 end
 
