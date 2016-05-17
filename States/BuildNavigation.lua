@@ -1,4 +1,4 @@
-BuildNavigationState = { }
+BuildNavigationState = {}
 BuildNavigationState.__index = BuildNavigationState
 BuildNavigationState.Name = "Build Navigation"
 

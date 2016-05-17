@@ -1,4 +1,4 @@
-VendorState = { }
+VendorState = {}
 VendorState.__index = VendorState
 VendorState.Name = "Vendor"
 
@@ -9,7 +9,7 @@ setmetatable(VendorState, {
 })
 
 function VendorState.new()
-	local self = setmetatable( { }, VendorState)
+	local self = setmetatable({}, VendorState)
 	self.Settings = {
 		Enabled = true,
 		NpcName = "",
@@ -22,8 +22,8 @@ function VendorState.new()
 		VendorGold = false,
 		SellEnabled = true,
 		BuyEnabled = true,
-		IgnoreItemsNamed = { },
-		BuyItems = { },
+		IgnoreItemsNamed = {,
+		BuyItems = {},
 		SecondsBetweenTries = 300
 	}
 	-- Buy Items Format {Name, BuyAt, BuyMax} BuyAt level we should buyat or below, BuyMax Max to have in Inventory so if is 100 and we have 20 bot will buy 80
@@ -36,8 +36,8 @@ function VendorState.new()
 	self.SleepTimer = nil
 
 	self.DepositList = nil
-	self.CurrentSellList = { }
-	self.CurrentBuyList = { }
+	self.CurrentSellList = {}
+	self.CurrentBuyList = {}
 
 	self.ItemCheckFunction = nil
 

@@ -1,4 +1,4 @@
-StartFishingState = { }
+StartFishingState = {}
 StartFishingState.__index = StartFishingState
 StartFishingState.Name = "Start fishing"
 
@@ -17,6 +17,7 @@ function StartFishingState.new()
 		MaxEnergyCheat = false,
 		FishingMethod = StartFishingState.SETTINGS_ON_NORMAL_FISHING
 	}
+	
 	self.PlayerNearby = nil
 	self.SleepTimer = nil
 	self.LastStartFishTickcount = 0

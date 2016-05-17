@@ -1,4 +1,4 @@
-IdleState = { }
+IdleState = {}
 IdleState.__index = IdleState
 IdleState.Name = "Idle"
 

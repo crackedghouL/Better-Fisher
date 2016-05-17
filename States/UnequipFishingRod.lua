@@ -1,4 +1,4 @@
-UnequipFishingRodState = { }
+UnequipFishingRodState = {}
 UnequipFishingRodState.__index = UnequipFishingRodState
 UnequipFishingRodState.Name = "Unequip fishing rod"
 

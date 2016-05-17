@@ -1,4 +1,4 @@
-DeathState = { }
+DeathState = {}
 DeathState.__index = DeathState
 DeathState.Name = "Death"
 

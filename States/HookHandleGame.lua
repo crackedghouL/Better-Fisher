@@ -1,4 +1,4 @@
-HookFishHandleGameState = { }
+HookFishHandleGameState = {}
 HookFishHandleGameState.__index = HookFishHandleGameState
 HookFishHandleGameState.Name = "Hook game"
 

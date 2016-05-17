@@ -1,4 +1,4 @@
-RepairState = { }
+RepairState = {}
 RepairState.__index = RepairState
 RepairState.Name = "Repair"
 
@@ -12,7 +12,7 @@ setmetatable(RepairState, {
 })
 
 function RepairState.new()
-	local self = setmetatable( { }, RepairState)
+	local self = setmetatable({}, RepairState)
 	self.Settings = {
 		Enabled = true,
 		NpcName = "",

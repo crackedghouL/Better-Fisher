@@ -1,4 +1,4 @@
-MoveToFishingSpotState = { }
+MoveToFishingSpotState = {}
 MoveToFishingSpotState.__index = MoveToFishingSpotState
 MoveToFishingSpotState.Name = "Move to fish spot"
 

@@ -1,4 +1,4 @@
-WarehouseState = { }
+WarehouseState = {}
 WarehouseState.__index = WarehouseState
 WarehouseState.Name = "Warehouse"
 
@@ -22,7 +22,7 @@ function WarehouseState.new()
 		DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR,
 		DepositMoney = false,
 		MoneyToKeep = 10000,
-		IgnoreItemsNamed = { },
+		IgnoreItemsNamed = {},
 		SecondsBetweenTries = 300
 	}
 
@@ -34,7 +34,7 @@ function WarehouseState.new()
 	self.SleepTimer = nil
 
 	self.DepositList = nil
-	self.CurrentDepositList = { }
+	self.CurrentDepositList = {}
 	self.DepositedMoney = false
 	self.DepositItems = false
 

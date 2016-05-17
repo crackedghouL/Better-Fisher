@@ -1,4 +1,4 @@
-EquipFloatState = { }
+EquipFloatState = {}
 EquipFloatState.__index = EquipFloatState
 EquipFloatState.Name = "Equip Float"
 

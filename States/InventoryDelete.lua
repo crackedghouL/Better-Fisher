@@ -1,4 +1,4 @@
-InventoryDeleteState = { }
+InventoryDeleteState = {}
 InventoryDeleteState.__index = InventoryDeleteState
 InventoryDeleteState.Name = "Inventory Delete"
 
@@ -9,7 +9,7 @@ setmetatable(InventoryDeleteState, {
 })
 
 function InventoryDeleteState.new()
-	local self = setmetatable( { }, InventoryDeleteState)
+	local self = setmetatable({}, InventoryDeleteState)
 	self.State = 0
 	self.Settings = {
 		DeleteItems = {},

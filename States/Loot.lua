@@ -1,4 +1,4 @@
-LootState = { }
+LootState = {}
 LootState.__index = LootState
 LootState.Name = "Loot"
 
