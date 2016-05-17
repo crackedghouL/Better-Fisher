@@ -417,10 +417,6 @@ function BotSettings.DrawBotSettings()
 						ImGui.SameLine()
 						ImGui.Text("Enable Main Window Debug")
 
-						_, Bot.EnableDebugRadar = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_radar", Bot.EnableDebugRadar)
-						ImGui.SameLine()
-						ImGui.Text("Enable Radar Debug")
-
 						_, Bot.EnableDebugInventory = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_inventory", Bot.EnableDebugInventory)
 						ImGui.SameLine()
 						ImGui.Text("Enable Inventory Debug")

@@ -61,13 +61,6 @@ function MainWindow.DrawMainWindow()
 				ImGui.EndMenu()
 			end
 			if ImGui.BeginMenu("Extra") then
-				if ImGui.MenuItem("Radar", "ALT+R", Radar.Visible) then
-					if Radar.Visible == false then
-						Radar.Visible = true
-					elseif Radar.Visible == true then
-						Radar.Visible = false
-					end
-				end
 				if ImGui.MenuItem("Inventory", "ALT+B", InventoryList.Visible) then
 					if InventoryList.Visible == false then
 						InventoryList.Visible = true

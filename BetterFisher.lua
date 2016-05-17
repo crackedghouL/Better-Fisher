@@ -6,7 +6,6 @@ Bot.PrintConsoleState = false
 Bot.EnableDebug = false
 Bot.EnableDebugMainWindow = false
 Bot.EnableDebugInventory = false
-Bot.EnableDebugRadar = false
 
 Bot.Counter = 0
 
@@ -38,12 +37,14 @@ end
 
 function Bot.comma_value(amount)
 	local formatted = amount
+
 	while true do
 		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1.%2')
-		if (k==0) then
+		if (k == 0) then
 			break
 		end
 	end
+
 	return formatted
 end
 
@@ -224,15 +225,6 @@ function Bot.OnPulse()
 					BotSettings.Visible = false
 				end
 			end
-		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('R')) then
-			if Bot._radarHotKeyPressed ~= true then
-				Bot._radarHotKeyPressed = true
-				if Radar.Visible == false then
-					Radar.Visible = true
-				elseif Radar.Visible == true then
-					Radar.Visible = false
-				end
-			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('B')) then
 			if Bot._inventoryHotKeyPressed ~= true then
 				Bot._inventoryHotKeyPressed = true
@@ -304,7 +296,6 @@ function Bot.OnPulse()
 			Bot._startHotKeyPressed = false
 			Bot._profileHotKeyPressed = false
 			Bot._settingsHotKeyPressed = false
-			Bot._radarHotKeyPressed = false
 			Bot._inventoryHotKeyPressed = false
 			Bot._consumableHotKeyPressed = false
 			Bot._statsHotKeyPressed = false
@@ -459,6 +450,7 @@ end
 
 function Bot.ConsumablesCustomRunCheck()
 	local selfPlayer = GetSelfPlayer()
+
 	if selfPlayer.CurrentActionName == "WAIT" then
 		local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
