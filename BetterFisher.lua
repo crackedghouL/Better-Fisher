@@ -1,15 +1,23 @@
 Bot = { }
 Bot.Settings = Settings()
 
+Bot.Version = "Better Fisher v0.9b BETA"
+
 Bot.Running = false
 Bot.PrintConsoleState = false
 Bot.EnableDebug = false
 Bot.EnableDebugMainWindow = false
 Bot.EnableDebugInventory = false
 
+Bot.Time = nil
+Bot.Hours = nil
+Bot.Minutes = nil
+Bot.Seconds = nil
+
 Bot.Counter = 0
 
 Bot.Fsm = FSM()
+Bot.IdleState = IdleState()
 Bot.DeathState = DeathState()
 Bot.BuildNavigationState = BuildNavigationState()
 Bot.MoveToFishingSpotState = MoveToFishingSpotState()
@@ -78,7 +86,6 @@ Bot.ResetStats()
 function Bot.Start()
 	if not Bot.Running then
 		Bot.Stats.SessionStart = Pyx.System.TickCount
-		-- Bot.ResetStats() --Only manual reset for long time stats with player interactions ?
 		Bot.SaveSettings()
 
 		Bot.TradeManagerState.Forced = false
@@ -178,8 +185,15 @@ function Bot.Start()
 			Bot.Fsm:AddState(Bot.StartFishingState)
 			Bot.Fsm:AddState(Bot.MoveToFishingSpotState)
 		end
-		Bot.Fsm:AddState(IdleState())
+		Bot.Fsm:AddState(Bot.IdleState)
 		Bot.Running = true
+	end
+
+	if Bot.Running then
+		Bot.Time = math.ceil((Bot.Stats.TotalSession + Pyx.System.TickCount - Bot.Stats.SessionStart) / 1000)
+		Bot.Seconds = Bot.Time % 60
+		Bot.Minutes = math.floor(Bot.Time / 60) % 60
+		Bot.Hours = math.floor(Bot.Time / (60 * 60))
 	end
 end
 
@@ -195,7 +209,7 @@ function Bot.Stop()
 end
 
 function Bot.OnPulse()
-	if Pyx.Input.IsGameForeground() then -- pause to start or stop bot
+	if Pyx.Input.IsGameForeground() then
 		if Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('S')) then
 			if Bot._startHotKeyPressed ~= true then
 				Bot._startHotKeyPressed = true
@@ -259,7 +273,7 @@ function Bot.OnPulse()
 					Bot.WarehouseState.ManualForced = true
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Warehouse")
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the bot first!")
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('T')) then
@@ -269,7 +283,7 @@ function Bot.OnPulse()
 					Bot.TradeManagerState.ManualForced = true
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Trader")
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the bot first!")
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('V')) then
@@ -279,7 +293,7 @@ function Bot.OnPulse()
 					Bot.VendorState.ManualForced = true
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Vendor")
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the bot first!")
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('G')) then
@@ -289,7 +303,7 @@ function Bot.OnPulse()
 					Bot.RepairState.ManualForced = true
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Go Repair")
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the bot first!")
 				end
 			end
 		else
@@ -312,6 +326,12 @@ function Bot.OnPulse()
 
 	if Bot.Running then
 		Bot.Fsm:Pulse()
+
+		if Bot.Hours == nil then
+			Bot.Hours = 0
+			Bot.Minutes = 0
+			Bot.Seconds = 0
+		end
 
 		if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe < 500 then
 			if GetSelfPlayer().IsSwimming then

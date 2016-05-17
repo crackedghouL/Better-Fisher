@@ -384,9 +384,6 @@ function BotSettings.DrawBotSettings()
 					ImGui.SameLine()
 					ImGui.Text("Sprint when moving instead of walking")
 				end
-				_, Bot.Settings.HookFishHandleGameSettings.UseOldAnimations = ImGui.Checkbox("##id_guid_adv_option_old_animations", Bot.Settings.HookFishHandleGameSettings.UseOldAnimations)
-				ImGui.SameLine()
-				ImGui.Text("Use old animations when fishing")
 				if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_BOAT_FISHING then
 					_, Bot.Settings.InvFullStop = ImGui.Checkbox("##id_guid_adv_option_invfullstop", Bot.Settings.InvFullStop)
 					ImGui.SameLine()
