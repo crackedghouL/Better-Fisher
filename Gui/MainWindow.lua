@@ -17,19 +17,6 @@ function MainWindow.DrawMainWindow()
 	if shouldDisplay then
 		local selfPlayer = GetSelfPlayer()
 
-		if h == nil then
-			h = 0
-			m = 0
-			s = 0
-		end
-
-		if Bot.Running then
-			t = math.ceil((Bot.Stats.TotalSession + Pyx.System.TickCount - Bot.Stats.SessionStart) / 1000)
-			s = t % 60
-			m = math.floor(t / 60) % 60
-			h = math.floor(t / (60 * 60))
-		end
-
 		if ImGui.BeginMenuBar() then
 			if ImGui.BeginMenu("Settings") then
 				if ImGui.MenuItem("Start/Stop", "ALT+S") then
@@ -175,7 +162,7 @@ function MainWindow.DrawMainWindow()
 		ImGui.Separator()
 
 		ImGui.Columns(2)
-		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", h, m, s))
+		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", Bot.Hours, Bot.MInutes, Bot.Seconds))
 		ImGui.NextColumn()
 		ImGui.Text("Loots: " .. string.format("%i", Bot.Stats.Loots))
 

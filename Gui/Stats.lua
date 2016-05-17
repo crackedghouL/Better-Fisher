@@ -16,19 +16,6 @@ function Stats.DrawStats()
 	if Stats.Visible then
 		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 220), -1.0)
 
-		if h == nil then
-			h = 0
-			m = 0
-			s = 0
-		end
-
-		if Bot.Running then
-			t = math.ceil((Bot.Stats.TotalSession + Pyx.System.TickCount - Bot.Stats.SessionStart) / 1000)
-			s = t % 60
-			m = math.floor(t / 60) % 60
-			h = math.floor(t / (60 * 60))
-		end
-
 		if Bot.Stats.Loots > 0 then
 			statsWhites = string.format("%i - %.02f%%%%", Bot.Stats.LootQuality[0] or 0, (Bot.Stats.LootQuality[0] or 0) / Bot.Stats.Loots * 100)
 			statsGreens = string.format("%i - %.02f%%%%", Bot.Stats.LootQuality[1] or 0, (Bot.Stats.LootQuality[1] or 0) / Bot.Stats.Loots * 100)
@@ -52,7 +39,7 @@ function Stats.DrawStats()
 		end
 
 		ImGui.Columns(3)
-		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", h, m, s))
+		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", Bot.Hours, Bot.Minutes, Bot.Seconds))
 		ImGui.NextColumn()
 		ImGui.Text("Loots: " .. string.format("%i", Bot.Stats.Loots))
 		ImGui.NextColumn()
