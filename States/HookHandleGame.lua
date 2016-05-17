@@ -12,8 +12,7 @@ function HookFishHandleGameState.new()
 	local self = setmetatable({}, HookFishHandleGameState)
 	self.Settings = {
 		NoDelay = false,
-		AlwaysPerfect = false,
-		UseOldAnimations = false
+		AlwaysPerfect = false
 	}
 	self.LastGameTick = 0
 	self.RandomWaitTime = 0
