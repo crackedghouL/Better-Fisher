@@ -26,9 +26,6 @@ function BotSettings.DrawBotSettings()
 	if BotSettings.Visible == true then
 		_, BotSettings.Visible = ImGui.Begin("Bot Settings", BotSettings.Visible, ImVec2(350, 400), -1.0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)
 
-		BotSettings.UpdateInventoryList()
-		BotSettings.UpdateBaitComboBox()
-
 		if ImGui.Button("Save settings", ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
 			Bot.SaveSettings()
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Settings saved")
@@ -54,6 +51,8 @@ function BotSettings.DrawBotSettings()
 		ImGui.Spacing()
 
 		if ImGui.CollapsingHeader("Fishing options", "if_gui_fishing_option", true, false) then
+			BotSettings.UpdateBaitComboBox()
+
 			if not table.find(BotSettings.BaitComboBoxItems, Bot.Settings.ConsumablesSettings.Consumables[1].Name) then
 				table.insert(BotSettings.BaitComboBoxItems, Bot.Settings.ConsumablesSettings.Consumables[1].Name)
 			end
@@ -103,6 +102,8 @@ function BotSettings.DrawBotSettings()
 
 		if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_NORMAL_FISHING then
 			if ImGui.CollapsingHeader("NPCs options", "id_gui_npc_option", true, false) then
+				BotSettings.UpdateInventoryList()
+
 				ImGui.Columns(2)
 				_, Bot.Settings.TradeManagerSettings.Enabled = ImGui.Checkbox("##id_gui_npc_option_enable_trader", Bot.Settings.TradeManagerSettings.Enabled)
 				ImGui.SameLine()
