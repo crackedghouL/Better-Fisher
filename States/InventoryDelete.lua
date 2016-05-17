@@ -81,7 +81,7 @@ function InventoryDeleteState:Run()
 end
 
 function InventoryDeleteState:GetItems()
-	local items = { }
+	local items = {}
 	local selfPlayer = GetSelfPlayer()
 
 	if selfPlayer then

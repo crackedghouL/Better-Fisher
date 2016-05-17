@@ -32,6 +32,7 @@ function EquipFloatState:NeedToRun()
 	self.EquippedState = 0 -- 0 = nothing
 
 	local selfPlayer = GetSelfPlayer()
+	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_LEFT_HAND)
 
 	if not selfPlayer then
 		return false
@@ -54,7 +55,6 @@ function EquipFloatState:NeedToRun()
 			if Bot.EnableDebug == true then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.ItemEnchantStaticStatus.Name .. " which have durability found")
 			end
-
 			self.EquipState = 1
 		end
 
@@ -63,7 +63,6 @@ function EquipFloatState:NeedToRun()
 				if Bot.EnableDebug == true then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.ItemEnchantStaticStatus.Name .. " have more than 0 durability left")
 				end
-
 				self.EquipState = 2
 			end
 		end
@@ -73,9 +72,6 @@ function EquipFloatState:NeedToRun()
 			if string.find(v.ItemEnchantStaticStatus.Name, "Float") then
 				if Bot.EnableDebug == true then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] The item have in the a '+' in the name, so is a enhanced float")
-				end
-
-				if Bot.EnableDebug == true then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
 				end
 				self.ItemToEquip = v
@@ -84,7 +80,6 @@ function EquipFloatState:NeedToRun()
 				if Bot.EnableDebug == true then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Maybe " .. v.ItemEnchantStaticStatus.Name .. " is a know float?")
 				end
-
 				self.EquipState = 3
 			end
 		end
@@ -126,8 +121,6 @@ function EquipFloatState:NeedToRun()
 		return false
 	end
 
-	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_LEFT_HAND)
-
 	if not equippedItem then
 		return true
 	else
@@ -154,18 +147,10 @@ function EquipFloatState:NeedToRun()
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 278312 or	-- Maple Float +4
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 343848		-- Maple Float +5
 		then
-			self.EquippedState = 3
+			return false
 		else
-			self.EquippedState = 4
+			return true
 		end
-	end
-
-	if self.EquippedState == 3 then
-		return false
-	end
-
-	if self.EquippedState == 4 then
-		return true
 	end
 
 	return equippedItem.Endurance == 0

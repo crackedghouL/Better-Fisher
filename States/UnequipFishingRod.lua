@@ -113,18 +113,10 @@ function UnequipFishingRodState:NeedToRun()
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 540452 or -- Calpheon Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 540453	 -- Mediah Rod
 		then
-			self.EquippedState = 4
+			return true
 		else
-			self.EquippedState = 5
+			return false
 		end
-	end
-
-	if self.EquippedState == 4 then
-		return true
-	end
-
-	if self.EquippedState == 5 then
-		return false
 	end
 
 	return equippedItem.Endurance == 0

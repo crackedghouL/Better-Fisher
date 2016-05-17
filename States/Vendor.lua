@@ -147,7 +147,6 @@ function VendorState:Run()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
-	StartFishingState.good_position = false
 
 	if equippedItem then
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
@@ -170,7 +169,7 @@ function VendorState:Run()
 	Navigator.Stop()
 
 	if self.SleepTimer ~= nil and self.SleepTimer:IsRunning() and not self.SleepTimer:Expired() then
-		return
+		return false
 	end
 
 	if table.length(npcs) < 1 then
@@ -187,7 +186,7 @@ function VendorState:Run()
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
 		self.State = 2
-		return true
+		return
 	end
 
 	if self.State == 2 then -- 2 = create buy and/or sell lists
@@ -224,7 +223,7 @@ function VendorState:Run()
 			self.State = 5
 		end
 
-		return true
+		return
 	end
 
 	if self.State == 3 then -- 3 = sell items and clear sell list
@@ -248,31 +247,34 @@ function VendorState:Run()
 		end
 
 		table.remove(self.CurrentSellList, 1)
-		return true
+		return
 	end
 
 	if self.State == 4 then -- 4 = buy items and clear buy list
 		if table.length(self.CurrentBuyList) < 1 then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Buy from " .. self.Settings.NpcName .. " done")
+			if Bot.EnableDebug then
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Buy from " .. self.Settings.NpcName .. " done")
+			end
 			self.SleepTimer = PyxTimer:New(2)
 			self.SleepTimer:Start()
 			self.State = 5
-			return true
+			return
 		else
 			if selfPlayer.Inventory.FreeSlots <= 0 then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Inventory is full")
 				self.State = 5
-				return true
+				return
 			end
 		end
 
 		local item = self.CurrentBuyList[1]
 		local itemPtr = self:GetBuyItemByName(item.name)
 		if itemPtr ~= nil then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Buying " .. item.name .. " Quantity: " .. item.countNeeded)
+			print("[" .. os.date(Bot.UsedTimezone) .. "] Buying " .. item.name .. " quantity: " .. item.countNeeded)
 			for cnt = 1, item.countNeeded do
 				itemPtr:Buy(1)
 			end
+
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
 		else
@@ -282,10 +284,22 @@ function VendorState:Run()
 		end
 
 		table.remove(self.CurrentBuyList, 1)
-		return true
+		return
 	end
 
-	if self.State == 5 then -- 5 = state complete
+	if self.State == 5 then -- 5 = close correctly the npc window
+		if NpcShop.IsShopping then
+			NpcShop.Close()
+		end
+
+		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer:Start()
+		Bot.SilverStats()
+		self.State = 6
+		return
+	end
+
+	if self.State == 6 then -- 6 = state complete
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end

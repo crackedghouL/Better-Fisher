@@ -122,6 +122,7 @@ end
 function RepairState:HasNpc()
 	return string.len(self.Settings.NpcName) > 0
 end
+
 function RepairState:GetPosition()
 	return Vector3(self.Settings.NpcPosition.X, self.Settings.NpcPosition.Y, self.Settings.NpcPosition.Z)
 end
@@ -155,7 +156,6 @@ function RepairState:Run()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
-	StartFishingState.good_position = false
 
 	if equippedItem then
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
@@ -191,6 +191,7 @@ function RepairState:Run()
 
 	table.sort(npcs, function(a,b) return a.Position:GetDistance3D(vendorPosition) < b.Position:GetDistance3D(vendorPosition) end)
 	local npc = npcs[1]
+
 	if self.State == 1 then
 		npc:InteractNpc()
 		self.SleepTimer = PyxTimer:New(3)

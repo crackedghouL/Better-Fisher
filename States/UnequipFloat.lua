@@ -75,18 +75,10 @@ function UnequipFloatState:NeedToRun()
 																		 -- Palm Tree Float +4
 																		 -- Palm Tree Float +5
 		then
-			self.EquippedState = 3
+			return true
 		else
-			self.EquippedState = 4
+			return false
 		end
-	end
-
-	if self.EquippedState == 3 then
-		return true
-	end
-
-	if self.EquippedState == 4 then
-		return false
 	end
 
 	return equippedItem.Endurance == 0

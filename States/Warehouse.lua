@@ -36,6 +36,7 @@ function WarehouseState.new()
 	self.DepositList = nil
 	self.CurrentDepositList = { }
 	self.DepositedMoney = false
+	self.DepositItems = false
 
 	self.ItemCheckFunction = nil
 
@@ -115,11 +116,12 @@ end
 
 function WarehouseState:Reset()
 	self.State = 0
+	self.LastUseTimer = nil
+	self.SleepTimer = nil
 	self.Forced = false
 	self.ManualForced = false
 	self.DepositedMoney = false
-	self.LastUseTimer = nil
-	self.SleepTimer = nil
+	self.DepositItems = false
 end
 
 function WarehouseState:Exit()
@@ -135,6 +137,7 @@ function WarehouseState:Exit()
 		self.Forced = false
 		self.ManualForced = false
 		self.DepositedMoney = false
+		self.DepositItems = false
 	end
 end
 
@@ -142,7 +145,6 @@ function WarehouseState:Run()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
-	StartFishingState.good_position = false
 
 	if equippedItem then
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
@@ -179,7 +181,7 @@ function WarehouseState:Run()
 	table.sort(npcs, function(a,b) return a.Position:GetDistance3D(vendorPosition) < b.Position:GetDistance3D(vendorPosition) end)
 	local npc = npcs[1]
 
-	if self.State == 1 then
+	if self.State == 1 then -- 1 = open npc dialog
 		npc:InteractNpc()
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
@@ -187,7 +189,7 @@ function WarehouseState:Run()
 		return
 	end
 
-	if self.State == 2 then
+	if self.State == 2 then -- 2 = create deposit list
 		if not Dialog.IsTalking then
 			print("[" .. os.date(Bot.UsedTimezone) .. "] " .. self.Settings.NpcName " dialog didn't open")
 			self.SleepTimer = PyxTimer:New(3)
@@ -196,17 +198,21 @@ function WarehouseState:Run()
 		end
 
 		BDOLua.Execute("Warehouse_OpenPanelFromDialog()")
-		self.SleepTimer = PyxTimer:New(5)
+		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
-		self.State = 3
-		self.CurrentDepositList = self:GetItems()
-		if Bot.EnableDebug then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Deposit list done")
+
+		if self.Settings.DepositItems or (not self.Settings.DepositItems and self.ManualForced) then
+			if Bot.EnableDebug then
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Deposit list done")
+			end
+			self.CurrentDepositList = self:GetItems()
 		end
+
+		self.State = 3
 		return
 	end
 
-	if self.State == 3 then
+	if self.State == 3 then -- 3 = deposit money
 		if not self.DepositedMoney and (self.Settings.DepositMoney or self.ManualForced) then
 			local toDeposit = selfPlayer.Inventory.Money - self.Settings.MoneyToKeep
 			if toDeposit > 0 then
@@ -222,18 +228,13 @@ function WarehouseState:Run()
 		end
 	end
 
-	if self.State == 4 then
+	if self.State == 4 then -- 4 = deposit items
 		if table.length(self.CurrentDepositList) < 1 then
-			if self.DepositedMoney and (self.Settings.DepositItems or self.ManualForced) then
-				if self.CallWhenCompleted then
-					self.CallWhenCompleted(self)
-				end
-			end
-
 			Bot.Stats.SilverGained = Bot.Stats.SilverGained + 1
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
-			self:Exit()
+			self.DepositItems = true
+			self.State = 5
 			return
 		end
 
@@ -247,7 +248,7 @@ function WarehouseState:Run()
 			end
 
 			itemPtr:PushToWarehouse(npc)
-			self.SleepTimer = PyxTimer:New(3)
+			self.SleepTimer = PyxTimer:New(2)
 			self.SleepTimer:Start()
 		end
 
@@ -255,7 +256,14 @@ function WarehouseState:Run()
 		return
 	end
 
+	if self.State == 5 then -- 5 = state complete
+		if self.CallWhenCompleted then
+			self.CallWhenCompleted(self)
+		end
+	end
+
 	self:Exit()
+	return false
 end
 
 function WarehouseState:GetItems()
