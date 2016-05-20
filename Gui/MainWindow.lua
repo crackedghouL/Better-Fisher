@@ -17,6 +17,12 @@ function MainWindow.DrawMainWindow()
 	if shouldDisplay then
 		local selfPlayer = GetSelfPlayer()
 
+		if Bot.Hours == nil then
+			Bot.Hours = 0
+			Bot.Minutes = 0
+			Bot.Seconds = 0
+		end
+
 		if ImGui.BeginMenuBar() then
 			if ImGui.BeginMenu("Settings") then
 				if ImGui.MenuItem("Start/Stop", "ALT+S") then
