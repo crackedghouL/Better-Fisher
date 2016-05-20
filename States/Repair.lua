@@ -44,6 +44,10 @@ function RepairState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
+	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+		return false
+	end
+
 	if not selfPlayer then
 		return false
 	end
@@ -57,32 +61,17 @@ function RepairState:NeedToRun()
 		return false
 	end
 
-	if not self:HasNpc() and Bot.Settings.InvFullStop == true then
+	if not Bot.Settings.EnableRepair then
 		self.Forced = false
 		return false
 	end
 
-	if Bot.Settings.EnableRepair == false then
+	if not self:HasNpc() and Bot.Settings.InvFullStop then
 		self.Forced = false
 		return false
 	end
 
-	if self.Forced == true and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.Forced = false
-		return false
-	elseif self.Forced == true then
-		return true
-	end
-
-	if self.ManualForced == true and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.ManualForced = false
-		self.Forced = false
-		return false
-	elseif self.ManualForced == true then
-		return true
-	end
-
-	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+	if Looting.IsLooting and selfPlayer.CurrentActionName == "WAIT" then
 		return false
 	end
 
@@ -114,6 +103,21 @@ function RepairState:NeedToRun()
 				end
 			end
 		end
+	end
+
+	if self.Forced and not Navigator.CanMoveTo(self:GetPosition()) then
+		self.Forced = false
+		return false
+	elseif self.Forced then
+		return true
+	end
+
+	if self.ManualForced and not Navigator.CanMoveTo(self:GetPosition()) then
+		self.ManualForced = false
+		self.Forced = false
+		return false
+	elseif self.ManualForced then
+		return true
 	end
 
 	return false
@@ -252,28 +256,28 @@ function RepairState:Run()
 end
 
 function RepairState:GetItems()
-    local items = { }
+    local items = {}
     local selfPlayer = GetSelfPlayer()
     if selfPlayer then
         for k,v in pairs(selfPlayer.EquippedItems) do
             if self.ItemCheckFunction then
                 if self.ItemCheckFunction(v) then
-                    table.insert(items, { item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count })
+                    table.insert(items, {item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
                 end
             else
                 if v.HasEndurance and v.EndurancePercent < 100 then
-                    table.insert(items, { item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count })
+                    table.insert(items, {item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
                 end
             end
         end
         for k,v in pairs(selfPlayer.Inventory.Items) do
             if self.ItemCheckFunction then
                 if self.ItemCheckFunction(v) then
-                    table.insert(items, { item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count })
+                    table.insert(items, {item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
                 end
             else
                 if v.HasEndurance and v.EndurancePercent < 100 then
-                    table.insert(items, { item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count })
+                    table.insert(items, {item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
                 end
             end
         end

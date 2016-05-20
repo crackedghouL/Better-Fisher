@@ -50,6 +50,10 @@ end
 function VendorState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 
+	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+		return false
+	end
+
 	if not selfPlayer then
 		return false
 	end
@@ -63,35 +67,21 @@ function VendorState:NeedToRun()
 		return false
 	end
 
-	if not self:HasNpc() and Bot.Settings.InvFullStop == true then
+	if not self:HasNpc() and Bot.Settings.InvFullStop then
 		self.Forced = false
 		return false
 	end
 
-	if self.Settings.SellEnabled == false and self.Settings.BuyEnabled == false then
+	if Looting.IsLooting and selfPlayer.CurrentActionName == "WAIT" then
+		return false
+	end
+
+	if not self.Settings.SellEnabled and not self.Settings.BuyEnabled then
 		self.Forced = false
 		return false
 	end
 
-	if self.Forced and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.Forced = false
-		return false
-	elseif self.Forced == true then
-		return true
-	end
-
-	if self.ManualForced and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.ManualForced = false
-		return false
-	elseif self.ManualForced == true then
-		return true
-	end
-
-	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
-		return false
-	end
-
-	if self.Settings.SellEnabled == true then
+	if self.Settings.SellEnabled then
 		if self.Settings.VendorOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3 and table.length(self:GetSellItems()) > 0 and Navigator.CanMoveTo(self:GetPosition()) then
 			self.Forced = true
 			return true
@@ -101,11 +91,25 @@ function VendorState:NeedToRun()
 		end
 	end
 
-	if self.Settings.BuyEnabled == true then
+	if self.Settings.BuyEnabled then
 		if self.Settings.BuyItems and table.length(self:GetBuyItems(false)) > 0 and Navigator.CanMoveTo(self:GetPosition()) then
 			self.Forced = true
 			return true
 		end
+	end
+
+	if self.Forced and not Navigator.CanMoveTo(self:GetPosition()) then
+		self.Forced = false
+		return false
+	elseif self.Forced then
+		return true
+	end
+
+	if self.ManualForced and not Navigator.CanMoveTo(self:GetPosition()) then
+		self.ManualForced = false
+		return false
+	elseif self.ManualForced then
+		return true
 	end
 
 	return false
@@ -121,10 +125,10 @@ end
 
 function VendorState:Reset()
 	self.State = 0
-	self.Forced = false
-	self.ManualForced = false
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
+	self.Forced = false
+	self.ManualForced = false
 end
 
 function VendorState:Exit()
@@ -134,11 +138,11 @@ function VendorState:Exit()
 		end
 
 		self.State = 0
-		self.Forced = false
-		self.ManualForced = false
 		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastUseTimer:Start()
 		self.SleepTimer = nil
+		self.Forced = false
+		self.ManualForced = false
 	end
 end
 
@@ -200,7 +204,7 @@ function VendorState:Run()
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
 
-		if self.Settings.BuyEnabled == true and self.Settings.SellEnabled == true then
+		if self.Settings.BuyEnabled and self.Settings.SellEnabled then
 			if Bot.EnableDebug then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Buy/Sell list done")
 			end
@@ -330,7 +334,7 @@ function VendorState:CanSellGrade(item)
 end
 
 function VendorState:GetSellItems()
-	local items = { }
+	local items = {}
 	local selfPlayer = GetSelfPlayer()
 
 	if selfPlayer then
@@ -338,11 +342,11 @@ function VendorState:GetSellItems()
 			if not v.ItemEnchantStaticStatus.IsFishingRod then
 				if self.ItemCheckFunction then
 					if self.ItemCheckFunction(v) then
-						table.insert(items, { slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count })
+						table.insert(items, {slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
 					end
 				else
-					if not table.find(self.Settings.IgnoreItemsNamed, v.ItemEnchantStaticStatus.Name) and self:CanSellGrade(v) == true then
-						table.insert(items, { slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count })
+					if not table.find(self.Settings.IgnoreItemsNamed, v.ItemEnchantStaticStatus.Name) and self:CanSellGrade(v) then
+						table.insert(items, {slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
 					end
 				end
 			end

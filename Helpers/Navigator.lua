@@ -1,4 +1,4 @@
-Navigator = { }
+Navigator = {}
 Navigator.Running = false
 Navigator.Destination = Vector3(0, 0, 0)
 Navigator.Waypoints = { }
@@ -42,7 +42,7 @@ end
 
 function Navigator.MoveToStraight(destination)
 	local selfPlayer = GetSelfPlayer()
-	Navigator.Waypoints = { }
+	Navigator.Waypoints = {}
 	table.insert(Navigator.Waypoints, destination)
 	Navigator.Destination = destination
 	Navigator.Running = true

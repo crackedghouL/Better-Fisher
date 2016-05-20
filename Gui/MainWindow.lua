@@ -2,7 +2,7 @@
 -- Variables
 -----------------------------------------------------------------------------
 
-MainWindow = { }
+MainWindow = {}
 
 MainWindow.Popupconfirm = false
 MainWindow.ConfirmPopup = false
@@ -21,7 +21,7 @@ function MainWindow.DrawMainWindow()
 			if ImGui.BeginMenu("Settings") then
 				if ImGui.MenuItem("Start/Stop", "ALT+S") then
 					if not Bot.Running then
-						if Bot.Settings.DeleteUsedRods == true then
+						if Bot.Settings.DeleteUsedRods then
 							ConfirmWindow.Visible = true
 						else
 							Bot.Start()
@@ -32,16 +32,16 @@ function MainWindow.DrawMainWindow()
 				end
 				ImGui.Separator()
 				if ImGui.MenuItem("Open Profile Editor", "ALT+P", ProfileEditor.Visible) then
-					if ProfileEditor.Visible == false then
+					if not ProfileEditor.Visible then
 						ProfileEditor.Visible = true
-					elseif ProfileEditor.Visible == true then
+					elseif ProfileEditor.Visible then
 						ProfileEditor.Visible = false
 					end
 				end
 				if ImGui.MenuItem("Open Bot Settings", "ALT+O", BotSettings.Visible) then
-					if BotSettings.Visible == false then
+					if not BotSettings.Visible then
 						BotSettings.Visible = true
-					elseif BotSettings.Visible == true then
+					elseif BotSettings.Visible then
 						BotSettings.Visible = false
 					end
 				end
@@ -49,23 +49,23 @@ function MainWindow.DrawMainWindow()
 			end
 			if ImGui.BeginMenu("Extra") then
 				if ImGui.MenuItem("Inventory", "ALT+B", InventoryList.Visible) then
-					if InventoryList.Visible == false then
+					if not InventoryList.Visible then
 						InventoryList.Visible = true
-					elseif InventoryList.Visible == true then
+					elseif InventoryList.Visible then
 						InventoryList.Visible = false
 					end
 				end
 				if ImGui.MenuItem("Consumables", "ALT+C", LibConsumableWindow.Visible) then
-					if LibConsumableWindow.Visible == false then
+					if not LibConsumableWindow.Visible then
 						LibConsumableWindow.Visible = true
-					elseif LibConsumableWindow.Visible == true then
+					elseif LibConsumableWindow.Visible then
 						LibConsumableWindow.Visible = false
 					end
 				end
 				if ImGui.MenuItem("Loot stats", "ALT+L",Stats.Visible) then
-					if Stats.Visible == false then
+					if not Stats.Visible then
 						Stats.Visible = true
-					elseif Stats.Visible == true then
+					elseif Stats.Visible then
 						Stats.Visible = false
 					end
 				end
@@ -111,7 +111,8 @@ function MainWindow.DrawMainWindow()
 					local motto = {
 						'   ~Fishing is love, fishing is life~   ',
 						' ~So Long, and Thanks for All the Fish~ ',
-						'     ~The whole world is my hotspot~    '
+						'     ~The whole world is my hotspot~    ',
+						'  ~The power of fish makes us infinite~ '
 					}
 
 					print("[" .. os.date(Bot.UsedTimezone) .. "] ##########################################")
@@ -132,11 +133,11 @@ function MainWindow.DrawMainWindow()
 		ImGui.SameLine()
 		if not Bot.EnableDebugMainWindow then
 			if Bot.Running and Bot.Fsm.CurrentState then
-				ImGui.TextColored(ImVec4(0.20,1,0.20,1), "Running")
+				ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Running")
 			elseif selfPlayer.Inventory.FreeSlots == 0 then
-				ImGui.TextColored(ImVec4(1,0.20,0.20,1), "Inv. Full")
+				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Inv. Full")
 			else
-				ImGui.TextColored(ImVec4(1,0.20,0.20,1), "Stopped")
+				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Stopped")
 			end
 		else
 			ImGui.Text(selfPlayer.CurrentActionName)
@@ -147,13 +148,13 @@ function MainWindow.DrawMainWindow()
 		ImGui.Text("Inv. slots left:")
 		ImGui.SameLine()
 		if selfPlayer.Inventory.FreeSlots > 25 then
-			ImGui.TextColored(ImVec4(0.20,1,0.20,1), selfPlayer.Inventory.FreeSlots) -- green
+			ImGui.TextColored(ImVec4(0.2,1,0.2,1), selfPlayer.Inventory.FreeSlots) -- green
 		elseif selfPlayer.Inventory.FreeSlots >= 10 and selfPlayer.Inventory.FreeSlots <= 25 then
-			ImGui.TextColored(ImVec4(1,0.80,0.20,1), selfPlayer.Inventory.FreeSlots) -- yellow
+			ImGui.TextColored(ImVec4(1,0.8,0.2,1), selfPlayer.Inventory.FreeSlots) -- yellow
 		elseif selfPlayer.Inventory.FreeSlots >= 5 and selfPlayer.Inventory.FreeSlots < 10 then
-			ImGui.TextColored(ImVec4(1,0.40,0.20,1), selfPlayer.Inventory.FreeSlots) -- orange
+			ImGui.TextColored(ImVec4(1,0.4,0.2,1), selfPlayer.Inventory.FreeSlots) -- orange
 		elseif selfPlayer.Inventory.FreeSlots ~= 0 and selfPlayer.Inventory.FreeSlots < 5 then
-			ImGui.TextColored(ImVec4(1,0.20,0.20,1), selfPlayer.Inventory.FreeSlots) -- red
+			ImGui.TextColored(ImVec4(1,0.2,0.2,1), selfPlayer.Inventory.FreeSlots) -- red
 		else
 			ImGui.Text(selfPlayer.Inventory.FreeSlots)
 		end
@@ -162,7 +163,7 @@ function MainWindow.DrawMainWindow()
 		ImGui.Separator()
 
 		ImGui.Columns(2)
-		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", Bot.Hours, Bot.MInutes, Bot.Seconds))
+		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", Bot.Hours, Bot.Minutes, Bot.Seconds))
 		ImGui.NextColumn()
 		ImGui.Text("Loots: " .. string.format("%i", Bot.Stats.Loots))
 

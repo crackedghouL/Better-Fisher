@@ -42,7 +42,7 @@ function LootState:NeedToRun()
 		return false
 	end
 
-	if Bot.Settings.InvFullStop == false and selfPlayer.Inventory.FreeSlots <= 3 then -- beacuse with 0 is impossible to sell at trade manager
+	if not Bot.Settings.InvFullStop and selfPlayer.Inventory.FreeSlots <= 3 then -- beacuse with 0 is impossible to sell at trade manager
 		return false
 	end
 
@@ -64,11 +64,16 @@ function LootState:Run()
 		for i = 0, numLoots -1, x do -- for i = 0, numLoots -1 do
 			local lootItem = Looting.GetItemByIndex(i)
 			local lootItemName = lootItem.ItemEnchantStaticStatus.Name
-			if string.find(lootItemName,"Moray") then -- Fix because some names contains weird characters
-				lootItemName = "Moray"
-			end
 			local lootItemType = "Trash"
 			local lootItemQuality = nil
+
+			if string.find(lootItemName, "Moray") then -- Fix because some names contains weird characters
+				lootItemName = "Moray"
+			elseif string.find(lootItemName, "Salmon") then
+				lootItemName = "Salmon"
+			elseif string.find(lootItemName, "Bass") then
+				lootItemName = "Bass"
+			end
 
 			if Bot.EnableDebug then
 				print(i)

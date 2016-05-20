@@ -13,17 +13,17 @@ setmetatable(HookFishState, {
 function HookFishState.new()
 	local self = setmetatable({}, HookFishState)
 	self.LastHookFishTickCount = 0
-	self.state = 0
 	self.LastHookStateTick = 0
 	self.RandomWaitTime = 0
+	self.state = 0
 	return self
 end
 
 function HookFishState:Reset()
 	self.LastHookFishTickCount = 0
-	self.state = 0
 	self.LastHookStateTick = 0
 	self.RandomWaitTime = 0
+	self.state = 0
 end
 
 function HookFishState:NeedToRun()

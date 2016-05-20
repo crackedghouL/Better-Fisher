@@ -12,7 +12,6 @@ function EquipFishingRodState.new()
 	local self = setmetatable({}, EquipFishingRodState)
 	self.LastEquipTickCount = 0
 	self.ItemToEquip = nil
-	self.EquippedState = 0
 	self.EquipState = 0
 	self.EquippedState = 0
 	return self
@@ -21,7 +20,6 @@ end
 function EquipFishingRodState:Reset()
 	self.LastEquipTickCount = 0
 	self.ItemToEquip = nil
-	self.EquippedState = 0
 	self.EquipState = 0
 	self.EquippedState = 0
 end
@@ -51,8 +49,8 @@ function EquipFishingRodState:NeedToRun()
 	end
 
 	for k,v in pairs(selfPlayer.Inventory.Items, function(t,a,b) return t[a].Endurance < t[b].Endurance end) do
-		if v.HasEndurance == true then
-			if Bot.EnableDebug == true then
+		if v.HasEndurance then
+			if Bot.EnableDebug then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.ItemEnchantStaticStatus.Name .. " which have durability found")
 			end
 			self.EquipState = 1
@@ -60,7 +58,7 @@ function EquipFishingRodState:NeedToRun()
 
 		if self.EquipState == 1 then -- 1 = item have endurance
 			if v.Endurance > 0 then
-				if Bot.EnableDebug == true then
+				if Bot.EnableDebug then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.ItemEnchantStaticStatus.Name .. " have more than 0 durability left")
 				end
 				self.EquipState = 2
@@ -68,15 +66,15 @@ function EquipFishingRodState:NeedToRun()
 		end
 
 		if self.EquipState == 2 then -- 2 = normal rod
-			if v.ItemEnchantStaticStatus.IsFishingRod == true then
-				if Bot.EnableDebug == true then
+			if v.ItemEnchantStaticStatus.IsFishingRod then
+				if Bot.EnableDebug then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] IsFishingRod = " .. tostring(v.ItemEnchantStaticStatus.IsFishingRod) .. ", so is a normal rod")
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
 				end
 				self.ItemToEquip = v
 				break
 			else
-				if Bot.EnableDebug == true then
+				if Bot.EnableDebug then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Maybe " .. v.ItemEnchantStaticStatus.Name .. " is a enhanced rod?")
 				end
 				self.EquipState = 3
@@ -85,14 +83,14 @@ function EquipFishingRodState:NeedToRun()
 
 		if self.EquipState == 3 then -- 3 = this is for enhanced rod
 			if string.find(v.ItemEnchantStaticStatus.Name, "Fishing Rod") then
-				if Bot.EnableDebug == true then
+				if Bot.EnableDebug then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] The item have in the a '+' in the name, so is a enhanced rod")
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
 				end
 				self.ItemToEquip = v
 				break
 			else
-				if Bot.EnableDebug == true then
+				if Bot.EnableDebug then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Maybe " .. v.ItemEnchantStaticStatus.Name .. " is a know rod?")
 				end
 				self.EquipState = 4
@@ -157,7 +155,7 @@ function EquipFishingRodState:NeedToRun()
 				v.ItemEnchantStaticStatus.ItemId == 540452 or -- Calpheon Rod
 				v.ItemEnchantStaticStatus.ItemId == 540453	  -- Mediah Rod
 			then
-				if Bot.EnableDebug == true then
+				if Bot.EnableDebug then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
 				end
 				self.ItemToEquip = v

@@ -45,6 +45,10 @@ end
 function TradeManagerState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 
+	if self.LastTradeUseTimer ~= nil and not self.LastTradeUseTimer:Expired() then
+		return false
+	end
+
 	if not selfPlayer then
 		return false
 	end
@@ -58,32 +62,17 @@ function TradeManagerState:NeedToRun()
 		return false
 	end
 
-	if Bot.Settings.EnableTrader == false then
+	if not Bot.Settings.EnableTrader then
 		self.Forced = false
 		return false
 	end
 
-	if not self:HasNpc() and Bot.Settings.InvFullStop == true then
+	if not self:HasNpc() and Bot.Settings.InvFullStop then
 		self.Forced = false
 		return false
 	end
 
-	if self.Forced == true and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.Forced = false
-		return false
-	elseif self.Forced == true then
-		return true
-	end
-
-	if self.ManualForced == true and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.ManualForced = false
-		self.Forced = false
-		return false
-	elseif self.ManualForced == true then
-		return true
-	end
-
-	if self.LastTradeUseTimer ~= nil and not self.LastTradeUseTimer:Expired() then
+	if Looting.IsLooting and selfPlayer.CurrentActionName == "WAIT" then
 		return false
 	end
 
@@ -92,15 +81,30 @@ function TradeManagerState:NeedToRun()
 		return true
 	end
 
+	if self.Forced and not Navigator.CanMoveTo(self:GetPosition()) then
+		self.Forced = false
+		return false
+	elseif self.Forced == true then
+		return true
+	end
+
+	if self.ManualForced and not Navigator.CanMoveTo(self:GetPosition()) then
+		self.ManualForced = false
+		self.Forced = false
+		return false
+	elseif self.ManualForced == true then
+		return true
+	end
+
 	return false
 end
 
 function TradeManagerState:Reset()
 	self.State = 0
-	self.Forced = false
-	self.ManualForced = false
 	self.LastTradeUseTimer = nil
 	self.SleepTimer = nil
+	self.Forced = false
+	self.ManualForced = false
 end
 
 function TradeManagerState:Exit()
@@ -149,7 +153,7 @@ function TradeManagerState:Run()
 
 	Navigator.Stop()
 
-	if self.SleepTimer ~= nil and self.SleepTimer:IsRunning() and self.SleepTimer:Expired() == false then
+	if self.SleepTimer ~= nil and self.SleepTimer:IsRunning() and not self.SleepTimer:Expired() then
 		return
 	end
 
@@ -297,7 +301,7 @@ function TradeManagerState:GetItems()
 
 	if selfPlayer then
 		for k,v in pairs(selfPlayer.Inventory.Items) do
-			if v.ItemEnchantStaticStatus.IsTradeAble == true then
+			if v.ItemEnchantStaticStatus.IsTradeAble then
 				if self.ItemCheckFunction then
 					if self.ItemCheckFunction(v) then
 						table.insert(items, {slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})

@@ -2,7 +2,7 @@
 -- Variables
 ---------------------------------------------
 
-Stats = { }
+Stats = {}
 Stats.Visible = false
 
 SilverInitial = GetSelfPlayer().Inventory.Money
@@ -49,7 +49,7 @@ function Stats.DrawStats()
 		ImGui.Separator()
 
 		ImGui.Columns(1)
-		ImGui.Text("Silver Gained: " .. Bot.comma_value(Bot.Stats.SilverGained))
+		ImGui.Text("Silver Gained: " .. Bot.FormatMoney(Bot.Stats.SilverGained))
 
 		ImGui.Columns(1)
 		ImGui.Separator()
@@ -62,13 +62,13 @@ function Stats.DrawStats()
 		ImGui.Columns(1)
 		ImGui.Separator()
 
-		if Bot.Settings.LootSettings.LootKeys == true or Bot.Settings.LootSettings.LootShards == true then
+		if Bot.Settings.LootSettings.LootKeys or Bot.Settings.LootSettings.LootShards then
 			ImGui.Columns(2)
-			if Bot.Settings.LootSettings.LootKeys == true then
+			if Bot.Settings.LootSettings.LootKeys then
 				ImGui.Text("Keys: " .. statsKeys)
 			end
 			ImGui.NextColumn()
-			if Bot.Settings.LootSettings.LootShards == true then
+			if Bot.Settings.LootSettings.LootShards then
 				ImGui.Text("Shards: " .. statsShards)
 			end
 
@@ -78,13 +78,13 @@ function Stats.DrawStats()
 
 		ImGui.Columns(1)
 		if ImGui.CollapsingHeader("Fish quality", "id_gui_loot_quality", true, false) then
-			if Bot.Settings.LootSettings.LootWhite == true or Bot.Settings.LootSettings.LootGreen == true then
+			if Bot.Settings.LootSettings.LootWhite or Bot.Settings.LootSettings.LootGreen then
 				ImGui.Columns(2)
-				if Bot.Settings.LootSettings.LootWhite == true then
+				if Bot.Settings.LootSettings.LootWhite then
 					ImGui.Text("Whites: " .. statsWhites)
 				end
 				ImGui.NextColumn()
-				if Bot.Settings.LootSettings.LootGreen == true then
+				if Bot.Settings.LootSettings.LootGreen then
 					ImGui.Text("Greens: " .. statsGreens)
 				end
 
@@ -92,13 +92,13 @@ function Stats.DrawStats()
 				ImGui.Separator()
 			end
 
-			if Bot.Settings.LootSettings.LootBlue == true or Bot.Settings.LootSettings.LootGold == true then
+			if Bot.Settings.LootSettings.LootBlue or Bot.Settings.LootSettings.LootGold then
 				ImGui.Columns(2)
-				if Bot.Settings.LootSettings.LootBlue == true then
+				if Bot.Settings.LootSettings.LootBlue then
 					ImGui.Text("Blues: " .. statsBlues)
 				end
 				ImGui.NextColumn()
-				if Bot.Settings.LootSettings.LootGold == true then
+				if Bot.Settings.LootSettings.LootGold then
 					ImGui.Text("Golds: " .. statsGolds)
 				end
 
@@ -106,7 +106,7 @@ function Stats.DrawStats()
 				ImGui.Separator()
 			end
 
-			if Bot.Settings.LootSettings.LootOrange == true then
+			if Bot.Settings.LootSettings.LootOrange then
 				ImGui.Columns(1)
 				ImGui.Text("Oranges: " .. statsOranges)
 

@@ -14,14 +14,12 @@ setmetatable(StartFishingState, {
 function StartFishingState.new()
 	local self = setmetatable({}, StartFishingState)
 	self.Settings = {
-		MaxEnergyCheat = false,
+		UseMaxEnergy = false,
 		FishingMethod = StartFishingState.SETTINGS_ON_NORMAL_FISHING
 	}
-	
 	self.PlayerNearby = nil
 	self.SleepTimer = nil
 	self.LastStartFishTickcount = 0
-	self.EquippedState = 0
 	self.LastActionTime = 0
 	self.State = 0
 	return self
@@ -31,7 +29,6 @@ function StartFishingState:Reset()
 	self.PlayerNearby = nil
 	self.SleepTimer = nil
 	self.LastStartFishTickcount = 0
-	self.EquippedState = 0
 	self.LastActionTime = 0
 	self.State = 0
 end
@@ -45,6 +42,14 @@ function StartFishingState:NeedToRun()
 	end
 
 	if not selfPlayer.IsAlive then
+		return false
+	end
+
+	if Pyx.System.TickCount - self.LastStartFishTickcount < 4000 then
+		return false
+	end
+
+	if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe > 100 then
 		return false
 	end
 
@@ -130,26 +135,16 @@ function StartFishingState:NeedToRun()
 		end
 	end
 
-	if Pyx.System.TickCount - self.LastStartFishTickcount < 4000 then
-		return false
-	end
-
-	if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe > 100 then
-		return false
-	end
-
 	return selfPlayer.CurrentActionName == "WAIT" and not Looting.IsLooting
 end
 
 function StartFishingState:Run()
-	Bot.Stats.LastLootTick = Pyx.System.TickCount
-	Bot.SilverStats()
-	self.SleepTimer = nil
-
 	local selfPlayer = GetSelfPlayer()
 
+	Bot.Stats.LastLootTick = Pyx.System.TickCount
+	Bot.SilverStats()
+
 	if not self.PlayerNearby() then
-		if selfPlayer.HealthPercent <= Bot.Settings.HealthPercent and Bot.Counter == 0 and Bot.Settings.escapeEnabled == true then
 		if selfPlayer.HealthPercent <= Bot.Settings.HealthPercent and Bot.Counter == 0 and Bot.Settings.AutoEscape then
 			Navigator.Stop()
 			BDOLua.Execute("callRescue()")
@@ -157,7 +152,7 @@ function StartFishingState:Run()
 		end
 	end
 
-	if Bot.Settings.InvFullStop == true and selfPlayer.Inventory.FreeSlots == 0 then
+	if Bot.Settings.InvFullStop and selfPlayer.Inventory.FreeSlots == 0 then
 		if Bot.Running then
 			Bot.Stop()
 		end
@@ -174,7 +169,7 @@ function StartFishingState:Run()
 			selfPlayer:DoAction("FISHING_START")
 			selfPlayer:DoAction("FISHING_ING_START")
 
-			if self.Settings.MaxEnergyCheat == true then
+			if self.Settings.UseMaxEnergy then
 				selfPlayer:DoAction("FISHING_START_END_Lv10")
 			else
 				selfPlayer:DoAction("FISHING_START_END_Lv0")

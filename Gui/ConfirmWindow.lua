@@ -2,7 +2,7 @@
 -- Variables
 ---------------------------------------------
 
-ConfirmWindow = { }
+ConfirmWindow = {}
 ConfirmWindow.Visible = false
 
 ---------------------------------------------
@@ -16,17 +16,17 @@ function ConfirmWindow.DrawConfirmWindow()
 		ImGui.TextColored(ImVec4(1,0.20,0.20,1) ,"WARNING!")
 		ImGui.Text("By default all \"Fishing Rods\", \"Thick Fishing Rods\"and \"Steel Fishing Rods\",\nwill be deleted on 0 durability because they can't be repaired.")
 		ImGui.Spacing()
-		if ImGui.Button("Continue##btn_ok_start_bot", ImVec2(ImGui.GetContentRegionAvailWidth() / 3, 20)) then
+		if ImGui.Button("Continue", ImVec2(ImGui.GetContentRegionAvailWidth() / 3, 20)) then
 			Bot.Start()
 			ConfirmWindow.Visible = false
 		end
 		ImGui.SameLine()
-		if ImGui.Button("Disable it##btn_change_option_start_bot", ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
+		if ImGui.Button("Disable it", ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
 			Bot.Settings.DeleteUsedRods = false
 			ConfirmWindow.Visible = false
 		end
 		ImGui.SameLine()
-		if ImGui.Button("Cancel##btn_cancel_start_bot", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+		if ImGui.Button("Cancel", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 			ConfirmWindow.Visible = false
 		end
 

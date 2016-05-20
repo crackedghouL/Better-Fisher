@@ -49,6 +49,10 @@ end
 function WarehouseState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 
+	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+		return false
+	end
+
 	if not selfPlayer then
 		return false
 	end
@@ -62,33 +66,33 @@ function WarehouseState:NeedToRun()
 		return false
 	end
 
-	if Bot.Settings.EnableWarehouse == false then
+	if not Bot.Settings.EnableWarehouse then
 		self.Forced = false
 		return false
 	end
 
-	if not self:HasNpc() and Bot.Settings.InvFullStop == true then
+	if not self:HasNpc() and Bot.Settings.InvFullStop then
 		self.Forced = false
 		return false
 	end
 
-	if self.Forced == true and not Navigator.CanMoveTo(self:GetPosition()) then
+	if Looting.IsLooting and selfPlayer.CurrentActionName == "WAIT" then
+		return false
+	end
+
+	if self.Forced and not Navigator.CanMoveTo(self:GetPosition()) then
 		self.Forced = false
 		return false
 	elseif self.Forced == true then
 		return true
 	end
 
-	if self.ManualForced == true and not Navigator.CanMoveTo(self:GetPosition()) then
+	if self.ManualForced and not Navigator.CanMoveTo(self:GetPosition()) then
 		self.ManualForced = false
 		self.Forced = false
 		return false
-	elseif self.ManualForced == true then
+	elseif self.ManualForced then
 		return true
-	end
-
-	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
-		return false
 	end
 
 	if self.Forced and selfPlayer.WeightPercent >= 95 then
@@ -242,8 +246,6 @@ function WarehouseState:Run()
 		local itemPtr = selfPlayer.Inventory:GetItemByName(item.name)
 		if itemPtr ~= nil then
 			if Bot.EnableDebug then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Index: #" .. itemPtr.InventoryIndex .. " Deposited: " .. itemPtr.ItemEnchantStaticStatus.Name)
-			else
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Deposited: " .. itemPtr.ItemEnchantStaticStatus.Name)
 			end
 
@@ -267,7 +269,7 @@ function WarehouseState:Run()
 end
 
 function WarehouseState:GetItems()
-	local items = { }
+	local items = {}
 	local selfPlayer = GetSelfPlayer()
 
 	if selfPlayer then

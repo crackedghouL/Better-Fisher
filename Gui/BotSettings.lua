@@ -23,7 +23,7 @@ BotSettings.BaitComboBoxSelected = 0
 function BotSettings.DrawBotSettings()
 	local valueChanged = false
 
-	if BotSettings.Visible == true then
+	if BotSettings.Visible then
 		_, BotSettings.Visible = ImGui.Begin("Bot Settings", BotSettings.Visible, ImVec2(350, 400), -1.0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)
 
 		if ImGui.Button("Save settings", ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
@@ -78,16 +78,16 @@ function BotSettings.DrawBotSettings()
 			ImGui.TextColored(ImVec4(1,1,1,1), "Loot White Fish")
 			_, Bot.Settings.LootSettings.LootGreen = ImGui.Checkbox("##id_guid_fisher_option_loot_green", Bot.Settings.LootSettings.LootGreen)
 			ImGui.SameLine()
-			ImGui.TextColored(ImVec4(0.20,1,0.20,1), "Loot Green Fish")
+			ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Loot Green Fish")
 			_, Bot.Settings.LootSettings.LootBlue = ImGui.Checkbox("##id_guid_fisher_option_loot_blue", Bot.Settings.LootSettings.LootBlue)
 			ImGui.SameLine()
-			ImGui.TextColored(ImVec4(0.40,0.60,1,1), "Loot Blue Fish")
+			ImGui.TextColored(ImVec4(0.4,0.6,1,1), "Loot Blue Fish")
 			_, Bot.Settings.LootSettings.LootGold = ImGui.Checkbox("##id_guid_fisher_option_loot_gold", Bot.Settings.LootSettings.LootGold)
 			ImGui.SameLine()
-			ImGui.TextColored(ImVec4(1,0.80,0.20,1), "Loot Gold Fish")
+			ImGui.TextColored(ImVec4(1,0.8,0.2,1), "Loot Gold Fish")
 			_, Bot.Settings.LootSettings.LootOrange = ImGui.Checkbox("##id_guid_fisher_option_loot_orange", Bot.Settings.LootSettings.LootOrange)
 			ImGui.SameLine()
-			ImGui.TextColored(ImVec4(1,0.40,0.20,1), "Loot Orange Fish")
+			ImGui.TextColored(ImVec4(1,0.4,0.2,1), "Loot Orange Fish")
 			_, Bot.Settings.LootSettings.LootShards = ImGui.Checkbox("##id_guid_fisher_option_loot_shard", Bot.Settings.LootSettings.LootShards)
 			ImGui.SameLine()
 			ImGui.Text("Loot Shards")
@@ -122,7 +122,7 @@ function BotSettings.DrawBotSettings()
 
 				ImGui.Separator()
 
-				if Bot.Settings.TradeManagerSettings.Enabled == true then
+				if Bot.Settings.TradeManagerSettings.Enabled then
 					if ImGui.TreeNode("Trade Manager") then
 						_, Bot.Settings.TradeManagerSettings.TradeManagerOnInventoryFull = ImGui.Checkbox("##id_guid_trademanager_full_inventory", Bot.Settings.TradeManagerSettings.TradeManagerOnInventoryFull)
 						ImGui.SameLine()
@@ -134,7 +134,7 @@ function BotSettings.DrawBotSettings()
 					end
 				end
 
-				if Bot.Settings.WarehouseSettings.Enabled == true then
+				if Bot.Settings.WarehouseSettings.Enabled then
 					if ImGui.TreeNode("Warehouse") then
 						if ImGui.RadioButton("Deposit after Vendor##id_guid_warehouse_after_vendor", Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR) then
 							Bot.Settings.WarehouseSettings.DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR
@@ -185,12 +185,12 @@ function BotSettings.DrawBotSettings()
 					end
 				end
 
-				if Bot.Settings.VendorSettings.Enabled == true then
+				if Bot.Settings.VendorSettings.Enabled then
 					if ImGui.TreeNode("Vendor") then
 						ImGui.Separator()
 						_, Bot.Settings.VendorSettings.BuyEnabled = ImGui.Checkbox("Enable Buying", Bot.Settings.VendorSettings.BuyEnabled)
 						ImGui.Separator()
-						if Bot.Settings.VendorSettings.BuyEnabled == true then
+						if Bot.Settings.VendorSettings.BuyEnabled then
 							ImGui.Text("Select item")
 							ImGui.SameLine()
 							valueChanged, BotSettings.InventoryComboSelectedIndex = ImGui.Combo("##id_guid_vendor_buy_combo_select", BotSettings.InventoryComboSelectedIndex, BotSettings.InventoryName)
@@ -204,7 +204,7 @@ function BotSettings.DrawBotSettings()
 									end
 								end
 
-								if found == false then
+								if not found then
 									table.insert(Bot.VendorState.Settings.BuyItems, { Name = inventoryName, BuyAt = 0, BuyMax = 1 })
 								end
 
@@ -271,7 +271,7 @@ function BotSettings.DrawBotSettings()
 						ImGui.Separator()
 						_, Bot.Settings.VendorSettings.SellEnabled = ImGui.Checkbox("Enable Selling", Bot.Settings.VendorSettings.SellEnabled)
 						ImGui.Separator()
-						if Bot.Settings.VendorSettings.SellEnabled == true then
+						if Bot.Settings.VendorSettings.SellEnabled then
 							_, Bot.Settings.VendorSettings.VendorOnInventoryFull = ImGui.Checkbox("##id_guid_vendor_sell_full_inventory", Bot.Settings.VendorSettings.VendorOnInventoryFull)
 							ImGui.SameLine()
 							ImGui.Text("Go to Vendor when inventory is full")
@@ -286,11 +286,11 @@ function BotSettings.DrawBotSettings()
 							ImGui.SameLine()
 							_, Bot.Settings.VendorSettings.VendorGreen = ImGui.Checkbox("##id_guid_vendor_sell_green", Bot.Settings.VendorSettings.VendorGreen)
 							ImGui.SameLine()
-							ImGui.TextColored(ImVec4(0.20,1,0.20,1), "Sell green")
+							ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Sell green")
 							ImGui.SameLine()
 							_, Bot.Settings.VendorSettings.VendorBlue = ImGui.Checkbox("##id_guid_vendor_sell_blue", Bot.Settings.VendorSettings.VendorBlue)
 							ImGui.SameLine()
-							ImGui.TextColored(ImVec4(0.40,0.60,1,1), "Sell blue")
+							ImGui.TextColored(ImVec4(0.4,0.6,1,1), "Sell blue")
 
 							ImGui.Spacing()
 
@@ -317,7 +317,7 @@ function BotSettings.DrawBotSettings()
 					end
 				end
 
-				if Bot.Settings.RepairSettings.Enabled == true then
+				if Bot.Settings.RepairSettings.Enabled then
 					if ImGui.TreeNode("Repair") then
 						if ImGui.RadioButton("Repair after Warehouse##id_guid_repair_after_warehouse", Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE) then
 							Bot.Settings.RepairSettings.RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE

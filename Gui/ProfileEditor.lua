@@ -2,7 +2,7 @@
 -- Variables
 -----------------------------------------------------------------------------
 
-ProfileEditor = { }
+ProfileEditor = {}
 ProfileEditor.Visible = false
 ProfileEditor.CurrentProfile = Profile()
 ProfileEditor.AvailablesProfilesSelectedIndex = 0
@@ -37,7 +37,7 @@ function ProfileEditor.DrawProfileEditor()
 				ProfileEditor.LoadProfile(ProfileEditor.AvailablesProfiles[ProfileEditor.AvailablesProfilesSelectedIndex])
 			end
 
-			if ImGui.Button("Clear profile##id_guid_profile_clear", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+			if ImGui.Button("Clear profile", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 				Navigation.ClearMesh()
 				ProfileEditor.CurrentProfile = Profile()
 				ProfileEditor.CurrentProfileSaveName = "Unamed"
@@ -47,7 +47,7 @@ function ProfileEditor.DrawProfileEditor()
 				_,Navigation.MesherEnabled = ImGui.Checkbox("Enable mesher##id_guid_profile_enable_mesher", Navigation.MesherEnabled)
 				ImGui.SameLine();
 				_,Navigation.RenderMesh = ImGui.Checkbox("Draw geometry##id_guid_profile_draw_mesher", Navigation.RenderMesh)
-				if ImGui.Button("Build navigation##id_guid_profile_editor_build_navigation", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+				if ImGui.Button("Build navigation", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 					Navigation.BuildNavigation()
 				end
 			end
@@ -58,7 +58,8 @@ function ProfileEditor.DrawProfileEditor()
 				else
 					ImGui.Text("Distance: Not set")
 				end
-				if ImGui.Button("Set##id_guid_profile_set_fishing_spot" , ImVec2(ImGui.GetContentRegionAvailWidth() / 2.08, 20)) then
+
+				if ImGui.Button("Set" , ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
 					local selfPlayer = GetSelfPlayer()
 					if selfPlayer then
 						ProfileEditor.CurrentProfile.FishSpotPosition.X = selfPlayer.Position.X
@@ -68,7 +69,7 @@ function ProfileEditor.DrawProfileEditor()
 					end
 				end
 				ImGui.SameLine()
-				if ImGui.Button("Clear##id_guid_profile_clear_fishing_spot", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+				if ImGui.Button("Clear", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 					ProfileEditor.CurrentProfile.FishSpotPosition.X = 0
 					ProfileEditor.CurrentProfile.FishSpotPosition.Y = 0
 					ProfileEditor.CurrentProfile.FishSpotPosition.Z = 0
@@ -82,7 +83,7 @@ function ProfileEditor.DrawProfileEditor()
 				else
 					ImGui.Text("Name: Not set")
 				end
-				if ImGui.Button("Set##id_guid_profile_set_trademanager" , ImVec2(ImGui.GetContentRegionAvailWidth() / 2.08, 20)) then
+				if ImGui.Button("Set" , ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
 					local npcs = GetNpcs()
 					if table.length(npcs) > 0 then
 						local TradeManagerNpc = npcs[1]
@@ -93,7 +94,7 @@ function ProfileEditor.DrawProfileEditor()
 					end
 				end
 				ImGui.SameLine()
-				if ImGui.Button("Clear##id_guid_profile_clear_trademanager", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+				if ImGui.Button("Clear", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 					ProfileEditor.CurrentProfile.TradeManagerNpcName = ""
 					ProfileEditor.CurrentProfile.TradeManagerNpcPosition.X = 0
 					ProfileEditor.CurrentProfile.TradeManagerNpcPosition.Y = 0
@@ -108,7 +109,7 @@ function ProfileEditor.DrawProfileEditor()
 					ImGui.Text("Name: Not set")
 				end
 
-				if ImGui.Button("Set##id_guid_profile_set_vendor" , ImVec2(ImGui.GetContentRegionAvailWidth() / 2.08, 20)) then
+				if ImGui.Button("Set" , ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
 					local npcs = GetNpcs()
 					if table.length(npcs) > 0 then
 						local VendorNpc = npcs[1]
@@ -119,7 +120,7 @@ function ProfileEditor.DrawProfileEditor()
 					end
 				end
 				ImGui.SameLine()
-				if ImGui.Button("Clear##id_guid_profile_clear_vendor", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+				if ImGui.Button("Clear", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 					ProfileEditor.CurrentProfile.VendorNpcName = ""
 					ProfileEditor.CurrentProfile.VendorNpcPosition.X = 0
 					ProfileEditor.CurrentProfile.VendorNpcPosition.Y = 0
@@ -134,7 +135,7 @@ function ProfileEditor.DrawProfileEditor()
 					ImGui.Text("Name: Not set")
 				end
 
-				if ImGui.Button("Set##id_guid_profile_set_repair" , ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
+				if ImGui.Button("Set" , ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
 					local npcs = GetNpcs()
 					if table.length(npcs) > 0 then
 						local RepairNpc = npcs[1]
@@ -144,9 +145,8 @@ function ProfileEditor.DrawProfileEditor()
 						ProfileEditor.CurrentProfile.RepairNpcPosition.Z = RepairNpc.Position.Z
 					end
 				end
-
 				ImGui.SameLine()
-				if ImGui.Button("Clear##id_guid_profile_clear_repair", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+				if ImGui.Button("Clear", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 					ProfileEditor.CurrentProfile.RepairNpcName = ""
 					ProfileEditor.CurrentProfile.RepairNpcPosition.X = 0
 					ProfileEditor.CurrentProfile.RepairNpcPosition.Y = 0
@@ -161,7 +161,7 @@ function ProfileEditor.DrawProfileEditor()
 					ImGui.Text("Warehouse: Not set")
 				end
 
-				if ImGui.Button("Set##id_guid_profile_set_warehouse" , ImVec2(ImGui.GetContentRegionAvailWidth() / 2.08, 20)) then
+				if ImGui.Button("Set" , ImVec2(ImGui.GetContentRegionAvailWidth() / 2.08, 20)) then
 					local npcs = GetNpcs()
 					if table.length(npcs) > 0 then
 						local WarehouseNpc = npcs[1]
@@ -172,8 +172,7 @@ function ProfileEditor.DrawProfileEditor()
 					end
 				end
 				ImGui.SameLine()
-
-				if ImGui.Button("Clear##id_guid_profile_clear_warehouse", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+				if ImGui.Button("Clear", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 					ProfileEditor.CurrentProfile.WarehouseNpcName = ""
 					ProfileEditor.CurrentProfile.WarehouseNpcPosition.X = 0
 					ProfileEditor.CurrentProfile.WarehouseNpcPosition.Y = 0
@@ -267,7 +266,6 @@ end
 
 function ProfileEditor.OnRender3D()
 	if Navigation.RenderMesh then
-		local selfPlayer = GetSelfPlayer()
 		if ProfileEditor.CurrentProfile:HasFishSpot() then
 			Renderer.Draw3DTrianglesList(GetInvertedTriangleList(ProfileEditor.CurrentProfile.FishSpotPosition.X, ProfileEditor.CurrentProfile.FishSpotPosition.Y + 100, ProfileEditor.CurrentProfile.FishSpotPosition.Z, 20, 50, 0xAAFF0000, 0xAAFF00FF))
 		end
