@@ -50,10 +50,6 @@ end
 function VendorState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 
-	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
-		return false
-	end
-
 	if not selfPlayer then
 		return false
 	end
@@ -69,6 +65,10 @@ function VendorState:NeedToRun()
 
 	if not self:HasNpc() and Bot.Settings.InvFullStop then
 		self.Forced = false
+		return false
+	end
+
+	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
 		return false
 	end
 

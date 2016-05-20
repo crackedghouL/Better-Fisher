@@ -44,10 +44,6 @@ function RepairState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
-	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
-		return false
-	end
-
 	if not selfPlayer then
 		return false
 	end
@@ -68,6 +64,10 @@ function RepairState:NeedToRun()
 
 	if not self:HasNpc() and Bot.Settings.InvFullStop then
 		self.Forced = false
+		return false
+	end
+
+	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
 		return false
 	end
 

@@ -67,7 +67,7 @@ function EquipFloatState:NeedToRun()
 
 
 		if self.EquipState == 2 then -- 2 = this is for enhanced float
-			if string.find(v.ItemEnchantStaticStatus.Name, "Float") then
+			if string.find(tostring(v.ItemEnchantStaticStatus.Name), "Float") then
 				if Bot.EnableDebug then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] The item have in the a '+' in the name, so is a enhanced float")
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
@@ -126,7 +126,7 @@ function EquipFloatState:NeedToRun()
 	end
 
 	if self.EquippedState == 1 then -- 2 = search for 'Float' string
-		if not string.find(equippedItem.ItemEnchantStaticStatus.Name, "Float") then
+		if not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Float") then
 			self.EquippedState = 2
 		end
 	end

@@ -45,10 +45,6 @@ end
 function TradeManagerState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 
-	if self.LastTradeUseTimer ~= nil and not self.LastTradeUseTimer:Expired() then
-		return false
-	end
-
 	if not selfPlayer then
 		return false
 	end
@@ -69,6 +65,10 @@ function TradeManagerState:NeedToRun()
 
 	if not self:HasNpc() and Bot.Settings.InvFullStop then
 		self.Forced = false
+		return false
+	end
+
+	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
 		return false
 	end
 

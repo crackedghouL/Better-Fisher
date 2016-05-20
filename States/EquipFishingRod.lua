@@ -82,7 +82,7 @@ function EquipFishingRodState:NeedToRun()
 		end
 
 		if self.EquipState == 3 then -- 3 = this is for enhanced rod
-			if string.find(v.ItemEnchantStaticStatus.Name, "Fishing Rod") then
+			if string.find(tostring(v.ItemEnchantStaticStatus.Name), "Fishing Rod") then
 				if Bot.EnableDebug then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] The item have in the a '+' in the name, so is a enhanced rod")
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
@@ -181,7 +181,7 @@ function EquipFishingRodState:NeedToRun()
 	end
 
 	if self.EquippedState == 2 then -- 2 = search for 'Fishing Rod' string
-		if not string.find(equippedItem.ItemEnchantStaticStatus.Name, "Fishing Rod") then
+		if not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Fishing Rod") then
 			self.EquippedState = 3
 		end
 	end

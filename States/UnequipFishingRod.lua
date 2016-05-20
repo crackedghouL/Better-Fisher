@@ -50,7 +50,7 @@ function UnequipFishingRodState:NeedToRun()
 	end
 
 	if self.state == 2 then -- 2 = search for 'Fishing Rod' string
-		if not string.find(equippedItem.ItemEnchantStaticStatus.Name, "Fishing Rod") then
+		if not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Fishing Rod") then
 			self.state = 3
 		end
 	end

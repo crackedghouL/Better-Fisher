@@ -44,7 +44,7 @@ function UnequipFloatState:NeedToRun()
 	end
 
 	if self.state == 1 then -- 2 = search for 'float' string
-		if not string.find(equippedItem.ItemEnchantStaticStatus.Name, "Float") then
+		if not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Float") then
 			self.state = 2
 		end
 	end

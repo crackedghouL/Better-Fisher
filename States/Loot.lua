@@ -42,7 +42,7 @@ function LootState:NeedToRun()
 		return false
 	end
 
-	if not Bot.Settings.InvFullStop and selfPlayer.Inventory.FreeSlots <= 3 then -- beacuse with 0 is impossible to sell at trade manager
+	if not Bot.Settings.InvFullStop and selfPlayer.Inventory.FreeSlots <= 2 then -- beacuse with 0 is impossible to sell at trade manager
 		return false
 	end
 
