@@ -26,7 +26,7 @@ function WarehouseState.new()
 		SecondsBetweenTries = 300
 	}
 
-	self.State = 0
+	self.state = 0
 	self.Forced = false
 	self.ManualForced = false
 
@@ -119,22 +119,22 @@ function WarehouseState:NeedToRun()
 end
 
 function WarehouseState:Reset()
-	self.State = 0
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
 	self.Forced = false
 	self.ManualForced = false
 	self.DepositedMoney = false
 	self.DepositItems = false
+	self.state = 0
 end
 
 function WarehouseState:Exit()
-	if self.State > 1 then
+	if self.state > 1 then
 		if Dialog.IsTalking then
 			Dialog.ClickExit()
 		end
 
-		self.State = 0
+		self.state = 0
 		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastUseTimer:Start()
 		self.SleepTimer = nil
@@ -160,12 +160,12 @@ function WarehouseState:Run()
 		end
 
 		Navigator.MoveTo(vendorPosition, nil, Bot.Settings.PlayerRun)
-		if self.State > 1 then
+		if self.state > 1 then
 			self:Exit()
 			return
 		end
 
-		self.State = 1
+		self.state = 1
 		return
 	end
 
@@ -185,15 +185,15 @@ function WarehouseState:Run()
 	table.sort(npcs, function(a,b) return a.Position:GetDistance3D(vendorPosition) < b.Position:GetDistance3D(vendorPosition) end)
 	local npc = npcs[1]
 
-	if self.State == 1 then -- 1 = open npc dialog
+	if self.state == 1 then -- 1 = open npc dialog
 		npc:InteractNpc()
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
-		self.State = 2
+		self.state = 2
 		return
 	end
 
-	if self.State == 2 then -- 2 = create deposit list
+	if self.state == 2 then -- 2 = create deposit list
 		if not Dialog.IsTalking then
 			print("[" .. os.date(Bot.UsedTimezone) .. "] " .. self.Settings.NpcName " dialog didn't open")
 			self.SleepTimer = PyxTimer:New(3)
@@ -212,11 +212,11 @@ function WarehouseState:Run()
 			self.CurrentDepositList = self:GetItems()
 		end
 
-		self.State = 3
+		self.state = 3
 		return
 	end
 
-	if self.State == 3 then -- 3 = deposit money
+	if self.state == 3 then -- 3 = deposit money
 		if not self.DepositedMoney and (self.Settings.DepositMoney or self.ManualForced) then
 			local toDeposit = selfPlayer.Inventory.Money - self.Settings.MoneyToKeep
 			if toDeposit > 0 then
@@ -227,18 +227,18 @@ function WarehouseState:Run()
 			end
 
 			self.DepositedMoney = true
-			self.State = 4
+			self.state = 4
 			return
 		end
 	end
 
-	if self.State == 4 then -- 4 = deposit items
+	if self.state == 4 then -- 4 = deposit items
 		if table.length(self.CurrentDepositList) < 1 then
 			Bot.Stats.SilverGained = Bot.Stats.SilverGained + 1
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
 			self.DepositItems = true
-			self.State = 5
+			self.state = 5
 			return
 		end
 
@@ -258,7 +258,7 @@ function WarehouseState:Run()
 		return
 	end
 
-	if self.State == 5 then -- 5 = state complete
+	if self.state == 5 then -- 5 = state complete
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end

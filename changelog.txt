@@ -177,3 +177,7 @@ Added option "Stop bot when peoples is nearby"
 Fixed vendor don't buying items
 Fixed for facing wrong when fishing
 Minor fixes
+
+[0.XX BETA]
+Removed Radar [done]
+Removed old fishing animations [done]

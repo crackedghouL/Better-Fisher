@@ -21,7 +21,7 @@ function RepairState.new()
 		SecondsBetweenTries = 300
 	}
 
-	self.State = 0
+	self.state = 0
 	self.Forced = false
 	self.ManualForced = false
 
@@ -132,12 +132,12 @@ function RepairState:GetPosition()
 end
 
 function RepairState:Reset()
-	self.State = 0
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
 	self.Forced = false
 	self.ManualForced = false
 	self.RepairList = {}
+	self.state = 0
 end
 
 function RepairState:Exit()
@@ -145,14 +145,14 @@ function RepairState:Exit()
 		Dialog.ClickExit()
 	end
 
-	if self.State > 1 then
-		self.State = 0
+	if self.state > 1 then
 		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastUseTimer:Start()
 		self.SleepTimer = nil
 		self.Forced = false
 		self.ManualForced = false
 		self.RepairList = {}
+		self.state = 0
 	end
 end
 
@@ -171,12 +171,12 @@ function RepairState:Run()
 		end
 
 		Navigator.MoveTo(vendorPosition,nil,Bot.Settings.PlayerRun)
-		if self.State > 1 then
+		if self.state > 1 then
 			self:Exit()
 			return
 		end
 
-		self.State = 1
+		self.state = 1
 		return
 	end
 
@@ -196,37 +196,37 @@ function RepairState:Run()
 	table.sort(npcs, function(a,b) return a.Position:GetDistance3D(vendorPosition) < b.Position:GetDistance3D(vendorPosition) end)
 	local npc = npcs[1]
 
-	if self.State == 1 then
+	if self.state == 1 then
 		npc:InteractNpc()
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
-		self.State = 2
+		self.state = 2
 		return true
 	end
 
-	if self.State == 2 then
-		self.State = 3
+	if self.state == 2 then
+		self.state = 3
 		BDOLua.Execute("Repair_OpenPanel(true)")
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
 		return
 	end
 
-	if self.State == 3 then
+	if self.state == 3 then
 		if not Dialog.IsTalking then
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Repair dialog didn't open")
 			self:Exit()
 			return
 		end
 
-		self.State = 4
+		self.state = 4
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
 		return
 	end
 
-	if self.State == 4 then
-		self.State = 5
+	if self.state == 4 then
+		self.state = 5
 		if self.RepairEquipped then
 			selfPlayer:RepairAllEquippedItems(npc)
 			self.SleepTimer = PyxTimer:New(5)
@@ -235,8 +235,8 @@ function RepairState:Run()
 		return
 	end
 
-	if self.State == 5 then
-		self.State = 6
+	if self.state == 5 then
+		self.state = 6
 		if self.RepairInventory then
 			selfPlayer:RepairAllInventoryItems(npc)
 			self.SleepTimer = PyxTimer:New(5)
@@ -245,7 +245,7 @@ function RepairState:Run()
 		return
 	end
 
-	if self.State == 6 then
+	if self.state == 6 then
 		print("[" .. os.date(Bot.UsedTimezone) .. "] Repair done")
 		BDOLua.Execute("Repair_OpenPanel(false)\r\nFixEquip_Close()")
 		self.SleepTimer = PyxTimer:New(3)

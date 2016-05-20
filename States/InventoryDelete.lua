@@ -10,7 +10,7 @@ setmetatable(InventoryDeleteState, {
 
 function InventoryDeleteState.new()
 	local self = setmetatable({}, InventoryDeleteState)
-	self.State = 0
+	self.state = 0
 	self.Settings = {
 		DeleteItems = {},
 		DeleteDepletedItems = {},
@@ -51,19 +51,20 @@ function InventoryDeleteState:NeedToRun()
 end
 
 function InventoryDeleteState:Reset()
-	self.State = 0
 	self.LastUseTimer = nil
 	self.Forced = false
 	self.ItemList = {}
+	self.state = 0
 end
 
 function InventoryDeleteState:Exit()
-	if self.State > 1 then
-		self.State = 0
+	if self.state > 1 then
+		self.state = 0
 		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastUseTimer:Start()
 		self.Forced = false
 		self.ItemList = {}
+		self.state = 0
 	end
 end
 

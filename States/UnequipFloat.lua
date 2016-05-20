@@ -11,19 +11,19 @@ setmetatable(UnequipFloatState, {
 function UnequipFloatState.new()
 	local self = setmetatable({}, UnequipFloatState)
 	self.LastUnequipTickcount = 0
-	self.EquippedState = 0
+	self.state = 0
 	return self
 end
 
 function UnequipFloatState:Reset()
 	self.LastUnequipTickcount = 0
-	self.EquippedState = 0
+	self.state = 0
 end
 
 function UnequipFloatState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_LEFT_HAND)
-	self.EquippedState = 0 -- 0 = nothing
+	self.state = 0 -- 0 = nothing
 
 	if not selfPlayer then
 		return false
@@ -40,16 +40,16 @@ function UnequipFloatState:NeedToRun()
 	if not equippedItem then
 		return false
 	else
-		self.EquippedState = 1
+		self.state = 1
 	end
 
-	if self.EquippedState == 1 then -- 2 = search for 'float' string
+	if self.state == 1 then -- 2 = search for 'float' string
 		if not string.find(equippedItem.ItemEnchantStaticStatus.Name, "Float") then
-			self.EquippedState = 2
+			self.state = 2
 		end
 	end
 
-	if self.EquippedState == 2 then -- 3 fallback to know float using ids
+	if self.state == 2 then -- 3 fallback to know float using ids
 		if 	not equippedItem.ItemEnchantStaticStatus.ItemId == 16167 or	 -- Ash Tree Float
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 81703 or	 -- Ash Tree Float +1
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 147239 or -- Ash Tree Float +2

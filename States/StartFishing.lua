@@ -21,7 +21,7 @@ function StartFishingState.new()
 	self.SleepTimer = nil
 	self.LastStartFishTickcount = 0
 	self.LastActionTime = 0
-	self.State = 0
+	self.state = 0
 	return self
 end
 
@@ -30,7 +30,7 @@ function StartFishingState:Reset()
 	self.SleepTimer = nil
 	self.LastStartFishTickcount = 0
 	self.LastActionTime = 0
-	self.State = 0
+	self.state = 0
 end
 
 function StartFishingState:NeedToRun()
@@ -56,22 +56,22 @@ function StartFishingState:NeedToRun()
 	if not equippedItem then
 		return false
 	else
-		self.EquippedState = 1
+		self.state = 1
 	end
 
-	if self.EquippedState == 1 then -- 1 = normal rod
+	if self.state == 1 then -- 1 = normal rod
 		if not equippedItem.ItemEnchantStaticStatus.IsFishingRod then
-			self.EquippedState = 2
+			self.state = 2
 		end
 	end
 
-	if self.EquippedState == 2 then -- 2 = search for 'Fishing Rod' string
+	if self.state == 2 then -- 2 = search for 'Fishing Rod' string
 		if not string.find(equippedItem.ItemEnchantStaticStatus.Name, "Fishing Rod") then
-			self.EquippedState = 3
+			self.state = 3
 		end
 	end
 
-	if self.EquippedState == 3 then -- 3 fallback to know rods using ids
+	if self.state == 3 then -- 3 fallback to know rods using ids
 		if	not equippedItem.ItemEnchantStaticStatus.ItemId == 16147 or  -- Thick Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 16151 or  -- Steel Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 16152 or  -- Gold Rod
@@ -157,9 +157,9 @@ function StartFishingState:Run()
 			Bot.Stop()
 		end
 	else
-		if self.State == 0 then
-			self.State = 1
+		if self.state == 0 then
 			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation() - 3.14)
+			self.state = 1
 			self.LastActionTime = Pyx.System.TickCount
 		elseif self.state == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing ...")
@@ -172,7 +172,7 @@ function StartFishingState:Run()
 				selfPlayer:DoAction("FISHING_START_END_Lv0")
 			end
 
-			self.State = 0
+			self.state = 0
 			self.LastStartFishTickcount = Pyx.System.TickCount
 		end
 	end

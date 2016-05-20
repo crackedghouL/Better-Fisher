@@ -22,13 +22,13 @@ function VendorState.new()
 		VendorGold = false,
 		SellEnabled = true,
 		BuyEnabled = true,
-		IgnoreItemsNamed = {,
+		IgnoreItemsNamed = {},
 		BuyItems = {},
 		SecondsBetweenTries = 300
 	}
 	-- Buy Items Format {Name, BuyAt, BuyMax} BuyAt level we should buyat or below, BuyMax Max to have in Inventory so if is 100 and we have 20 bot will buy 80
 
-	self.State = 0
+	self.state = 0
 	self.Forced = false
 	self.ManualForced = false
 
@@ -124,25 +124,25 @@ function VendorState:GetPosition()
 end
 
 function VendorState:Reset()
-	self.State = 0
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
 	self.Forced = false
 	self.ManualForced = false
+	self.state = 0
 end
 
 function VendorState:Exit()
-	if self.State > 1 then
+	if self.state > 1 then
 		if Dialog.IsTalking then
 			Dialog.ClickExit()
 		end
 
-		self.State = 0
 		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastUseTimer:Start()
 		self.SleepTimer = nil
 		self.Forced = false
 		self.ManualForced = false
+		self.state = 0
 	end
 end
 
@@ -162,11 +162,11 @@ function VendorState:Run()
 		end
 
 		Navigator.MoveTo(vendorPosition,nil,Bot.Settings.PlayerRun)
-		if self.State > 1 then
+		if self.state > 1 then
 			self:Exit()
 			return
 		end
-		self.State = 1
+		self.state = 1
 		return
 	end
 
@@ -185,15 +185,15 @@ function VendorState:Run()
 	table.sort(npcs, function(a,b) return a.Position:GetDistance3D(vendorPosition) < b.Position:GetDistance3D(vendorPosition) end)
 	local npc = npcs[1]
 
-	if self.State == 1 then -- 1 = open npc dialog
+	if self.state == 1 then -- 1 = open npc dialog
 		npc:InteractNpc()
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
-		self.State = 2
+		self.state = 2
 		return
 	end
 
-	if self.State == 2 then -- 2 = create buy and/or sell lists
+	if self.state == 2 then -- 2 = create buy and/or sell lists
 		if not Dialog.IsTalking then
 			print("[" .. os.date(Bot.UsedTimezone) .. "] " .. self.Settings.NpcName " dialog didn't open")
 			self:Exit()
@@ -208,35 +208,35 @@ function VendorState:Run()
 			if Bot.EnableDebug then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Buy/Sell list done")
 			end
-			self.State = 3
+			self.state = 3
 			self.CurrentSellList = self:GetSellItems()
 			self.CurrentBuyList = self:GetBuyItems(true)
 		elseif self.Settings.SellEnabled == true then
 			if Bot.EnableDebug then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Sell list done")
 			end
-			self.State = 3
+			self.state = 3
 			self.CurrentSellList = self:GetSellItems()
 		elseif self.Settings.BuyEnabled == true then
 			if Bot.EnableDebug then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Buy list done")
 			end
-			self.State = 4
+			self.state = 4
 			self.CurrentBuyList = self:GetBuyItems(true)
 		else
-			self.State = 5
+			self.state = 5
 		end
 
 		return
 	end
 
-	if self.State == 3 then -- 3 = sell items and clear sell list
+	if self.state == 3 then -- 3 = sell items and clear sell list
 		if table.length(self.CurrentSellList) < 1 then
 			if self.Settings.BuyEnabled and self.CurrentBuyList ~= nil then
-				self.State = 4
+				self.state = 4
 				return
 			else
-				self.State = 5
+				self.state = 5
 				return
 			end
 		end
@@ -254,19 +254,19 @@ function VendorState:Run()
 		return
 	end
 
-	if self.State == 4 then -- 4 = buy items and clear buy list
+	if self.state == 4 then -- 4 = buy items and clear buy list
 		if table.length(self.CurrentBuyList) < 1 then
 			if Bot.EnableDebug then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Buy from " .. self.Settings.NpcName .. " done")
 			end
 			self.SleepTimer = PyxTimer:New(2)
 			self.SleepTimer:Start()
-			self.State = 5
+			self.state = 5
 			return
 		else
 			if selfPlayer.Inventory.FreeSlots <= 0 then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Inventory is full")
-				self.State = 5
+				self.state = 5
 				return
 			end
 		end
@@ -291,7 +291,7 @@ function VendorState:Run()
 		return
 	end
 
-	if self.State == 5 then -- 5 = close correctly the npc window
+	if self.state == 5 then -- 5 = close correctly the npc window
 		if NpcShop.IsShopping then
 			NpcShop.Close()
 		end
@@ -299,11 +299,11 @@ function VendorState:Run()
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
 		Bot.SilverStats()
-		self.State = 6
+		self.state = 6
 		return
 	end
 
-	if self.State == 6 then -- 6 = state complete
+	if self.state == 6 then -- 6 = state complete
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end
