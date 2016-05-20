@@ -138,7 +138,7 @@ function MainWindow.DrawMainWindow()
 		ImGui.Text("State:")
 		ImGui.SameLine()
 		if not Bot.EnableDebugMainWindow then
-			if Bot.Running and Bot.Fsm.CurrentState then
+			if Bot.Running and Bot.FSM.CurrentState then
 				ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Running")
 			elseif selfPlayer.Inventory.FreeSlots == 0 then
 				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Inv. Full")

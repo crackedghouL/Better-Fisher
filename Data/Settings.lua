@@ -1,4 +1,4 @@
-Settings = { }
+Settings = {}
 Settings.__index = Settings
 
 setmetatable(Settings, {

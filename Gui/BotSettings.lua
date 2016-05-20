@@ -2,7 +2,7 @@
 -- Variables
 -----------------------------------------------------------------------------
 
-BotSettings = { }
+BotSettings = {}
 BotSettings.Visible = false
 
 BotSettings.InventoryComboSelectedIndex = 0

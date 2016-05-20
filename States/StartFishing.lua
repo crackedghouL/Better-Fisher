@@ -6,9 +6,9 @@ StartFishingState.SETTINGS_ON_NORMAL_FISHING = 0
 StartFishingState.SETTINGS_ON_BOAT_FISHING = 1
 
 setmetatable(StartFishingState, {
-  __call = function (cls, ...)
-	return cls.new(...)
-  end,
+	__call = function (cls, ...)
+		return cls.new(...)
+	end,
 })
 
 function StartFishingState.new()
@@ -17,19 +17,19 @@ function StartFishingState.new()
 		UseMaxEnergy = false,
 		FishingMethod = StartFishingState.SETTINGS_ON_NORMAL_FISHING
 	}
-	self.PlayerNearby = nil
 	self.SleepTimer = nil
 	self.LastStartFishTickcount = 0
 	self.LastActionTime = 0
+	self.PlayersNearby = 0
 	self.state = 0
 	return self
 end
 
 function StartFishingState:Reset()
-	self.PlayerNearby = nil
 	self.SleepTimer = nil
 	self.LastStartFishTickcount = 0
 	self.LastActionTime = 0
+	self.PlayersNearby = 0
 	self.state = 0
 end
 
@@ -144,8 +144,16 @@ function StartFishingState:Run()
 	Bot.Stats.LastLootTick = Pyx.System.TickCount
 	Bot.SilverStats()
 
-	if self.PlayerNearby <= Bot.Settings.MinPeopleBeforeAutoEscape or Bot.Settings.MinPeopleBeforeAutoEscape == 0 then
-		if selfPlayer.HealthPercent <= Bot.Settings.HealthPercent and Bot.Counter == 0 and Bot.Settings.AutoEscape then
+	if selfPlayer.HealthPercent <= Bot.Settings.HealthPercent and Bot.Settings.AutoEscape and Bot.Counter == 0 then
+		local players = GetCharacters()
+
+		for k,v in pairs(players) do
+			if v.IsPlayer and v.Name ~= selfPlayer.Name then -- not string.match(me.Key, v.Key)
+				self.PlayersNearby = self.PlayersNearby + 1
+			end
+		end
+
+		if self.PlayersNearby <= Bot.Settings.MinPeopleBeforeAutoEscape or Bot.Settings.MinPeopleBeforeAutoEscape == 0 then
 			local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
 			if equippedItem.ItemEnchantStaticStatus.IsFishingRod then

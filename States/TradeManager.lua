@@ -1,4 +1,4 @@
-TradeManagerState = { }
+TradeManagerState = {}
 TradeManagerState.__index = TradeManagerState
 TradeManagerState.Name = "TradeManager"
 

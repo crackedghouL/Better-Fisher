@@ -128,8 +128,6 @@ function Bot.Start()
 		Bot.RepairState.Settings.NpcName = currentProfile.RepairNpcName
 		Bot.RepairState.Settings.NpcPosition = currentProfile.RepairNpcPosition
 
-		Bot.StartFishingState.PlayerNearby = Bot.PlayerNearby
-
 		if Bot.MeshDisabled ~= true then
 			ProfileEditor.Visible = false
 			Navigation.MesherEnabled = false
@@ -399,20 +397,6 @@ function Bot.StateMoving(state)
 			selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 		end
 	end
-end
-
-function Bot.PlayerNearby()
-	local me = GetSelfPlayer()
-	local players = GetCharacters()
-	local count = 0
-
-	for k,v in pairs(players) do
-		if v.IsPlayer and v.Name ~= me.Name then -- not string.match(me.Key, v.Key)
-			count = count + 1
-		end
-	end
-
-	return (count > 0)
 end
 
 function Bot.Death(state)

@@ -1,7 +1,7 @@
 Navigator = {}
 Navigator.Running = false
 Navigator.Destination = Vector3(0, 0, 0)
-Navigator.Waypoints = { }
+Navigator.Waypoints = {}
 Navigator.ApproachDistance = 100
 Navigator.LastObstacleCheckTick = 0
 Navigator.LastFindPathTick = 0
