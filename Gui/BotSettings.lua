@@ -398,6 +398,7 @@ function BotSettings.DrawBotSettings()
 				_, Bot.Settings.StopWhenPeopleNearby = ImGui.Checkbox("##id_guid_adv_option_stop_bot_when_someone_nearby", Bot.Settings.StopWhenPeopleNearby)
 				ImGui.SameLine()
 				ImGui.TextColored(ImVec4(1,0,0,1), "Stop bot when someone is nearby")
+				_, Bot.Settings.StopWhenPeopleNearbyDistance = ImGui.SliderInt("Distance##id_guid_adv_option_stop_bot_when_someone_nearby_distance", Bot.Settings.StopWhenPeopleNearbyDistance, 0, 10000)
 				ImGui.TreePop()
 			end
 

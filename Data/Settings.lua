@@ -16,6 +16,7 @@ function Settings.new()
 	self.DeleteUsedRods = true
 	self.InvFullStop = false
 	self.StopWhenPeopleNearby = false
+	self.StopWhenPeopleNearbyDistance = 5000
 	self.TradeManagerSettings = {}
 	self.WarehouseSettings = {}
 	self.VendorSettings = {}

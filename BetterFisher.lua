@@ -341,7 +341,7 @@ function Bot.OnPulse()
 			local me = GetSelfPlayer()
 			local players = GetCharacters()
 			local count = 0
-			local SafeDistance = 5000
+			local SafeDistance = Bot.Settings.StopWhenPeopleNearbyDistance
 
 			for k,v in pairs(players, function(t,a,b) return t[a].Position.Distance3DFromMe < t[b].Position.Distance3DFromMe end) do
 				if (v.IsPlayer and v.Name ~= me.Name) and math.floor(me.Position.Distance3DFromMe) <= SafeDistance then -- not string.match(me.Key, v.Key)

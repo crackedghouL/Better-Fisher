@@ -181,3 +181,4 @@ Minor fixes
 [0.XX BETA]
 Removed Radar [done]
 Removed old fishing animations [done]
+Fixed little bugs [done]
