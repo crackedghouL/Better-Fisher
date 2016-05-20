@@ -181,4 +181,6 @@ Minor fixes
 [0.XX BETA]
 Removed Radar [done]
 Removed old fishing animations [done]
+Added new option, safer distance before stop the script [done]
+Added new option, minimum peoples for call Escape [done]
 Fixed little bugs [done]

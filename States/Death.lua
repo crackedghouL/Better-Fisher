@@ -14,9 +14,9 @@ setmetatable(DeathState, {
 
 function DeathState.new()
 	local self = setmetatable({}, DeathState)
+	self.Settings = { ReviveMethod = DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED }
 	self.LastUseTimer = nil
 	self.CallWhenCompleted = nil
-	self.Settings = { ReviveMethod = DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED }
 	self.WasDead = false
 	return self
 end
@@ -51,10 +51,10 @@ function DeathState:Run()
 	end
 
 	if self.Settings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_NODE then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Attempt to revive at nearest node...");
+		print("[" .. os.date(Bot.UsedTimezone) .. "] Trying to revive at nearest node...");
 		selfPlayer:ReviveAtNode()
 	elseif self.Settings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Attempt to revive at nearest village...");
+		print("[" .. os.date(Bot.UsedTimezone) .. "] Trying to revive at nearest village...");
 		selfPlayer:ReviveAtVillage()
 	else
 		if Bot.EnableDebug then

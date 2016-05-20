@@ -370,11 +370,11 @@ function BotSettings.DrawBotSettings()
 		end
 
 		if ImGui.CollapsingHeader("Anti-PK", "id_gui_antipk_option", true, false) then
-			_, Bot.Settings.AutoEscape =  ImGui.Checkbox("##id_gui_antipk_escape", Bot.Settings.AutoEscape)
+			_, Bot.Settings.AutoEscape =  ImGui.Checkbox("##id_gui_antipk_autoescape", Bot.Settings.AutoEscape)
 			ImGui.SameLine()
 			ImGui.Text("Enable /Escape")
-
-			valueChanged, Bot.Settings.HealthPercent = ImGui.SliderInt("Health percent##id_gui_antipk_escapeSlider", Bot.Settings.HealthPercent, 1, 95)
+			_, Bot.Settings.HealthPercent = ImGui.SliderInt("Health percent##id_gui_antipk_health_percent", Bot.Settings.HealthPercent, 1, 95)
+			_, Bot.Settings.MinPeopleBeforeAutoEscape = ImGui.SliderInt("Minimun people for Auto Escape##id_gui_antipk_min_people_before_autoescape", Bot.Settings.MinPeopleBeforeAutoEscape, 0, 10)
 		end
 
 		if ImGui.CollapsingHeader("Advanced options", "id_gui_adv_option", true, false) then

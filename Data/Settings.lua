@@ -12,6 +12,7 @@ function Settings.new()
 	self.LastProfileName = ""
 	self.HealthPercent = 80
 	self.AutoEscape = false
+	self.MinPeopleBeforeAutoEscape = 5
 	self.PlayerRun = false
 	self.DeleteUsedRods = true
 	self.InvFullStop = false

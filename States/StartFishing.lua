@@ -144,8 +144,14 @@ function StartFishingState:Run()
 	Bot.Stats.LastLootTick = Pyx.System.TickCount
 	Bot.SilverStats()
 
-	if not self.PlayerNearby() then
+	if self.PlayerNearby <= Bot.Settings.MinPeopleBeforeAutoEscape or Bot.Settings.MinPeopleBeforeAutoEscape == 0 then
 		if selfPlayer.HealthPercent <= Bot.Settings.HealthPercent and Bot.Counter == 0 and Bot.Settings.AutoEscape then
+			local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
+
+			if equippedItem.ItemEnchantStaticStatus.IsFishingRod then
+				selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
+			end
+
 			Navigator.Stop()
 			BDOLua.Execute("callRescue()")
 			Bot.Counter = 10000
