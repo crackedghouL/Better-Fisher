@@ -158,13 +158,10 @@ function StartFishingState:Run()
 		end
 	else
 		if self.State == 0 then
-			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
-			self.SleepTimer = PyxTimer:New(2)
-			self.SleepTimer:Start()
-			selfPlayer:DoAction("MOVE_FORWARD")
 			self.State = 1
+			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation() - 3.14)
 			self.LastActionTime = Pyx.System.TickCount
-		elseif self.State == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then
+		elseif self.state == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing ...")
 			selfPlayer:DoAction("FISHING_START")
 			selfPlayer:DoAction("FISHING_ING_START")
