@@ -57,21 +57,25 @@ function RepairState:NeedToRun()
 		return false
 	end
 
-	if not Bot.Settings.EnableRepair then
-		self.Forced = false
-		return false
-	end
-
 	if not self:HasNpc() and Bot.Settings.InvFullStop then
 		self.Forced = false
 		return false
 	end
 
 	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+		self.Forced = false
 		return false
 	end
 
-	if Looting.IsLooting and selfPlayer.CurrentActionName == "WAIT" then
+	if self.ManualForced and not Navigator.CanMoveTo(self:GetPosition()) then
+		self.ManualForced = false
+		return false
+	elseif self.ManualForced then
+		return true
+	end
+
+	if not Bot.Settings.EnableRepair then
+		self.Forced = false
 		return false
 	end
 
@@ -109,14 +113,6 @@ function RepairState:NeedToRun()
 		self.Forced = false
 		return false
 	elseif self.Forced then
-		return true
-	end
-
-	if self.ManualForced and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.ManualForced = false
-		self.Forced = false
-		return false
-	elseif self.ManualForced then
 		return true
 	end
 

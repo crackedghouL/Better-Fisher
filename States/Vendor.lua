@@ -69,11 +69,15 @@ function VendorState:NeedToRun()
 	end
 
 	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+		self.Forced = false
 		return false
 	end
 
-	if Looting.IsLooting and selfPlayer.CurrentActionName == "WAIT" then
+	if self.ManualForced and not Navigator.CanMoveTo(self:GetPosition()) then
+		self.ManualForced = false
 		return false
+	elseif self.ManualForced then
+		return true
 	end
 
 	if not self.Settings.SellEnabled and not self.Settings.BuyEnabled then
@@ -102,13 +106,6 @@ function VendorState:NeedToRun()
 		self.Forced = false
 		return false
 	elseif self.Forced then
-		return true
-	end
-
-	if self.ManualForced and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.ManualForced = false
-		return false
-	elseif self.ManualForced then
 		return true
 	end
 
