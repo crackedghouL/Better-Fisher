@@ -21,6 +21,7 @@ function StartFishingState.new()
 	self.LastStartFishTickcount = 0
 	self.LastActionTime = 0
 	self.PlayersNearby = 0
+	self.EquippedState = 0
 	self.state = 0
 	return self
 end
@@ -30,6 +31,7 @@ function StartFishingState:Reset()
 	self.LastStartFishTickcount = 0
 	self.LastActionTime = 0
 	self.PlayersNearby = 0
+	self.EquippedState = 0
 	self.state = 0
 end
 
@@ -56,22 +58,22 @@ function StartFishingState:NeedToRun()
 	if not equippedItem then
 		return false
 	else
-		self.state = 1
+		self.EquippedState = 1
 	end
 
-	if self.state == 1 then -- 1 = normal rod
+	if self.EquippedState == 1 then -- 1 = normal rod
 		if not equippedItem.ItemEnchantStaticStatus.IsFishingRod then
-			self.state = 2
+			self.EquippedState = 2
 		end
 	end
 
-	if self.state == 2 then -- 2 = search for 'Fishing Rod' string
+	if self.EquippedState == 2 then -- 2 = search for 'Fishing Rod' string
 		if not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Fishing Rod") then
-			self.state = 3
+			self.EquippedState = 3
 		end
 	end
 
-	if self.state == 3 then -- 3 fallback to know rods using ids
+	if self.EquippedState == 3 then -- 3 fallback to know rods using ids
 		if	not equippedItem.ItemEnchantStaticStatus.ItemId == 16147 or  -- Thick Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 16151 or  -- Steel Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 16152 or  -- Gold Rod
@@ -172,11 +174,14 @@ function StartFishingState:Run()
 		end
 	else
 		if self.state == 0 then
-			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation() - 3.14)
+			selfPlayer:DoAction("MOVE_BACKWARD")
+			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
 			self.state = 1
 			self.LastActionTime = Pyx.System.TickCount
 		elseif self.state == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing ...")
+			if Bot.EnableDebug then
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing ...")
+			end
 			selfPlayer:DoAction("FISHING_START")
 			selfPlayer:DoAction("FISHING_ING_START")
 

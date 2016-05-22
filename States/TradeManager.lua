@@ -15,21 +15,15 @@ function TradeManagerState.new()
 		NpcName = "",
 		NpcPosition = { X = 0, Y = 0, Z = 0 },
 		SellAll = true,
-		TradeManagerOnInventoryFull = true,
 		DoBargainGame = true,
 		IgnoreItemsNamed = { },
 		SecondsBetweenTries = 300
 	}
 
-	self.state = 0
-	self.Forced = false
-	self.ManualForced = false
-
 	self.LastTradeUseTimer = nil
 	self.SleepTimer = nil
 
-	self.CurrentSellList = { }
-
+	self.CurrentSellList = {}
 	self.ItemCheckFunction = nil
 
 	self.CallWhenCompleted = nil
@@ -39,6 +33,10 @@ function TradeManagerState.new()
 	self.BargainCount = 0
 	self.BargainDice = 0 -- Last dice, 0=high 1=low
 
+	self.Forced = false
+	self.ManualForced = false
+	self.state = 0
+
 	return self
 end
 
@@ -46,50 +44,37 @@ function TradeManagerState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 
 	if not selfPlayer then
-		return false
+		self.Forced = false
 	end
 
 	if not selfPlayer.IsAlive then
-		return false
+		self.Forced = false
 	end
 
-	if not self:HasNpc() then
+	if not self:HasNpc() or (not self:HasNpc() and Bot.Settings.InvFullStop) then
 		self.Forced = false
-		return false
-	end
-
-	if not self:HasNpc() and Bot.Settings.InvFullStop then
-		self.Forced = false
-		return false
 	end
 
 	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
 		self.Forced = false
-		return false
 	end
 
-	if self.ManualForced and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.ManualForced = false
-		return false
-	elseif self.ManualForced == true then
-		return true
-	end
-
-	if not Bot.Settings.EnableTrader then
+	if not self.Settings.Enabled then
 		self.Forced = false
-		return false
 	end
 
-	if self.Settings.TradeManagerOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3 and table.length(self:GetItems()) > 0 and Navigator.CanMoveTo(self:GetPosition()) and not Looting.IsLooting then
+	if not Navigator.CanMoveTo(self:GetPosition()) then
+		self.Forced = false
+	end
+
+	if selfPlayer.Inventory.FreeSlots <= 3 and table.length(self:GetItems()) > 0 and not Looting.IsLooting then
 		self.Forced = true
-		return true
 	end
 
-	if self.Forced and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.Forced = false
-		return false
-	elseif self.Forced == true then
+	if self.Forced or self.ManualForced then
 		return true
+	elseif not self.Forced or not self.ManualForced then
+		return false
 	end
 
 	return false
@@ -113,12 +98,12 @@ function TradeManagerState:Exit()
 			Dialog.ClickExit()
 		end
 
-		self.state = 0
 		self.LastTradeUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastTradeUseTimer:Start()
 		self.SleepTimer = nil
 		self.Forced = false
 		self.ManualForced = false
+		self.state = 0
 	end
 end
 
@@ -205,7 +190,9 @@ function TradeManagerState:Run()
 					self.SleepTimer:Start()
 					self.BargainState = 1
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Not enought energy. Skipping bargain minigame")
+					if Bot.EnableDebug then
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Not enought energy. Skipping bargain minigame")
+					end
 					self.SleepTimer = PyxTimer:New(2)
 					self.SleepTimer:Start()
 					self.BargainState = 0
@@ -213,8 +200,10 @@ function TradeManagerState:Run()
 				end
 			elseif self.BargainState == 1 then
 				if BDOLua.Execute("return isTradeGameSuccess()") == true then
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Bargain succes!")
-					self.SleepTimer = PyxTimer:New(1)
+					if Bot.EnableDebug then
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Bargain succes!")
+					end
+					self.SleepTimer = PyxTimer:New(2)
 					self.SleepTimer:Start()
 
 					BDOLua.Execute("Fglobal_TradeGame_Close()")
@@ -224,7 +213,9 @@ function TradeManagerState:Run()
 					self.state = 4
 					self.CurrentSellList = self:GetItems()
 				elseif self.BargainCount >= 3 then
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Bargain fail")
+					if Bot.EnableDebug then
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Bargain fail")
+					end
 					BDOLua.Execute("Fglobal_TradeGame_Close()")
 					self.SleepTimer = PyxTimer:New(2)
 					self.SleepTimer:Start()
@@ -257,13 +248,15 @@ function TradeManagerState:Run()
 
 	if self.state == 4 then -- 4 = sell all
 		if table.length(self.CurrentSellList) < 1 then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Sell list created")
+			if Bot.EnableDebug then
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Sell list created")
+			end
 			self:Exit()
 			return
 		end
 
 		TradeMarket.SellAll() -- Currently only Sell All is supported
-		self.SleepTimer = PyxTimer:New(5)
+		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
 		self.state = 5
 		return

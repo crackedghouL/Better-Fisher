@@ -54,18 +54,13 @@ function InventoryDeleteState:Reset()
 	self.LastUseTimer = nil
 	self.Forced = false
 	self.ItemList = {}
-	self.state = 0
 end
 
 function InventoryDeleteState:Exit()
-	if self.state > 1 then
-		self.state = 0
-		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
-		self.LastUseTimer:Start()
-		self.Forced = false
-		self.ItemList = {}
-		self.state = 0
-	end
+	self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
+	self.LastUseTimer:Start()
+	self.Forced = false
+	self.ItemList = {}
 end
 
 function InventoryDeleteState:Run()

@@ -26,10 +26,6 @@ function WarehouseState.new()
 		SecondsBetweenTries = 300
 	}
 
-	self.state = 0
-	self.Forced = false
-	self.ManualForced = false
-
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
 
@@ -43,6 +39,10 @@ function WarehouseState.new()
 	self.CallWhenCompleted = nil
 	self.CallWhileMoving = nil
 
+	self.Forced = false
+	self.ManualForced = false
+	self.state = 0
+
 	return self
 end
 
@@ -50,65 +50,51 @@ function WarehouseState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 
 	if not selfPlayer then
-		return false
+		self.Forced = false
 	end
 
 	if not selfPlayer.IsAlive then
-		return false
+		self.Forced = false
 	end
 
-	if not self:HasNpc() then
+	if not self:HasNpc() or (not self:HasNpc() and Bot.Settings.InvFullStop) then
 		self.Forced = false
-		return false
-	end
-
-	if not self:HasNpc() and Bot.Settings.InvFullStop then
-		self.Forced = false
-		return false
 	end
 
 	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
 		self.Forced = false
-		return false
 	end
 
-	if self.ManualForced and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.ManualForced = false
-		return false
-	elseif self.ManualForced then
-		return true
-	end
-
-	if not Bot.Settings.EnableWarehouse then
+	if not self.Settings.Enabled then
 		self.Forced = false
-		return false
 	end
 
-	if self.Forced and not Navigator.CanMoveTo(self:GetPosition()) then
+	if not Navigator.CanMoveTo(self:GetPosition()) then
 		self.Forced = false
-		return false
-	elseif self.Forced == true then
-		return true
 	end
 
-	if self.Forced and selfPlayer.WeightPercent >= 95 then
+	if selfPlayer.WeightPercent >= 95 then
 		if Navigator.CanMoveTo(self:GetPosition())	then
 			self.Forced = true
-			return true
 		else
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Deposit money! Can not find path to NPC: " .. self.Settings.NpcName)
-			return false
+			self.Forced = false
 		end
 	end
 
-	if self.Forced and table.length(self:GetItems()) > 0 and (selfPlayer.Inventory.FreeSlots <= 3 or selfPlayer.WeightPercent >= 95) then
+	if table.length(self:GetItems()) > 0 and (selfPlayer.Inventory.FreeSlots <= 3 or selfPlayer.WeightPercent >= 95) then
 		if Navigator.CanMoveTo(self:GetPosition()) then
 			self.Forced = true
-			return true
 		else
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Deposit items! Can not find path to NPC: " .. self.Settings.NpcName)
-			return false
+			self.Forced = false
 		end
+	end
+
+	if self.Forced or self.ManualForced then
+		return true
+	elseif not self.Forced or not self.ManualForced then
+		return false
 	end
 
 	return false
@@ -130,7 +116,6 @@ function WarehouseState:Exit()
 			Dialog.ClickExit()
 		end
 
-		self.state = 0
 		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastUseTimer:Start()
 		self.SleepTimer = nil
@@ -138,6 +123,7 @@ function WarehouseState:Exit()
 		self.ManualForced = false
 		self.DepositedMoney = false
 		self.DepositItems = false
+		self.state = 0
 	end
 end
 
@@ -241,12 +227,9 @@ function WarehouseState:Run()
 		local item = self.CurrentDepositList[1]
 		local itemPtr = selfPlayer.Inventory:GetItemByName(item.name)
 		if itemPtr ~= nil then
-			if Bot.EnableDebug then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Deposited: " .. itemPtr.ItemEnchantStaticStatus.Name)
-			end
-
+			print("[" .. os.date(Bot.UsedTimezone) .. "] Deposited: " .. itemPtr.ItemEnchantStaticStatus.Name)
 			itemPtr:PushToWarehouse(npc)
-			self.SleepTimer = PyxTimer:New(2)
+			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
 		end
 

@@ -108,7 +108,9 @@ function EquipFloatState:NeedToRun()
 															  -- Palm Tree Float +4
 															  -- Palm Tree Float +5
 			then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
+				if Bot.EnableDebug then
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
+				end
 				self.ItemToEquip = v
 				break
 			end

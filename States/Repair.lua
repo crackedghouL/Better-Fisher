@@ -21,10 +21,6 @@ function RepairState.new()
 		SecondsBetweenTries = 300
 	}
 
-	self.state = 0
-	self.Forced = false
-	self.ManualForced = false
-
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
 
@@ -37,6 +33,10 @@ function RepairState.new()
     self.RepairEquipped = true
     self.RepairInventory = true
 
+	self.Forced = false
+	self.ManualForced = false
+	self.state = 0
+
 	return self
 end
 
@@ -45,75 +45,61 @@ function RepairState:NeedToRun()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
 	if not selfPlayer then
-		return false
+		self.Forced = false
 	end
 
 	if not selfPlayer.IsAlive then
-		return false
+		self.Forced = false
 	end
 
-	if not self:HasNpc() then
+	if not self:HasNpc() or (not self:HasNpc() and Bot.Settings.InvFullStop) then
 		self.Forced = false
-		return false
-	end
-
-	if not self:HasNpc() and Bot.Settings.InvFullStop then
-		self.Forced = false
-		return false
 	end
 
 	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
 		self.Forced = false
-		return false
 	end
 
-	if self.ManualForced and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.ManualForced = false
-		return false
-	elseif self.ManualForced then
-		return true
-	end
-
-	if not Bot.Settings.EnableRepair then
+	if not self.Settings.Enabled then
 		self.Forced = false
-		return false
+	end
+
+	if not Navigator.CanMoveTo(self:GetPosition()) then
+		self.Forced = false
 	end
 
 	if not equippedItem then
 		for k,v in pairs(selfPlayer.Inventory.Items) do
 			if 	v.HasEndurance and v.EndurancePercent <= 0 and
-				(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151)) 
+				(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
 			then
 				if Navigator.CanMoveTo(self:GetPosition()) then
 					self.Forced = true
-					return true
 				else
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Repair! Can not find path to NPC: " .. self.Settings.NpcName)
-					return false
+					self.Forced = false
 				end
 			end
 		end
 	else
 		for k,v in pairs(selfPlayer.EquippedItems) do
 			if 	v.HasEndurance and v.EndurancePercent <= 0 and
-				(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151)) 
+				(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
 			then
 				if Navigator.CanMoveTo(self:GetPosition()) then
 					self.Forced = true
-					return true
 				else
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Repair! Can not find path to NPC: " .. self.Settings.NpcName)
-					return false
+					self.Forced = false
 				end
 			end
 		end
 	end
 
-	if self.Forced and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.Forced = false
+	if self.Forced or self.ManualForced then
 		return false
-	elseif self.Forced then
-		return true
+	elseif not self.Forced or not self.ManualForced then
+		return false
 	end
 
 	return false
@@ -130,9 +116,9 @@ end
 function RepairState:Reset()
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
+	self.RepairList = {}
 	self.Forced = false
 	self.ManualForced = false
-	self.RepairList = {}
 	self.state = 0
 end
 
@@ -145,9 +131,9 @@ function RepairState:Exit()
 		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastUseTimer:Start()
 		self.SleepTimer = nil
+		self.RepairList = {}
 		self.Forced = false
 		self.ManualForced = false
-		self.RepairList = {}
 		self.state = 0
 	end
 end
@@ -225,7 +211,7 @@ function RepairState:Run()
 		self.state = 5
 		if self.RepairEquipped then
 			selfPlayer:RepairAllEquippedItems(npc)
-			self.SleepTimer = PyxTimer:New(5)
+			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
 		end
 		return
@@ -235,7 +221,7 @@ function RepairState:Run()
 		self.state = 6
 		if self.RepairInventory then
 			selfPlayer:RepairAllInventoryItems(npc)
-			self.SleepTimer = PyxTimer:New(5)
+			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
 		end
 		return
