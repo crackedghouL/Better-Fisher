@@ -42,7 +42,7 @@ function LootState:NeedToRun()
 		return false
 	end
 
-	if not Bot.Settings.InvFullStop and selfPlayer.Inventory.FreeSlots <= 2 then -- beacuse with 0 is impossible to sell at trade manager
+	if not Bot.Settings.InvFullStop and selfPlayer.Inventory.FreeSlots <= 3 then
 		return false
 	end
 
@@ -64,7 +64,7 @@ function LootState:Run()
 		for i = 0, numLoots -1, x do -- for i = 0, numLoots -1 do
 			local lootItem = Looting.GetItemByIndex(i)
 			local lootItemName = lootItem.ItemEnchantStaticStatus.Name
-			local lootItemType = "Trash"
+			local lootItemType = nil
 			local lootItemQuality = nil
 
 			if string.find(lootItemName, "Moray") then -- Fix because some names contains weird characters
@@ -78,6 +78,16 @@ function LootState:Run()
 			if Bot.EnableDebug then
 				print(i)
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Trying to loot: " .. numLoots .. "x " .. lootItemName)
+			end
+
+			if 	not self.Settings.LootWhite and not self.Settings.LootGreen and
+				not self.Settings.LootBlue and not self.Settings.LootGold and
+				not self.Settings.LootOrange and not self.Settings.LootShards and
+				not self.Settings.LootKeys and not self.Settings.LootEggs
+			then
+				lootItemType = "Trash"
+				Bot.Stats.Trashes = Bot.Stats.Trashes + 1
+				self.state = 7
 			end
 
 			if lootItem then
@@ -103,107 +113,133 @@ function LootState:Run()
 				end
 			end
 
-			if self.state == 2 then -- 2 = understand type and classify of the loot
+			if self.state == 2 then -- 2 = understand what type of the loot is
 				if lootItem.ItemEnchantStaticStatus.Classify == 16 and lootItem.ItemEnchantStaticStatus.IsTradeAble then
 					lootItemType = "Fish"
 					self.state = 3
-				elseif lootItem.ItemEnchantStaticStatus.Type == 2 and lootItem.ItemEnchantStaticStatus.Classify == 0 then
-					self.state = 3
-				elseif lootItem.ItemEnchantStaticStatus.Type == 0 and lootItem.ItemEnchantStaticStatus.Classify == 0 then
-					self.state = 3
-				end
-			end
-
-			if self.state == 3 then -- 3 = check for settings
-				if self.Settings.LootShards then
-					if 	lootItem.ItemEnchantStaticStatus.ItemId == 40218 or -- ancient relic crystal shard
+				--elseif lootItem.ItemEnchantStaticStatus.Type == 2 and lootItem.ItemEnchantStaticStatus.Classify == 0 then
+				elseif 	lootItem.ItemEnchantStaticStatus.ItemId == 40218 or -- ancient relic crystal shard
 						lootItem.ItemEnchantStaticStatus.ItemId == 4997 or  -- hard black crystal shard
 						lootItem.ItemEnchantStaticStatus.ItemId == 4998     -- sharp black crystal shard
-					then
-						lootItemType = "Shard"
-						Bot.Stats.Shards = Bot.Stats.Shards + 1
-						self.state = 4
-					end
-				end
-
-				if self.Settings.LootKeys then
-					if 	lootItem.ItemEnchantStaticStatus.ItemId == 44165 or -- silver key
+				then
+					lootItemType = "Shard"
+					self.state = 4
+				--elseif lootItem.ItemEnchantStaticStatus.Type == 0 and lootItem.ItemEnchantStaticStatus.Classify == 0 then
+				elseif 	lootItem.ItemEnchantStaticStatus.ItemId == 44165 or -- silver key
 						lootItem.ItemEnchantStaticStatus.ItemId == 44166 or -- bronze key
 						lootItem.ItemEnchantStaticStatus.ItemId == 44164    -- gold key
-					then
-						lootItemType = "Key"
-						Bot.Stats.Keys = Bot.Stats.Keys + 1
-						self.state = 4
-					end
-				end
-
-				if self.Settings.LootEggs then
-					if 	lootItem.ItemEnchantStaticStatus.ItemId == 16195 or -- black spirit egg
+				then
+					lootItemType = "Key"
+					self.state = 5
+				elseif 	lootItem.ItemEnchantStaticStatus.ItemId == 16195 or -- black spirit egg
 						lootItem.ItemEnchantStaticStatus.ItemId == 16192 or -- egg with star pattern
 						lootItem.ItemEnchantStaticStatus.ItemId == 16191 or -- life egg
 						lootItem.ItemEnchantStaticStatus.ItemId == 16194 or -- rainbow egg
 						lootItem.ItemEnchantStaticStatus.ItemId == 16193 	-- raindrop egg
-					then
-						lootItemType = "Egg"
-						Bot.Stats.Trashes = Bot.Stats.Trashes + 1
-						self.state = 4
-					end
+				then
+					lootItemType = "Egg"
+					self.state = 6
+				elseif 	not self.Settings.LootWhite and not self.Settings.LootGreen and
+						not self.Settings.LootBlue and not self.Settings.LootGold and
+						not self.Settings.LootOrange and not self.Settings.LootShards and
+						not self.Settings.LootKeys and not self.Settings.LootEggs
+				then
+					lootItemType = "Trash"
+					self.state = 7
+				else
+					lootItemType = "Trash"
+					self.state = 7
 				end
+			end
 
+			if self.state == 3 then -- 3 = check for fishes
 				if lootItemType == "Fish" then
-					if self.Settings.LootWhite and lootItemQuality == "White" then
+					Bot.Stats.Fishes = Bot.Stats.Fishes + 1
+
+					if lootItemQuality == "White" then
 						Bot.Stats.LootQuality[0] = (Bot.Stats.LootQuality[0] or 0) + 1
-						Bot.Stats.Fishes = Bot.Stats.Fishes + 1
-						self.state = 4
-					elseif not self.Settings.LootWhite and lootItemQuality == "White" then
-						self.state = 5
+						if self.Settings.LootWhite then
+							self.state = 8
+						elseif not self.Settings.LootWhite then
+							self.state = 9
+						end
 					end
 
-					if self.Settings.LootGreen and lootItemQuality == "Green" then
+					if lootItemQuality == "Green" then
 						Bot.Stats.LootQuality[1] = (Bot.Stats.LootQuality[1] or 0) + 1
-						Bot.Stats.Fishes = Bot.Stats.Fishes + 1
-						self.state = 4
-					elseif not self.Settings.LootGreen and lootItemQuality == "Green" then
-						self.state = 5
+						if self.Settings.LootGreen then
+							self.state = 8
+						elseif not self.Settings.LootGreen then
+							self.state = 9
+						end
 					end
 
-					if self.Settings.LootBlue and lootItemQuality == "Blue" then
+					if lootItemQuality == "Blue" then
 						Bot.Stats.LootQuality[2] = (Bot.Stats.LootQuality[2] or 0) + 1
-						Bot.Stats.Fishes = Bot.Stats.Fishes + 1
-						self.state = 4
-					elseif not self.Settings.LootBlue and lootItemQuality == "Blue" then
-						self.state = 5
+						if self.Settings.LootBlue then
+							self.state = 8
+						elseif not self.Settings.LootBlue then
+							self.state = 9
+						end
 					end
 
-					if self.Settings.LootGold and lootItemQuality == "Gold" then
+					if lootItemQuality == "Gold" then
 						Bot.Stats.LootQuality[3] = (Bot.Stats.LootQuality[3] or 0) + 1
-						Bot.Stats.Fishes = Bot.Stats.Fishes + 1
-						self.state = 4
-					elseif not self.Settings.LootGold and lootItemQuality == "Gold" then
-						self.state = 5
+						if self.Settings.LootGold then
+							self.state = 8
+						elseif not self.Settings.LootGold then
+							self.state = 9
+						end
 					end
 
-					if self.Settings.LootOrange and lootItemQuality == "Orange" then
+					if lootItemQuality == "Orange" then
 						Bot.Stats.LootQuality[4] = (Bot.Stats.LootQuality[4] or 0) + 1
-						Bot.Stats.Fishes = Bot.Stats.Fishes + 1
-						self.state = 4
-					elseif not self.Settings.LootOrange and lootItemQuality == "Orange" then
-						self.state = 5
+						if self.Settings.LootOrange then
+							self.state = 8
+						elseif not self.Settings.LootOrange then
+							self.state = 9
+						end
 					end
 				end
+			end
 
+			if self.state == 4 then -- 4 = check for shards
+				if lootItemType == "Shard" then
+					Bot.Stats.Shards = Bot.Stats.Shards + 1
+					if self.Settings.LootShards then
+						self.state = 8
+					elseif self.Settings.LootShards then
+						self.state = 9
+					end
+				end
+			end
+
+			if self.state == 5 then -- 5 = check for keys
+				if lootItemType == "Key" then
+					Bot.Stats.Keys = Bot.Stats.Keys + 1
+					if self.Settings.LootKeys then
+						self.state = 8
+					elseif self.Settings.LootKeys then
+						self.state = 9
+					end
+				end
+			end
+
+			if self.state == 6 then -- 6 = check for eggs
+				if lootItemType == "Egg" then
+					Bot.Stats.Eggs = Bot.Stats.Eggs + 1
+					if self.Settings.LootEggs then
+						self.state = 8
+					elseif self.Settings.LootEggs then
+						self.state = 9
+					end
+				end
+			end
+
+			if self.state == 7 then -- 7 = check for trashes
 				if lootItemType == "Trash" then
 					Bot.Stats.Trashes = Bot.Stats.Trashes + 1
-					self.state = 5
-				end
-
-				if 	not self.Settings.LootWhite and not self.Settings.LootGreen and
-					not self.Settings.LootBlue and not self.Settings.LootGold and
-					not self.Settings.LootOrange and not self.Settings.LootShards and
-					not self.Settings.LootKeys and not self.Settings.LootEggs
-				then
-					Bot.Stats.Trashes = Bot.Stats.Trashes + 1
-					self.state = 5
+					self.state = 9
 				end
 			end
 
@@ -216,12 +252,12 @@ function LootState:Run()
 				Bot.Stats.AverageLootTime = math.ceil((Bot.Stats.TotalLootTime / Bot.Stats.LootTimeCount) / 1000)
 			end
 
-			if self.state == 4 then -- 4 = loot the item
+			if self.state == 8 then -- 8 = loot the item
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ")")
 				Looting.Take(i)
 			end
 
-			if self.state == 5 then -- 5 = don't loot the item
+			if self.state == 9 then -- 9 = don't loot the item
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Not looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ")")
 			end
 		end
