@@ -26,6 +26,7 @@ function Stats.DrawStats()
 			statsTrashes = string.format("%i - %.02f%%%%", Bot.Stats.Trashes, Bot.Stats.Trashes / Bot.Stats.Loots * 100)
 			statsKeys = string.format("%i - %.02f%%%%", Bot.Stats.Keys, Bot.Stats.Keys / Bot.Stats.Loots * 100)
 			statsShards = string.format("%i - %.02f%%%%", Bot.Stats.Shards, Bot.Stats.Shards / Bot.Stats.Loots * 100)
+			statsEggs = string.format("%i - %.02f%%%%", Bot.Stats.Eggs, Bot.Stats.Eggs / Bot.Stats.Loots * 100)
 		else
 			statsWhites = "0 - 0.00%%"
 			statsGreens = "0 - 0.00%%"
@@ -36,6 +37,7 @@ function Stats.DrawStats()
 			statsTrashes = "0 - 0.00%%"
 			statsKeys = "0 - 0.00%%"
 			statsShards = "0 - 0.00%%"
+			statsEggs = "0 - 0.00%%"
 		end
 
 		ImGui.Columns(3)
@@ -43,7 +45,7 @@ function Stats.DrawStats()
 		ImGui.NextColumn()
 		ImGui.Text("Loots: " .. string.format("%i", Bot.Stats.Loots))
 		ImGui.NextColumn()
-		ImGui.Text("Avg.: " .. Bot.Stats.AverageLootTime .. "s")
+		ImGui.Text("Avg: " .. Bot.Stats.AverageLootTime .. "s")
 
 		ImGui.Columns(1)
 		ImGui.Separator()

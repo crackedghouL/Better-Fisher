@@ -226,7 +226,7 @@ function ProfileEditor.SaveProfile(name)
 
 	--Navigation.ExportWavefrontObject(objFilename)
 
-	print("[" .. os.date(Bot.UsedTimezone) .. "] Save mesh : " .. meshFilename)
+	print("[" .. os.date(Bot.UsedTimezone) .. "] Save mesh: " .. meshFilename)
 	if not Navigation.SaveMesh(meshFilename) then
 		print("[" .. os.date(Bot.UsedTimezone) .. "] Unable to save .mesh !")
 		return
@@ -243,7 +243,7 @@ function ProfileEditor.LoadProfile(name)
 	local profileFilename = "\\Profiles\\" .. name .. ".json"
 	local meshFilename = "\\Profiles\\" .. name .. ".mesh"
 
-	print("[" .. os.date(Bot.UsedTimezone) .. "] Load mesh : " .. meshFilename)
+	print("[" .. os.date(Bot.UsedTimezone) .. "] Load mesh: " .. meshFilename)
 	if not Navigation.LoadMesh(meshFilename) then
 		print("[" .. os.date(Bot.UsedTimezone) .. "] Unable to load .mesh !")
 		return

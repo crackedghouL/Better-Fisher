@@ -65,6 +65,7 @@ function Bot.ResetStats()
 		Fishes = 0,
 		Shards = 0,
 		Keys = 0,
+		Eggs = 0,
 		Trashes = 0,
 		LootTimeCount = 0,
 		LastLootTick = 0,

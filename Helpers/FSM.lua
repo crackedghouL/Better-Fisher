@@ -62,7 +62,7 @@ function FSM:Pulse()
 end
 
 function FSM:Reset()
-	self.States = { }
+	self.States = {}
 	self.CurrentState = nil
 	self.ShowOutput = false
 end

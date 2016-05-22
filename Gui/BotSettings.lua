@@ -124,9 +124,6 @@ function BotSettings.DrawBotSettings()
 
 				if Bot.Settings.TradeManagerSettings.Enabled then
 					if ImGui.TreeNode("Trade Manager") then
-						_, Bot.Settings.TradeManagerSettings.TradeManagerOnInventoryFull = ImGui.Checkbox("##id_guid_trademanager_full_inventory", Bot.Settings.TradeManagerSettings.TradeManagerOnInventoryFull)
-						ImGui.SameLine()
-						ImGui.Text("Sell at Trader when inventory is full")
 						_, Bot.Settings.TradeManagerSettings.DoBargainGame = ImGui.Checkbox("##id_guid_trademanager_minigame", Bot.Settings.TradeManagerSettings.DoBargainGame)
 						ImGui.SameLine()
 						ImGui.Text("Play bargain minigame")
