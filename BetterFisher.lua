@@ -1,16 +1,23 @@
 Bot = { }
 Bot.Settings = Settings()
 
+Bot.Version = "Better Fisher v0.9b BETA"
+
 Bot.Running = false
 Bot.PrintConsoleState = false
 Bot.EnableDebug = false
 Bot.EnableDebugMainWindow = false
 Bot.EnableDebugInventory = false
-Bot.EnableDebugRadar = false
+
+Bot.Time = nil
+Bot.Hours = nil
+Bot.Minutes = nil
+Bot.Seconds = nil
 
 Bot.Counter = 0
 
-Bot.Fsm = FSM()
+Bot.FSM = FSM()
+Bot.IdleState = IdleState()
 Bot.DeathState = DeathState()
 Bot.BuildNavigationState = BuildNavigationState()
 Bot.MoveToFishingSpotState = MoveToFishingSpotState()
@@ -29,22 +36,23 @@ Bot.RepairState = RepairState()
 Bot.UnequipFishingRodState = UnequipFishingRodState()
 Bot.UnequipFloatState = UnequipFloatState()
 
--- more info at http://www.lua.org/pil/22.1.html
-if Bot.EnableDebug then
-	Bot.UsedTimezone = "%c" -- "%H:%M:%S %z"
+if Bot.EnableDebug then -- more info at http://www.lua.org/pil/22.1.html
+	Bot.UsedTimezone = "%c"
 else
 	Bot.UsedTimezone = "%X"
 end
 
-function Bot.comma_value(amount)
-	local formatted = amount
+function Bot.FormatMoney(amount)
+	local money = amount
+
 	while true do
-		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1.%2')
-		if (k==0) then
+		money, k = string.gsub(money, "^(-?%d+)(%d%d%d)", '%1.%2')
+		if (k == 0) then
 			break
 		end
 	end
-	return formatted
+
+	return money
 end
 
 function Bot.ResetStats()
@@ -57,6 +65,7 @@ function Bot.ResetStats()
 		Fishes = 0,
 		Shards = 0,
 		Keys = 0,
+		Eggs = 0,
 		Trashes = 0,
 		LootTimeCount = 0,
 		LastLootTick = 0,
@@ -76,8 +85,9 @@ Bot.ResetStats()
 
 function Bot.Start()
 	if not Bot.Running then
+		local currentProfile = ProfileEditor.CurrentProfile
+
 		Bot.Stats.SessionStart = Pyx.System.TickCount
-		-- Bot.ResetStats() --Only manual reset for long time stats with player interactions ?
 		Bot.SaveSettings()
 
 		Bot.TradeManagerState.Forced = false
@@ -88,8 +98,6 @@ function Bot.Start()
 		Bot.WarehouseState.ManualForced = false
 		Bot.RepairState.Forced = false
 		Bot.RepairState.ManualForced = false
-
-		local currentProfile = ProfileEditor.CurrentProfile
 
 		Bot.WarehouseState.Settings.NpcName = currentProfile.WarehouseNpcName
 		Bot.WarehouseState.Settings.NpcPosition = currentProfile.WarehouseNpcPosition
@@ -112,7 +120,7 @@ function Bot.Start()
 		Bot.InventoryDeleteState.ItemCheckFunction = Bot.DeleteItemCheck
 
 		Bot.ConsumablesState.CustomCondition = Bot.ConsumablesCustomRunCheck
-		-- Bot.ConsumablesState:ClearTimers() -- In case timer is set at more than 30min, the bot will use an other food while the buff is still active.
+		-- Bot.ConsumablesState:ClearTimers() -- In case timer is set at more than 30min, the bot will use an other food while the buff is still active
 		Bot.ConsumablesState.Settings.PreConsumeWait = 2
 		Bot.ConsumablesState.Settings.ConsumeWait = 8
 		Bot.ConsumablesState.ValidActions = { "WAIT" }
@@ -121,15 +129,13 @@ function Bot.Start()
 		Bot.RepairState.Settings.NpcName = currentProfile.RepairNpcName
 		Bot.RepairState.Settings.NpcPosition = currentProfile.RepairNpcPosition
 
-		Bot.StartFishingState.PlayerNearby = Bot.PlayerNearby
-
 		if Bot.MeshDisabled ~= true then
 			ProfileEditor.Visible = false
 			Navigation.MesherEnabled = false
 		end
 
 		if not currentProfile then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] No profile loaded !")
+			print("[" .. os.date(Bot.UsedTimezone) .. "] No profile loaded!")
 			return
 		end
 
@@ -138,46 +144,45 @@ function Bot.Start()
 			return
 		end
 
-		-- Bot.Fsm = FSM()
 		if Bot.Settings.PrintConsoleState then
-			Bot.Fsm.ShowOutput = true
+			Bot.FSM.ShowOutput = true
 		end
 
 		if Bot.Settings.OnBoat then
-			Bot.Fsm:AddState(Bot.DeathState)
-			Bot.Fsm:AddState(Bot.LootState)
-			Bot.Fsm:AddState(Bot.InventoryDeleteState)
-			Bot.Fsm:AddState(Bot.HookFishHandleGameState)
-			Bot.Fsm:AddState(Bot.HookFishState)
-			Bot.Fsm:AddState(Bot.UnequipFishingRodState)
-			Bot.Fsm:AddState(Bot.UnequipFloatState)
-			Bot.Fsm:AddState(Bot.EquipFishingRodState)
-			Bot.Fsm:AddState(Bot.EquipFloatState)
-			Bot.Fsm:AddState(Bot.ConsumablesState)
-			Bot.Fsm:AddState(LibConsumables.ConsumablesState)
-			Bot.Fsm:AddState(Bot.StartFishingState)
-			Bot.Fsm:AddState(Bot.MoveToFishingSpotState)
+			Bot.FSM:AddState(Bot.DeathState)
+			Bot.FSM:AddState(Bot.LootState)
+			Bot.FSM:AddState(Bot.InventoryDeleteState)
+			Bot.FSM:AddState(Bot.HookFishHandleGameState)
+			Bot.FSM:AddState(Bot.HookFishState)
+			Bot.FSM:AddState(Bot.UnequipFishingRodState)
+			Bot.FSM:AddState(Bot.UnequipFloatState)
+			Bot.FSM:AddState(Bot.EquipFishingRodState)
+			Bot.FSM:AddState(Bot.EquipFloatState)
+			Bot.FSM:AddState(Bot.ConsumablesState)
+			Bot.FSM:AddState(LibConsumables.ConsumablesState)
+			Bot.FSM:AddState(Bot.StartFishingState)
+			Bot.FSM:AddState(Bot.MoveToFishingSpotState)
 		else
-			Bot.Fsm:AddState(Bot.BuildNavigationState)
-			Bot.Fsm:AddState(Bot.DeathState)
-			Bot.Fsm:AddState(Bot.LootState)
-			Bot.Fsm:AddState(Bot.InventoryDeleteState)
-			Bot.Fsm:AddState(Bot.HookFishHandleGameState)
-			Bot.Fsm:AddState(Bot.HookFishState)
-			Bot.Fsm:AddState(Bot.UnequipFishingRodState)
-			Bot.Fsm:AddState(Bot.UnequipFloatState)
-			Bot.Fsm:AddState(Bot.TradeManagerState)
-			Bot.Fsm:AddState(Bot.RepairState)
-			Bot.Fsm:AddState(Bot.VendorState)
-			Bot.Fsm:AddState(Bot.WarehouseState)
-			Bot.Fsm:AddState(Bot.EquipFishingRodState)
-			Bot.Fsm:AddState(Bot.EquipFloatState)
-			Bot.Fsm:AddState(Bot.ConsumablesState)
-			Bot.Fsm:AddState(LibConsumables.ConsumablesState)
-			Bot.Fsm:AddState(Bot.StartFishingState)
-			Bot.Fsm:AddState(Bot.MoveToFishingSpotState)
+			Bot.FSM:AddState(Bot.BuildNavigationState)
+			Bot.FSM:AddState(Bot.DeathState)
+			Bot.FSM:AddState(Bot.LootState)
+			Bot.FSM:AddState(Bot.InventoryDeleteState)
+			Bot.FSM:AddState(Bot.HookFishHandleGameState)
+			Bot.FSM:AddState(Bot.HookFishState)
+			Bot.FSM:AddState(Bot.UnequipFishingRodState)
+			Bot.FSM:AddState(Bot.UnequipFloatState)
+			Bot.FSM:AddState(Bot.TradeManagerState)
+			Bot.FSM:AddState(Bot.RepairState)
+			Bot.FSM:AddState(Bot.VendorState)
+			Bot.FSM:AddState(Bot.WarehouseState)
+			Bot.FSM:AddState(Bot.EquipFishingRodState)
+			Bot.FSM:AddState(Bot.EquipFloatState)
+			Bot.FSM:AddState(Bot.ConsumablesState)
+			Bot.FSM:AddState(LibConsumables.ConsumablesState)
+			Bot.FSM:AddState(Bot.StartFishingState)
+			Bot.FSM:AddState(Bot.MoveToFishingSpotState)
 		end
-		Bot.Fsm:AddState(IdleState())
+		Bot.FSM:AddState(Bot.IdleState)
 		Bot.Running = true
 	end
 end
@@ -185,7 +190,7 @@ end
 function Bot.Stop()
 	Navigator.Stop()
 	Bot.Running = false
-	Bot.Fsm:Reset()
+	Bot.FSM:Reset()
 	Bot.WarehouseState:Reset()
 	Bot.VendorState:Reset()
 	Bot.TradeManagerState:Reset()
@@ -194,12 +199,12 @@ function Bot.Stop()
 end
 
 function Bot.OnPulse()
-	if Pyx.Input.IsGameForeground() then -- pause to start or stop bot
+	if Pyx.Input.IsGameForeground() then
 		if Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('S')) then
 			if Bot._startHotKeyPressed ~= true then
 				Bot._startHotKeyPressed = true
 				if Bot.Running then
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Stopping Bot from hotkey")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Stopping bot from hotkey")
 					Bot.Stop()
 				else
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Starting bot from hotkey")
@@ -209,54 +214,45 @@ function Bot.OnPulse()
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('P')) then
 			if Bot._profileHotKeyPressed ~= true then
 				Bot._profileHotKeyPressed = true
-				if ProfileEditor.Visible == false then
+				if not ProfileEditor.Visible then
 					ProfileEditor.Visible = true
-				elseif ProfileEditor.Visible == true then
+				elseif ProfileEditor.Visible then
 					ProfileEditor.Visible = false
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('O')) then
 			if Bot._settingsHotKeyPressed ~= true then
 				Bot._settingsHotKeyPressed = true
-				if BotSettings.Visible == false then
+				if not BotSettings.Visible then
 					BotSettings.Visible = true
-				elseif BotSettings.Visible == true then
+				elseif BotSettings.Visible then
 					BotSettings.Visible = false
-				end
-			end
-		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('R')) then
-			if Bot._radarHotKeyPressed ~= true then
-				Bot._radarHotKeyPressed = true
-				if Radar.Visible == false then
-					Radar.Visible = true
-				elseif Radar.Visible == true then
-					Radar.Visible = false
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('B')) then
 			if Bot._inventoryHotKeyPressed ~= true then
 				Bot._inventoryHotKeyPressed = true
-				if InventoryList.Visible == false then
+				if not InventoryList.Visible then
 					InventoryList.Visible = true
-				elseif InventoryList.Visible == true then
+				elseif InventoryList.Visible then
 					InventoryList.Visible = false
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('C')) then
 			if Bot._consumableHotKeyPressed ~= true then
 				Bot._consumableHotKeyPressed = true
-				if LibConsumableWindow.Visible == false then
+				if not LibConsumableWindow.Visible then
 					LibConsumableWindow.Visible = true
-				elseif LibConsumableWindow.Visible == true then
+				elseif LibConsumableWindow.Visible then
 					LibConsumableWindow.Visible = false
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('L')) then
 			if Bot._statsHotKeyPressed ~= true then
 				Bot._statsHotKeyPressed = true
-				if Stats.Visible == false then
+				if not Stats.Visible then
 					Stats.Visible = true
-				elseif Stats.Visible == true then
+				elseif Stats.Visible then
 					Stats.Visible = false
 				end
 			end
@@ -265,9 +261,11 @@ function Bot.OnPulse()
 				Bot._warehouseHotKeyPressed = true
 				if Bot.Running then
 					Bot.WarehouseState.ManualForced = true
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Warehouse")
+					if Bot.EnableDebug then
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Warehouse")
+					end
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the bot first!")
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('T')) then
@@ -275,9 +273,11 @@ function Bot.OnPulse()
 				Bot._traderHotKeyPressed = true
 				if Bot.Running then
 					Bot.TradeManagerState.ManualForced = true
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Trader")
+					if Bot.EnableDebug then
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Trader")
+					end
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the bot first!")
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('V')) then
@@ -285,9 +285,11 @@ function Bot.OnPulse()
 				Bot._vendorHotKeyPressed = true
 				if Bot.Running then
 					Bot.VendorState.ManualForced = true
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Vendor")
+					if Bot.EnableDebug then
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Vendor")
+					end
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the bot first!")
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('G')) then
@@ -295,16 +297,17 @@ function Bot.OnPulse()
 				Bot._repairHotKeyPressed = true
 				if Bot.Running then
 					Bot.RepairState.ManualForced = true
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Go Repair")
+					if Bot.EnableDebug then
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Go Repair")
+					end
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the bot first!")
 				end
 			end
 		else
 			Bot._startHotKeyPressed = false
 			Bot._profileHotKeyPressed = false
 			Bot._settingsHotKeyPressed = false
-			Bot._radarHotKeyPressed = false
 			Bot._inventoryHotKeyPressed = false
 			Bot._consumableHotKeyPressed = false
 			Bot._statsHotKeyPressed = false
@@ -320,7 +323,12 @@ function Bot.OnPulse()
 	end
 
 	if Bot.Running then
-		Bot.Fsm:Pulse()
+		Bot.FSM:Pulse()
+
+		Bot.Time = math.ceil((Bot.Stats.TotalSession + Pyx.System.TickCount - Bot.Stats.SessionStart) / 1000)
+		Bot.Seconds = Bot.Time % 60
+		Bot.Minutes = math.floor(Bot.Time / 60) % 60
+		Bot.Hours = math.floor(Bot.Time / (60 * 60))
 
 		if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe < 500 then
 			if GetSelfPlayer().IsSwimming then
@@ -332,7 +340,7 @@ function Bot.OnPulse()
 			local me = GetSelfPlayer()
 			local players = GetCharacters()
 			local count = 0
-			local SafeDistance = 5000
+			local SafeDistance = Bot.Settings.StopWhenPeopleNearbyDistance
 
 			for k,v in pairs(players, function(t,a,b) return t[a].Position.Distance3DFromMe < t[b].Position.Distance3DFromMe end) do
 				if (v.IsPlayer and v.Name ~= me.Name) and math.floor(me.Position.Distance3DFromMe) <= SafeDistance then -- not string.match(me.Key, v.Key)
@@ -392,25 +400,11 @@ function Bot.StateMoving(state)
 	end
 end
 
-function Bot.PlayerNearby()
-	local me = GetSelfPlayer()
-	local players = GetCharacters()
-	local count = 0
-
-	for k,v in pairs(players) do
-		if v.IsPlayer and v.Name ~= me.Name then -- not string.match(me.Key, v.Key)
-			count = count + 1
-		end
-	end
-
-	return (count > 0)
-end
-
 function Bot.Death(state)
 	if Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED then
 		Bot.Stop()
 	else
-		if Bot.Settings.InvFullStop == false then
+		if not Bot.Settings.InvFullStop then
 			Bot.TradeManagerState:Reset()
 			Bot.WarehouseState:Reset()
 			Bot.VendorState:Reset()
@@ -421,23 +415,23 @@ end
 
 function Bot.StateComplete(state)
 	if state == Bot.TradeManagerState then
-		if Bot.Settings.WarehouseSettings.Enabled == true and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then -- DepositMethod = 1
+		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then -- DepositMethod = 1
 			Bot.WarehouseState.Forced = true
 		end
 	elseif state == Bot.VendorState then
-		if Bot.Settings.WarehouseSettings.Enabled == true and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then -- DepositMethod = 0
+		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then -- DepositMethod = 0
 			Bot.WarehouseState.Forced = true
 		end
 	elseif state == Bot.RepairState then
-		if Bot.Settings.WarehouseSettings.Enabled == true and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then -- DepositMethod = 2
+		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then -- DepositMethod = 2
 			Bot.WarehouseState.Forced = true
 		end
 	elseif state == Bot.WarehouseState then
-		if Bot.Settings.RepairSettings.Enabled == true and Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then -- RepairMethod = 0
+		if Bot.Settings.RepairSettings.Enabled and Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then -- RepairMethod = 0
 			Bot.RepairState.Forced = true
 		end
 	elseif state == Bot.WarehouseState then
-		if Bot.Settings.RepairSettings.Enabled == true and Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then -- RepairMethod = 1
+		if Bot.Settings.RepairSettings.Enabled and Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then -- RepairMethod = 1
 			Bot.RepairState.Forced = true
 		end
 	end
@@ -459,6 +453,7 @@ end
 
 function Bot.ConsumablesCustomRunCheck()
 	local selfPlayer = GetSelfPlayer()
+
 	if selfPlayer.CurrentActionName == "WAIT" then
 		local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
@@ -485,10 +480,12 @@ function Bot.RepairCheck()
 		if Bot.EnableDebug then
 			print ("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. tostring(v.HasEndurance) .. " " .. tostring(v.EndurancePercent) .. " " .. tostring(v.ItemEnchantStaticStatus.IsFishingRod))
 		end
-		if v.HasEndurance and v.EndurancePercent <= 0 and v.ItemEnchantStaticStatus.IsFishingRod == true then
+
+		if v.HasEndurance and v.EndurancePercent <= 0 and v.ItemEnchantStaticStatus.IsFishingRod then
 			if Bot.EnableDebug then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Need to repair equipped items")
 			end
+
 			return true
 		end
 	end
@@ -497,7 +494,7 @@ function Bot.RepairCheck()
 		--if Bot.EnableDebug then
 			--print ("[" .. os.date(Bot.UsedTimezone) .. "] Inv: " .. tostring(v.HasEndurance) .. " " .. tostring(v.EndurancePercent) .. " " .. tostring(v.ItemEnchantStaticStatus.IsFishingRod))
 		--end
-		--if v.HasEndurance and v.EndurancePercent <= 0 and v.ItemEnchantStaticStatus.IsFishingRod == true then
+		--if v.HasEndurance and v.EndurancePercent <= 0 and v.ItemEnchantStaticStatus.IsFishingRod then
 			--if Bot.EnableDebug then
 				--print("[" .. os.date(Bot.UsedTimezone) .. "] Need to repair items on inventory")
 			--end

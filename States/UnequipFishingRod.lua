@@ -1,4 +1,4 @@
-UnequipFishingRodState = { }
+UnequipFishingRodState = {}
 UnequipFishingRodState.__index = UnequipFishingRodState
 UnequipFishingRodState.Name = "Unequip fishing rod"
 
@@ -11,19 +11,19 @@ setmetatable(UnequipFishingRodState, {
 function UnequipFishingRodState.new()
 	local self = setmetatable({}, UnequipFishingRodState)
 	self.LastUnequipTickcount = 0
-	self.EquippedState = 0
+	self.state = 0
 	return self
 end
 
 function UnequipFishingRodState:Reset()
 	self.LastUnequipTickcount = 0
-	self.EquippedState = 0
+	self.state = 0
 end
 
 function UnequipFishingRodState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
-	self.EquippedState = 0 -- 0 = nothing
+	self.state = 0 -- 0 = nothing
 
 	if not selfPlayer then
 		return false
@@ -40,22 +40,22 @@ function UnequipFishingRodState:NeedToRun()
 	if not equippedItem then
 		return false
 	else
-		self.EquippedState = 1
+		self.state = 1
 	end
 
-	if self.EquippedState == 1 then -- 1 = normal rod
+	if self.state == 1 then -- 1 = normal rod
 		if not equippedItem.ItemEnchantStaticStatus.IsFishingRod then
-			self.EquippedState = 2
+			self.state = 2
 		end
 	end
 
-	if self.EquippedState == 2 then -- 2 = search for 'Fishing Rod' string
-		if not string.find(equippedItem.ItemEnchantStaticStatus.Name, "Fishing Rod") then
-			self.EquippedState = 3
+	if self.state == 2 then -- 2 = search for 'Fishing Rod' string
+		if not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Fishing Rod") then
+			self.state = 3
 		end
 	end
 
-	if self.EquippedState == 3 then -- 3 fallback to know rod using ids
+	if self.state == 3 then -- 3 fallback to know rod using ids
 		if 	not equippedItem.ItemEnchantStaticStatus.ItemId == 16147 or  -- Thick Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 16151 or  -- Steel Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 16152 or  -- Gold Rod
@@ -113,18 +113,10 @@ function UnequipFishingRodState:NeedToRun()
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 540452 or -- Calpheon Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 540453	 -- Mediah Rod
 		then
-			self.EquippedState = 4
+			return true
 		else
-			self.EquippedState = 5
+			return false
 		end
-	end
-
-	if self.EquippedState == 4 then
-		return true
-	end
-
-	if self.EquippedState == 5 then
-		return false
 	end
 
 	return equippedItem.Endurance == 0

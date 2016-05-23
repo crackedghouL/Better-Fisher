@@ -177,3 +177,11 @@ Added option "Stop bot when peoples is nearby"
 Fixed vendor don't buying items
 Fixed for facing wrong when fishing
 Minor fixes
+
+[0.XX BETA]
+Removed Radar [done]
+Removed old fishing animations [done]
+Added new option, safer distance before stop the script [done]
+Added new option, minimum peoples for call Escape [done]
+Polished the code [done]
+Fixed little bugs [done]

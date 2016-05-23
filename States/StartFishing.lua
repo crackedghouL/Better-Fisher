@@ -1,38 +1,38 @@
-StartFishingState = { }
+StartFishingState = {}
 StartFishingState.__index = StartFishingState
 StartFishingState.Name = "Start fishing"
 
 StartFishingState.SETTINGS_ON_NORMAL_FISHING = 0
 StartFishingState.SETTINGS_ON_BOAT_FISHING = 1
 
-StartFishingState.good_position = false
-
 setmetatable(StartFishingState, {
-  __call = function (cls, ...)
-	return cls.new(...)
-  end,
+	__call = function (cls, ...)
+		return cls.new(...)
+	end,
 })
 
 function StartFishingState.new()
 	local self = setmetatable({}, StartFishingState)
 	self.Settings = {
-		MaxEnergyCheat = false,
+		UseMaxEnergy = false,
 		FishingMethod = StartFishingState.SETTINGS_ON_NORMAL_FISHING
 	}
-	self.PlayerNearby = nil
+	self.SleepTimer = nil
 	self.LastStartFishTickcount = 0
-	self.EquippedState = 0
 	self.LastActionTime = 0
-	self.State = 0
+	self.PlayersNearby = 0
+	self.EquippedState = 0
+	self.state = 0
 	return self
 end
 
 function StartFishingState:Reset()
-	self.PlayerNearby = nil
+	self.SleepTimer = nil
 	self.LastStartFishTickcount = 0
-	self.EquippedState = 0
 	self.LastActionTime = 0
-	self.State = 0
+	self.PlayersNearby = 0
+	self.EquippedState = 0
+	self.state = 0
 end
 
 function StartFishingState:NeedToRun()
@@ -44,6 +44,14 @@ function StartFishingState:NeedToRun()
 	end
 
 	if not selfPlayer.IsAlive then
+		return false
+	end
+
+	if Pyx.System.TickCount - self.LastStartFishTickcount < 4000 then
+		return false
+	end
+
+	if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe > 100 then
 		return false
 	end
 
@@ -60,7 +68,7 @@ function StartFishingState:NeedToRun()
 	end
 
 	if self.EquippedState == 2 then -- 2 = search for 'Fishing Rod' string
-		if not string.find(equippedItem.ItemEnchantStaticStatus.Name, "Fishing Rod") then
+		if not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Fishing Rod") then
 			self.EquippedState = 3
 		end
 	end
@@ -123,75 +131,67 @@ function StartFishingState:NeedToRun()
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 540452 or -- Calpheon Rod
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 540453	 -- Mediah Rod
 		then
-			self.EquippedState = 4
+			return false
 		else
-			self.EquippedState = 5
+			return true
 		end
-	end
-
-	if self.EquippedState == 4 then
-		return false
-	end
-
-	if self.EquippedState == 5 then
-		return true
-	end
-
-	if Pyx.System.TickCount - self.LastStartFishTickcount < 4000 then
-		return false
-	end
-
-	if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe > 100 then
-		return false
-	end
-
-	if Bot.Settings.OnBoat == true and selfPlayer.Inventory.FreeSlots == 0 then
-		Bot.Stop()
 	end
 
 	return selfPlayer.CurrentActionName == "WAIT" and not Looting.IsLooting
 end
 
 function StartFishingState:Run()
-	Bot.Stats.LastLootTick = Pyx.System.TickCount
-	Bot.SilverStats()
 	local selfPlayer = GetSelfPlayer()
 
-	if not self.PlayerNearby() then
-		if selfPlayer.HealthPercent <= Bot.Settings.HealthPercent and Bot.Counter == 0 and Bot.Settings.escapeEnabled == true then
+	Bot.Stats.LastLootTick = Pyx.System.TickCount
+	Bot.SilverStats()
+
+	if selfPlayer.HealthPercent <= Bot.Settings.HealthPercent and Bot.Settings.AutoEscape and Bot.Counter == 0 then
+		local players = GetCharacters()
+
+		for k,v in pairs(players) do
+			if v.IsPlayer and v.Name ~= selfPlayer.Name then -- not string.match(me.Key, v.Key)
+				self.PlayersNearby = self.PlayersNearby + 1
+			end
+		end
+
+		if self.PlayersNearby <= Bot.Settings.MinPeopleBeforeAutoEscape or Bot.Settings.MinPeopleBeforeAutoEscape == 0 then
+			local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
+
+			if equippedItem.ItemEnchantStaticStatus.IsFishingRod then
+				selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
+			end
+
 			Navigator.Stop()
 			BDOLua.Execute("callRescue()")
 			Bot.Counter = 10000
 		end
 	end
 
-	if Bot.Settings.OnBoat and selfPlayer.Inventory.FreeSlots == 0 then
+	if Bot.Settings.InvFullStop and selfPlayer.Inventory.FreeSlots == 0 then
 		if Bot.Running then
 			Bot.Stop()
 		end
 	else
-		if self.State == 0 then
+		if self.state == 0 then
+			selfPlayer:DoAction("MOVE_BACKWARD")
+			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
+			self.state = 1
 			self.LastActionTime = Pyx.System.TickCount
-			self.State = 1
-		elseif self.State == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then
-			if StartFishingState.good_position == false then
-				selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
-				selfPlayer:SetActionState(ACTION_FLAG_MOVE_FORWARD, 100)
-				StartFishingState.good_position = true
-				self.State = 0
+		elseif self.state == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then
+			if Bot.EnableDebug then
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing ...")
 			end
-
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing ...")
 			selfPlayer:DoAction("FISHING_START")
 			selfPlayer:DoAction("FISHING_ING_START")
 
-			if self.Settings.MaxEnergyCheat == true then
+			if self.Settings.UseMaxEnergy then
 				selfPlayer:DoAction("FISHING_START_END_Lv10")
 			else
 				selfPlayer:DoAction("FISHING_START_END_Lv0")
 			end
 
-			self.State = 0
+			self.state = 0
 			self.LastStartFishTickcount = Pyx.System.TickCount
 		end
 	end

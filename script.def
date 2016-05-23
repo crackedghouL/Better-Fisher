@@ -9,7 +9,6 @@ file=Gui/MainWindow.lua
 file=Gui/ProfileEditor.lua
 file=Gui/BotSettings.lua
 file=Gui/Stats.lua
-file=Gui/Radar.lua
 file=Gui/InventoryList.lua
 file=Gui/ConfirmWindow.lua
 file=States/BuildNavigation.lua

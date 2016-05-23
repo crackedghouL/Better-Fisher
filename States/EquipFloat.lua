@@ -1,4 +1,4 @@
-EquipFloatState = { }
+EquipFloatState = {}
 EquipFloatState.__index = EquipFloatState
 EquipFloatState.Name = "Equip Float"
 
@@ -12,7 +12,6 @@ function EquipFloatState.new()
 	local self = setmetatable({}, EquipFloatState)
 	self.LastEquipTickCount = 0
 	self.ItemToEquip = nil
-	self.EquippedState = 0
 	self.EquipState = 0
 	self.EquippedState = 0
 	return self
@@ -21,7 +20,6 @@ end
 function EquipFloatState:Reset()
 	self.LastEquipTickCount = 0
 	self.ItemToEquip = nil
-	self.EquippedState = 0
 	self.EquipState = 0
 	self.EquippedState = 0
 end
@@ -32,6 +30,7 @@ function EquipFloatState:NeedToRun()
 	self.EquippedState = 0 -- 0 = nothing
 
 	local selfPlayer = GetSelfPlayer()
+	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_LEFT_HAND)
 
 	if not selfPlayer then
 		return false
@@ -51,40 +50,34 @@ function EquipFloatState:NeedToRun()
 
 	for k,v in pairs(selfPlayer.Inventory.Items, function(t,a,b) return t[a].Endurance < t[b].Endurance end) do
 		if v.HasEndurance then
-			if Bot.EnableDebug == true then
+			if Bot.EnableDebug then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.ItemEnchantStaticStatus.Name .. " which have durability found")
 			end
-
 			self.EquipState = 1
 		end
 
 		if self.EquipState == 1 then -- 1 = item have endurance
 			if v.Endurance > 0 then
-				if Bot.EnableDebug == true then
+				if Bot.EnableDebug then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.ItemEnchantStaticStatus.Name .. " have more than 0 durability left")
 				end
-
 				self.EquipState = 2
 			end
 		end
 
 
 		if self.EquipState == 2 then -- 2 = this is for enhanced float
-			if string.find(v.ItemEnchantStaticStatus.Name, "Float") then
-				if Bot.EnableDebug == true then
+			if string.find(tostring(v.ItemEnchantStaticStatus.Name), "Float") then
+				if Bot.EnableDebug then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] The item have in the a '+' in the name, so is a enhanced float")
-				end
-
-				if Bot.EnableDebug == true then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
 				end
 				self.ItemToEquip = v
 				break
 			else
-				if Bot.EnableDebug == true then
+				if Bot.EnableDebug then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Maybe " .. v.ItemEnchantStaticStatus.Name .. " is a know float?")
 				end
-
 				self.EquipState = 3
 			end
 		end
@@ -115,7 +108,9 @@ function EquipFloatState:NeedToRun()
 															  -- Palm Tree Float +4
 															  -- Palm Tree Float +5
 			then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
+				if Bot.EnableDebug then
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
+				end
 				self.ItemToEquip = v
 				break
 			end
@@ -126,8 +121,6 @@ function EquipFloatState:NeedToRun()
 		return false
 	end
 
-	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_LEFT_HAND)
-
 	if not equippedItem then
 		return true
 	else
@@ -135,7 +128,7 @@ function EquipFloatState:NeedToRun()
 	end
 
 	if self.EquippedState == 1 then -- 2 = search for 'Float' string
-		if not string.find(equippedItem.ItemEnchantStaticStatus.Name, "Float") then
+		if not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Float") then
 			self.EquippedState = 2
 		end
 	end
@@ -154,18 +147,10 @@ function EquipFloatState:NeedToRun()
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 278312 or	-- Maple Float +4
 			not equippedItem.ItemEnchantStaticStatus.ItemId == 343848		-- Maple Float +5
 		then
-			self.EquippedState = 3
+			return false
 		else
-			self.EquippedState = 4
+			return true
 		end
-	end
-
-	if self.EquippedState == 3 then
-		return false
-	end
-
-	if self.EquippedState == 4 then
-		return true
 	end
 
 	return equippedItem.Endurance == 0

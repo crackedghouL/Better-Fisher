@@ -1,4 +1,4 @@
-DeathState = { }
+DeathState = {}
 DeathState.__index = DeathState
 DeathState.Name = "Death"
 
@@ -14,11 +14,10 @@ setmetatable(DeathState, {
 
 function DeathState.new()
 	local self = setmetatable({}, DeathState)
+	self.Settings = { ReviveMethod = DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED }
 	self.LastUseTimer = nil
 	self.CallWhenCompleted = nil
-	self.Settings = { ReviveMethod = DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED }
 	self.WasDead = false
-	self.DeathCount = 0
 	return self
 end
 
@@ -44,22 +43,23 @@ end
 function DeathState:Run()
 	local selfPlayer = GetSelfPlayer()
 
-	self.LastUseTimer = PyxTimer:New(1)
+	self.LastUseTimer = PyxTimer:New(3)
 	self.LastUseTimer:Start()
 
-	if self.WasDead == false then
+	if not self.WasDead then
 		self.WasDead = true
-		self.DeathCount = self.DeathCount + 1
 	end
 
 	if self.Settings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_NODE then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] I'm dead, attempt to revive at nearest node ...");
+		print("[" .. os.date(Bot.UsedTimezone) .. "] Trying to revive at nearest node...");
 		selfPlayer:ReviveAtNode()
 	elseif self.Settings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] I'm dead, attempt to revive at nearest village ...");
+		print("[" .. os.date(Bot.UsedTimezone) .. "] Trying to revive at nearest village...");
 		selfPlayer:ReviveAtVillage()
 	else
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Death have state: " .. self.Settings.ReviveMethod)
+		if Bot.EnableDebug then
+			print("[" .. os.date(Bot.UsedTimezone) .. "] Death have state: " .. self.Settings.ReviveMethod)
+		end
 	end
 
 	if self.CallWhenCompleted then
@@ -70,5 +70,4 @@ end
 function DeathState:Reset()
 	self.LastUseTimer = nil
 	self.WasDead = false
-	self.DeathCount = 0
 end

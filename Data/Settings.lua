@@ -1,8 +1,5 @@
-Settings = { }
+Settings = {}
 Settings.__index = Settings
-
-Settings.SETTINGS_ON_USE_REALLIFE_METERS = 0
-Settings.SETTINGS_ON_USE_INGAME_YARDS = 1
 
 setmetatable(Settings, {
 	__call = function (cls, ...)
@@ -13,13 +10,14 @@ setmetatable(Settings, {
 function Settings.new()
 	local self = setmetatable({}, Settings)
 	self.LastProfileName = ""
-	self.RadarMeasure = Settings.SETTINGS_ON_USE_REALLIFE_METERS
 	self.HealthPercent = 80
 	self.AutoEscape = false
+	self.MinPeopleBeforeAutoEscape = 5
 	self.PlayerRun = false
 	self.DeleteUsedRods = true
 	self.InvFullStop = false
 	self.StopWhenPeopleNearby = false
+	self.StopWhenPeopleNearbyDistance = 5000
 	self.TradeManagerSettings = {}
 	self.WarehouseSettings = {}
 	self.VendorSettings = {}

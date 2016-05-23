@@ -1,7 +1,7 @@
-Navigator = { }
+Navigator = {}
 Navigator.Running = false
 Navigator.Destination = Vector3(0, 0, 0)
-Navigator.Waypoints = { }
+Navigator.Waypoints = {}
 Navigator.ApproachDistance = 100
 Navigator.LastObstacleCheckTick = 0
 Navigator.LastFindPathTick = 0
@@ -42,7 +42,7 @@ end
 
 function Navigator.MoveToStraight(destination)
 	local selfPlayer = GetSelfPlayer()
-	Navigator.Waypoints = { }
+	Navigator.Waypoints = {}
 	table.insert(Navigator.Waypoints, destination)
 	Navigator.Destination = destination
 	Navigator.Running = true
@@ -101,7 +101,8 @@ function Navigator.Stop()
 
 	local selfPlayer = GetSelfPlayer()
 	if selfPlayer then
-		selfPlayer:MoveTo(Vector3(0, 0, 0))
+		selfPlayer:MoveTo(selfPlayer.Position)
+		selfPlayer:DoAction("WAIT")
 	end
 end
 
@@ -125,7 +126,7 @@ function Navigator.OnPulse()
 			if (Navigator.LastStuckCheckPosition.Distance2DFromMe < 40) then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] I'm stuck, jump forward !")
 				if Navigator.StuckCount < 20 then
-					selfPlayer:DoAction("JUMP_F_A")
+					selfPlayer:SetActionState(ACTION_FLAG_JUMP | ACTION_FLAG_MOVE_FORWARD)
 				end
 
 				Navigator.StuckCount = Navigator.StuckCount + 1

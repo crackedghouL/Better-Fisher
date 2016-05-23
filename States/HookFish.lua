@@ -1,4 +1,4 @@
-HookFishState = { }
+HookFishState = {}
 HookFishState.__index = HookFishState
 HookFishState.Name = "Hook fish"
 
@@ -13,17 +13,17 @@ setmetatable(HookFishState, {
 function HookFishState.new()
 	local self = setmetatable({}, HookFishState)
 	self.LastHookFishTickCount = 0
-	self.HookingState = 0
 	self.LastHookStateTick = 0
 	self.RandomWaitTime = 0
+	self.state = 0
 	return self
 end
 
 function HookFishState:Reset()
 	self.LastHookFishTickCount = 0
-	self.HookingState = 0
 	self.LastHookStateTick = 0
 	self.RandomWaitTime = 0
+	self.state = 0
 end
 
 function HookFishState:NeedToRun()
@@ -46,15 +46,17 @@ end
 
 function HookFishState:Run()
 	local selfPlayer = GetSelfPlayer()
-	if self.HookingState == 0 and selfPlayer.CurrentActionName == "FISHING_HOOK_ING" then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Got something!")
+	if self.state == 0 and selfPlayer.CurrentActionName == "FISHING_HOOK_ING" then
+		if Bot.EnableDebug then
+			print("[" .. os.date(Bot.UsedTimezone) .. "] Got something!")
+		end
 		self.LastHookStateTick = Pyx.System.TickCount
 		self.RandomWaitTime = math.random(500,1000)
-		self.HookingState = 1
-	elseif self.HookingState == 1 and Pyx.System.TickCount - self.LastHookStateTick > self.RandomWaitTime then
+		self.state = 1
+	elseif self.state == 1 and Pyx.System.TickCount - self.LastHookStateTick > self.RandomWaitTime then
 		selfPlayer:DoAction("FISHING_HOOK_DELAY")
 		self.LastHookStateTick = 0
-		self.HookingState = 0
+		self.state = 0
 		self.LastHookFishTickCount = Pyx.System.TickCount
 	end
 end

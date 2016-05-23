@@ -2,7 +2,7 @@
 -- Variables
 ---------------------------------------------
 
-InventoryList = { }
+InventoryList = {}
 InventoryList.Visible = false
 
 ShowDurability = false
@@ -15,18 +15,19 @@ ShowDurabilityColor = false
 function InventoryList.DrawInventoryList()
 	if InventoryList.Visible then
 		_, InventoryList.Visible = ImGui.Begin("Inventory list", InventoryList.Visible, ImVec2(500, 400), -1.0, ImGuiWindowFlags_MenuBar)
+		local selfPlayer = GetSelfPlayer()
 
 		if ImGui.BeginMenuBar() then
 			if ImGui.BeginMenu("Options") then
 				if ImGui.MenuItem("Show durability next to name", "", ShowDurability) then
-					if ShowDurability == true then
+					if ShowDurability then
 						ShowDurability = false
 					else
 						ShowDurability = true
 					end
 				end
 				if ImGui.MenuItem("Change name color based on durability", "", ShowDurabilityColor) then
-					if ShowDurabilityColor == true then
+					if ShowDurabilityColor then
 						ShowDurabilityColor = false
 					else
 						ShowDurabilityColor = true
@@ -37,7 +38,6 @@ function InventoryList.DrawInventoryList()
 			ImGui.EndMenuBar()
 		end
 
-		local selfPlayer = GetSelfPlayer()
 		if selfPlayer then
 			ImGui.Columns(2)
 			ImGui.Separator()
@@ -49,7 +49,7 @@ function InventoryList.DrawInventoryList()
 
 			for k,v in pairs(selfPlayer.Inventory.Items) do
 				if v.ItemEnchantStaticStatus.Type == 2 then -- consumanble
-					if ImGui.Button("Use##id_guid_inv_list_use" .. tostring(v.InventoryIndex)) then
+					if ImGui.Button("Use" .. tostring(v.InventoryIndex)) then
 						v:UseItem()
 					end
 					ImGui.SameLine()
@@ -64,20 +64,20 @@ function InventoryList.DrawInventoryList()
 						item = v.ItemEnchantStaticStatus.Name
 					end
 
-					if ImGui.Button("Equip##id_guid_inv_list_use" .. tostring(v.InventoryIndex)) then
+					if ImGui.Button("Equip" .. tostring(v.InventoryIndex)) then
 						v:UseItem()
 					end
 					ImGui.SameLine()
 
 					if ShowDurabilityColor then
 						if (v.Endurance == v.MaxEndurance) or v.EndurancePercent == 100 then
-							ImGui.TextColored(ImVec4(0.20,1,0.20,1), item) -- green
+							ImGui.TextColored(ImVec4(0.2,1,0.2,1), item) -- green
 						elseif (v.EndurancePercent > 50 and v.EndurancePercent < 100) then
-							ImGui.TextColored(ImVec4(1,0.50,0.50,1), item) -- yellow
+							ImGui.TextColored(ImVec4(1,0.5,0.5,1), item) -- yellow
 						elseif (v.EndurancePercent > 0 and v.EndurancePercent <= 50) then
-							ImGui.TextColored(ImVec4(1,0.80,0.50,1), item) -- orange
+							ImGui.TextColored(ImVec4(1,0.8,0.5,1), item) -- orange
 						elseif v.Endurance == 0 then
-							ImGui.TextColored(ImVec4(1,0.20,0.20,1), "[Broken] " .. item) -- red
+							ImGui.TextColored(ImVec4(1,0.2,0.2,1), "[Broken] " .. item) -- red
 						end
 					else
 						ImGui.Text(item)
@@ -145,7 +145,9 @@ function InventoryList.DrawInventoryList()
 						elseif v.ItemEnchantStaticStatus.Type == 8 then
 							ImGui.Text("Crafting Material")
 						else
-							ImGui.Text(v.ItemEnchantStaticStatus.Type .. " <- Report this number")
+							if Bot.EnableDebug then
+								ImGui.Text(v.ItemEnchantStaticStatus.Type .. " <- Report this number")
+							end
 						end
 
 						ImGui.Text("Quality:") -- Grade
@@ -153,13 +155,15 @@ function InventoryList.DrawInventoryList()
 						if v.ItemEnchantStaticStatus.Grade == ITEM_GRADE_WHITE then
 							ImGui.Text("White")
 						elseif v.ItemEnchantStaticStatus.Grade == ITEM_GRADE_GREEN then
-							ImGui.TextColored(ImVec4(0.20,1,0.20,1), "Green")
+							ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Green")
 						elseif v.ItemEnchantStaticStatus.Grade == ITEM_GRADE_BLUE then
-							ImGui.TextColored(ImVec4(0.40,0.6,1,1), "Blue")
+							ImGui.TextColored(ImVec4(0.4,0.6,1,1), "Blue")
 						elseif v.ItemEnchantStaticStatus.Grade == ITEM_GRADE_GOLD then
 							ImGui.TextColored(ImVec4(1,0.8,0,1), "Gold")
 						else
-							ImGui.Text(v.ItemEnchantStaticStatus.Grade .. " <- Report this number")
+							if Bot.EnableDebug then
+								ImGui.Text(v.ItemEnchantStaticStatus.Grade .. " <- Report this number")
+							end
 						end
 
 						if v.ItemEnchantStaticStatus.Type == 1 then -- Endurance
@@ -168,12 +172,14 @@ function InventoryList.DrawInventoryList()
 							ImGui.Text(v.Endurance .. "/" .. v.MaxEndurance)
 						elseif v.Endurance <= 32767 or v.MaxEndurance <= 32767 then -- it's for a lot of items
 						else
-							ImGui.Text("Durability:")
-							ImGui.SameLine()
-							ImGui.Text(v.Endurance .. " <- Report this number")
+							if Bot.EnableDebug then
+								ImGui.Text("Durability:")
+								ImGui.SameLine()
+								ImGui.Text(v.Endurance .. " <- Report this number")
+							end
 						end
 
-						if v.ItemEnchantStaticStatus.IsTradeAble == true then
+						if v.ItemEnchantStaticStatus.IsTradeAble then
 							ImGui.Text("Can be sold to trader") -- IsTradeAble
 						end
 					end
