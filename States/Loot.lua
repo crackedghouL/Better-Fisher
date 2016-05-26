@@ -50,13 +50,13 @@ function LootState:NeedToRun()
 end
 
 function LootState:Run()
-	Bot.Stats.Loots = Bot.Stats.Loots + 1
-
 	local numLoots = Looting.ItemCount
 	local x = tostring(numLoots)
+	local FishGameTime = 0
+	Bot.Stats.Loots = Bot.Stats.Loots + 1
 	self.state = 0 -- 0 = nothing
 
-	if Bot.EnableDebug then
+	if Bot.EnableDebug and Bot.EnableDebugLootState then
 		print("[" .. os.date(Bot.UsedTimezone) .. "] Item to loot: " .. numLoots)
 	end
 
@@ -75,7 +75,7 @@ function LootState:Run()
 				lootItemName = "Bass"
 			end
 
-			if Bot.EnableDebug then
+			if Bot.EnableDebug and Bot.EnableDebugLootState then
 				print(i)
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Trying to loot: " .. numLoots .. "x " .. lootItemName)
 			end
@@ -131,7 +131,7 @@ function LootState:Run()
 				then
 					lootItemType = "Key"
 					self.state = 5
-				elseif 	lootItem.ItemEnchantStaticStatus.ItemId == 16195 or -- black spirit egg
+				elseif	lootItem.ItemEnchantStaticStatus.ItemId == 16195 or -- black spirit egg
 						lootItem.ItemEnchantStaticStatus.ItemId == 16192 or -- egg with star pattern
 						lootItem.ItemEnchantStaticStatus.ItemId == 16191 or -- life egg
 						lootItem.ItemEnchantStaticStatus.ItemId == 16194 or -- rainbow egg
@@ -139,10 +139,8 @@ function LootState:Run()
 				then
 					lootItemType = "Egg"
 					self.state = 6
-				elseif 	not self.Settings.LootWhite and not self.Settings.LootGreen and
-						not self.Settings.LootBlue and not self.Settings.LootGold and
-						not self.Settings.LootOrange and not self.Settings.LootShards and
-						not self.Settings.LootKeys and not self.Settings.LootEggs
+				elseif	not self.Settings.LootWhite and not self.Settings.LootGreen and not self.Settings.LootBlue and not self.Settings.LootGold and
+						not self.Settings.LootOrange and not self.Settings.LootShards and not self.Settings.LootKeys and not self.Settings.LootEggs
 				then
 					lootItemType = "Trash"
 					self.state = 7
@@ -243,7 +241,6 @@ function LootState:Run()
 				end
 			end
 
-			local FishGameTime = "- "
 			if Bot.Stats.LastLootTick ~= 0 then
 				Bot.Stats.LootTimeCount = Bot.Stats.LootTimeCount + 1
 				FishGameTime = Pyx.System.TickCount - Bot.Stats.LastLootTick

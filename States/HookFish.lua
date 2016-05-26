@@ -47,7 +47,7 @@ end
 function HookFishState:Run()
 	local selfPlayer = GetSelfPlayer()
 	if self.state == 0 and selfPlayer.CurrentActionName == "FISHING_HOOK_ING" then
-		if Bot.EnableDebug then
+		if Bot.EnableDebug and Bot.EnableDebugHookFishState then
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Got something!")
 		end
 		self.LastHookStateTick = Pyx.System.TickCount

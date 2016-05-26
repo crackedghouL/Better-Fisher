@@ -141,6 +141,7 @@ function RepairState:Exit()
 end
 
 function RepairState:Run()
+	local npcs = GetNpcs()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
@@ -170,7 +171,6 @@ function RepairState:Run()
 		return
 	end
 
-	local npcs = GetNpcs()
 	if table.length(npcs) < 1 then
 		print("[" .. os.date(Bot.UsedTimezone) .. "] Repair could not find any NPC's")
 		self:Exit()
@@ -230,7 +230,9 @@ function RepairState:Run()
 	end
 
 	if self.state == 6 then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Repair done")
+		if Bot.EnableDebug and Bot.EnableDebugRepairState then
+			print("[" .. os.date(Bot.UsedTimezone) .. "] Repair done")
+		end
 		BDOLua.Execute("Repair_OpenPanel(false)\r\nFixEquip_Close()")
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()

@@ -12,7 +12,7 @@ MainWindow.ConfirmPopup = false
 -----------------------------------------------------------------------------
 
 function MainWindow.DrawMainWindow()
-	local _, shouldDisplay = ImGui.Begin("Better Fisher v0.9b BETA", true, ImVec2(320, 105), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
+	local _, shouldDisplay = ImGui.Begin(Bot.Version, true, ImVec2(320, 105), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
 
 	if shouldDisplay then
 		local selfPlayer = GetSelfPlayer()
@@ -147,7 +147,7 @@ function MainWindow.DrawMainWindow()
 		ImGui.Separator()
 		ImGui.Text("State:")
 		ImGui.SameLine()
-		if not Bot.EnableDebugMainWindow then
+		if not Bot.EnableDebug and not Bot.EnableDebugMainWindow then
 			if Bot.Running and Bot.FSM.CurrentState then
 				ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Running")
 			elseif selfPlayer.Inventory.FreeSlots == 0 then

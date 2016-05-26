@@ -57,7 +57,7 @@ function DeathState:Run()
 		print("[" .. os.date(Bot.UsedTimezone) .. "] Trying to revive at nearest village...");
 		selfPlayer:ReviveAtVillage()
 	else
-		if Bot.EnableDebug then
+		if Bot.EnableDebug and Bot.EnableDebugDeathState then
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Death have state: " .. self.Settings.ReviveMethod)
 		end
 	end

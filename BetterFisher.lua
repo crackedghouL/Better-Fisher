@@ -8,6 +8,18 @@ Bot.PrintConsoleState = false
 Bot.EnableDebug = false
 Bot.EnableDebugMainWindow = false
 Bot.EnableDebugInventory = false
+Bot.EnableDebugDeathState = false
+Bot.EnableDebugEquipFishignRodState = false
+Bot.EnableDebugEquipFloatState = false
+Bot.EnableDebugHookFishState = false
+Bot.EnableDebugHookHandleGameState = false
+Bot.EnableDebugInventoryDeleteState = false
+Bot.EnableDebugLootState = false
+Bot.EnableDebugRepairState = false
+Bot.EnableDebugStartFishingState = false
+Bot.EnableDebugTradeManagerState = false
+Bot.EnableDebugVendorState = false
+Bot.EnableDebugWarehouseState = false
 
 Bot.FishingLevel = 0
 

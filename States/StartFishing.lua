@@ -189,7 +189,7 @@ function StartFishingState:Run()
 				self.GoodPosition = true
 				self.state = 0
 			elseif self.GoodPosition then
-				if Bot.EnableDebug then
+				if Bot.EnableDebug and Bot.EnableDebugStartFishingState then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing...")
 				end
 

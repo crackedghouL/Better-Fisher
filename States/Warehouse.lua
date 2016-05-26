@@ -128,6 +128,7 @@ function WarehouseState:Exit()
 end
 
 function WarehouseState:Run()
+	local npcs = GetNpcs()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
@@ -157,7 +158,6 @@ function WarehouseState:Run()
 		return
 	end
 
-	local npcs = GetNpcs()
 	if table.length(npcs) < 1 then
 		print("[" .. os.date(Bot.UsedTimezone) .. "] Could not find any Warehouse NPC's")
 		self:Exit()
@@ -188,7 +188,7 @@ function WarehouseState:Run()
 		self.SleepTimer:Start()
 
 		if self.Settings.DepositItems or (not self.Settings.DepositItems and self.ManualForced) then
-			if Bot.EnableDebug then
+			if Bot.EnableDebug and Bot.EnableDebugWarehouseState then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Deposit list done")
 			end
 			self.CurrentDepositList = self:GetItems()
