@@ -9,6 +9,8 @@ Bot.EnableDebug = false
 Bot.EnableDebugMainWindow = false
 Bot.EnableDebugInventory = false
 
+Bot.FishingLevel = 0
+
 Bot.Time = nil
 Bot.Hours = nil
 Bot.Minutes = nil
@@ -320,6 +322,200 @@ function Bot.OnPulse()
 
 	if Bot.Counter > 0 then
 		Bot.Counter = Bot.Counter - 1
+	end
+
+	if selfPlayer then
+		local rawLevel = tonumber(BDOLua.Execute([[return getSelfPlayer():get():getLifeExperienceLevel(1)]]))
+
+		if rawLevel <= 10 then -- 1 to 10 = Beginner
+			if rawLevel == 1 then
+				Bot.FishingLevel = "Beginner 1"
+			elseif rawLevel == 2 then
+				Bot.FishingLevel = "Beginner 2"
+			elseif rawLevel == 3 then
+				Bot.FishingLevel = "Beginner 3"
+			elseif rawLevel == 4 then
+				Bot.FishingLevel = "Beginner 4"
+			elseif rawLevel == 5 then
+				Bot.FishingLevel = "Beginner 5"
+			elseif rawLevel == 6 then
+				Bot.FishingLevel = "Beginner 6"
+			elseif rawLevel == 7 then
+				Bot.FishingLevel = "Beginner 7"
+			elseif rawLevel == 8 then
+				Bot.FishingLevel = "Beginner 8"
+			elseif rawLevel == 9 then
+				Bot.FishingLevel = "Beginner 9"
+			elseif rawLevel == 10 then
+				Bot.FishingLevel = "Beginner 10"
+			else
+				Bot.FishingLevel = "Beginner ???"
+			end
+		elseif rawLevel >= 11 and rawLevel <= 20 then -- 11 to 20 = Apprentice
+			if rawLevel == 11 then
+				Bot.FishingLevel = "Apprentice 1"
+			elseif rawLevel == 12 then
+				Bot.FishingLevel = "Apprentice 2"
+			elseif rawLevel == 13 then
+				Bot.FishingLevel = "Apprentice 3"
+			elseif rawLevel == 14 then
+				Bot.FishingLevel = "Apprentice 4"
+			elseif rawLevel == 15 then
+				Bot.FishingLevel = "Apprentice 5"
+			elseif rawLevel == 16 then
+				Bot.FishingLevel = "Apprentice 6"
+			elseif rawLevel == 17 then
+				Bot.FishingLevel = "Apprentice 7"
+			elseif rawLevel == 18 then
+				Bot.FishingLevel = "Apprentice 8"
+			elseif rawLevel == 19 then
+				Bot.FishingLevel = "Apprentice 9"
+			elseif rawLevel == 20 then
+				Bot.FishingLevel = "Apprentice 10"
+			else
+				Bot.FishingLevel = "Apprentice ???"
+			end
+		elseif rawLevel >= 21 and rawLevel <= 30 then -- 21 to 30 = Skilled
+			if rawLevel == 21 then
+				Bot.FishingLevel = "Skilled 1"
+			elseif rawLevel == 22 then
+				Bot.FishingLevel = "Skilled 2"
+			elseif rawLevel == 23 then
+				Bot.FishingLevel = "Skilled 3"
+			elseif rawLevel == 24 then
+				Bot.FishingLevel = "Skilled 4"
+			elseif rawLevel == 25 then
+				Bot.FishingLevel = "Skilled 5"
+			elseif rawLevel == 26 then
+				Bot.FishingLevel = "Skilled 6"
+			elseif rawLevel == 27 then
+				Bot.FishingLevel = "Skilled 7"
+			elseif rawLevel == 28 then
+				Bot.FishingLevel = "Skilled 8"
+			elseif rawLevel == 29 then
+				Bot.FishingLevel = "Skilled 9"
+			elseif rawLevel == 30 then
+				Bot.FishingLevel = "Skilled 10"
+			else
+				Bot.FishingLevel = "Skilled ???"
+			end
+		elseif rawLevel >= 31 and rawLevel <= 40 then -- 31 to 40 = Professional
+			if rawLevel == 31 then
+				Bot.FishingLevel = "Professional 1"
+			elseif rawLevel == 32 then
+				Bot.FishingLevel = "Professional 2"
+			elseif rawLevel == 33 then
+				Bot.FishingLevel = "Professional 3"
+			elseif rawLevel == 34 then
+				Bot.FishingLevel = "Professional 4"
+			elseif rawLevel == 35 then
+				Bot.FishingLevel = "Professional 5"
+			elseif rawLevel == 36 then
+				Bot.FishingLevel = "Professional 6"
+			elseif rawLevel == 37 then
+				Bot.FishingLevel = "Professional 7"
+			elseif rawLevel == 38 then
+				Bot.FishingLevel = "Professional 8"
+			elseif rawLevel == 39 then
+				Bot.FishingLevel = "Professional 9"
+			elseif rawLevel == 40 then
+				Bot.FishingLevel = "Professional 10"
+			else
+				Bot.FishingLevel = "Professional ???"
+			end
+		elseif rawLevel >= 41 and rawLevel <= 50 then -- 41 to 50 = Artisan
+			if rawLevel == 41 then
+				Bot.FishingLevel = "Artisan 1"
+			elseif rawLevel == 42 then
+				Bot.FishingLevel = "Artisan 2"
+			elseif rawLevel == 43 then
+				Bot.FishingLevel = "Artisan 3"
+			elseif rawLevel == 44 then
+				Bot.FishingLevel = "Artisan 4"
+			elseif rawLevel == 45 then
+				Bot.FishingLevel = "Artisan 5"
+			elseif rawLevel == 46 then
+				Bot.FishingLevel = "Artisan 6"
+			elseif rawLevel == 47 then
+				Bot.FishingLevel = "Artisan 7"
+			elseif rawLevel == 48 then
+				Bot.FishingLevel = "Artisan 8"
+			elseif rawLevel == 49 then
+				Bot.FishingLevel = "Artisan 9"
+			elseif rawLevel == 50 then
+				Bot.FishingLevel = "Artisan 10"
+			else
+				Bot.FishingLevel = "Artisan ???"
+			end
+		elseif rawLevel >= 51 then -- 51 to 80 = Master
+			if rawLevel == 51 then
+				Bot.FishingLevel = "Master 1"
+			elseif rawLevel == 52 then
+				Bot.FishingLevel = "Master 2"
+			elseif rawLevel == 53 then
+				Bot.FishingLevel = "Master 3"
+			elseif rawLevel == 54 then
+				Bot.FishingLevel = "Master 4"
+			elseif rawLevel == 55 then
+				Bot.FishingLevel = "Master 5"
+			elseif rawLevel == 56 then
+				Bot.FishingLevel = "Master 6"
+			elseif rawLevel == 57 then
+				Bot.FishingLevel = "Master 7"
+			elseif rawLevel == 58 then
+				Bot.FishingLevel = "Master 8"
+			elseif rawLevel == 59 then
+				Bot.FishingLevel = "Master 9"
+			elseif rawLevel == 60 then
+				Bot.FishingLevel = "Master 10"
+			elseif rawLevel == 61 then
+				Bot.FishingLevel = "Master 11"
+			elseif rawLevel == 62 then
+				Bot.FishingLevel = "Master 12"
+			elseif rawLevel == 63 then
+				Bot.FishingLevel = "Master 13"
+			elseif rawLevel == 64 then
+				Bot.FishingLevel = "Master 14"
+			elseif rawLevel == 65 then
+				Bot.FishingLevel = "Master 15"
+			elseif rawLevel == 66 then
+				Bot.FishingLevel = "Master 16"
+			elseif rawLevel == 67 then
+				Bot.FishingLevel = "Master 17"
+			elseif rawLevel == 68 then
+				Bot.FishingLevel = "Master 18"
+			elseif rawLevel == 69 then
+				Bot.FishingLevel = "Master 19"
+			elseif rawLevel == 70 then
+				Bot.FishingLevel = "Master 20"
+			elseif rawLevel == 71 then
+				Bot.FishingLevel = "Master 21"
+			elseif rawLevel == 72 then
+				Bot.FishingLevel = "Master 22"
+			elseif rawLevel == 73 then
+				Bot.FishingLevel = "Master 23"
+			elseif rawLevel == 74 then
+				Bot.FishingLevel = "Master 24"
+			elseif rawLevel == 75 then
+				Bot.FishingLevel = "Master 25"
+			elseif rawLevel == 76 then
+				Bot.FishingLevel = "Master 26"
+			elseif rawLevel == 77 then
+				Bot.FishingLevel = "Master 27"
+			elseif rawLevel == 78 then
+				Bot.FishingLevel = "Master 28"
+			elseif rawLevel == 79 then
+				Bot.FishingLevel = "Master 29"
+			elseif rawLevel == 80 then
+				Bot.FishingLevel = "Master 30"
+			else
+				Bot.FishingLevel = "Master ???"
+			end
+		else
+			Bot.FishingLevel = "???"
+		end
+	else
+		Bot.FishingLevel = "N/A"
 	end
 
 	if Bot.Running then
