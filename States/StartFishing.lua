@@ -21,6 +21,7 @@ function StartFishingState.new()
 	self.LastStartFishTickcount = 0
 	self.LastActionTime = 0
 	self.PlayersNearby = 0
+	self.GoodPosition = nil
 	self.EquippedState = 0
 	self.state = 0
 	return self
@@ -31,6 +32,7 @@ function StartFishingState:Reset()
 	self.LastStartFishTickcount = 0
 	self.LastActionTime = 0
 	self.PlayersNearby = 0
+	self.GoodPosition = nil
 	self.EquippedState = 0
 	self.state = 0
 end
@@ -174,25 +176,35 @@ function StartFishingState:Run()
 		end
 	else
 		if self.state == 0 then
-			selfPlayer:DoAction("MOVE_BACKWARD")
-			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
+			if self.GoodPosition == nil then
+				self.GoodPosition = false
+			end
+
 			self.state = 1
 			self.LastActionTime = Pyx.System.TickCount
 		elseif self.state == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then
-			if Bot.EnableDebug then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing ...")
-			end
-			selfPlayer:DoAction("FISHING_START")
-			selfPlayer:DoAction("FISHING_ING_START")
+			if not self.GoodPosition then
+				selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation()) -- need to find a way to make it rotate for real...
+				selfPlayer:DoAction("RUN_LEFT", 100)
+				self.GoodPosition = true
+				self.state = 0
+			elseif self.GoodPosition then
+				if Bot.EnableDebug then
+					print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing...")
+				end
 
-			if self.Settings.UseMaxEnergy then
-				selfPlayer:DoAction("FISHING_START_END_Lv10")
-			else
-				selfPlayer:DoAction("FISHING_START_END_Lv0")
-			end
+				selfPlayer:DoAction("FISHING_START")
+				selfPlayer:DoAction("FISHING_ING_START")
 
-			self.state = 0
-			self.LastStartFishTickcount = Pyx.System.TickCount
+				if self.Settings.UseMaxEnergy then
+					selfPlayer:DoAction("FISHING_START_END_Lv10")
+				else
+					selfPlayer:DoAction("FISHING_START_END_Lv0")
+				end
+
+				self.state = 0
+				self.LastStartFishTickcount = Pyx.System.TickCount
+			end
 		end
 	end
 end

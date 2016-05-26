@@ -43,16 +43,14 @@ else
 end
 
 function Bot.FormatMoney(amount)
-	local money = amount
-
 	while true do
-		money, k = string.gsub(money, "^(-?%d+)(%d%d%d)", '%1.%2')
-		if (k == 0) then
+		amount, k = string.gsub(amount, "^(-?%d+)(%d%d%d)", '%1.%2')
+		if k == 0 then
 			break
 		end
 	end
 
-	return money
+	return amount
 end
 
 function Bot.ResetStats()
@@ -199,6 +197,8 @@ function Bot.Stop()
 end
 
 function Bot.OnPulse()
+	local selfPlayer = GetSelfPlayer()
+
 	if Pyx.Input.IsGameForeground() then
 		if Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('S')) then
 			if Bot._startHotKeyPressed ~= true then
@@ -331,13 +331,13 @@ function Bot.OnPulse()
 		Bot.Hours = math.floor(Bot.Time / (60 * 60))
 
 		if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe < 500 then
-			if GetSelfPlayer().IsSwimming then
-				GetSelfPlayer():DoAction("JUMP_F_A")
+			if selfPlayer.IsSwimming then
+				selfPlayer:DoAction("JUMP_F_A")
 			end
 		end
 
 		if Bot.Settings.StopWhenPeopleNearby then
-			local me = GetSelfPlayer()
+			local me = selfPlayer
 			local players = GetCharacters()
 			local count = 0
 			local SafeDistance = Bot.Settings.StopWhenPeopleNearbyDistance
