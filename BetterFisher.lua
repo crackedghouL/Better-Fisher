@@ -698,17 +698,17 @@ function Bot.RepairCheck()
 		end
 	end
 
-	--for k,v in pairs(selfPlayer.Inventory.Items) do
-		--if Bot.EnableDebug then
-			--print ("[" .. os.date(Bot.UsedTimezone) .. "] Inv: " .. tostring(v.HasEndurance) .. " " .. tostring(v.EndurancePercent) .. " " .. tostring(v.ItemEnchantStaticStatus.IsFishingRod))
-		--end
-		--if v.HasEndurance and v.EndurancePercent <= 0 and v.ItemEnchantStaticStatus.IsFishingRod then
-			--if Bot.EnableDebug then
-				--print("[" .. os.date(Bot.UsedTimezone) .. "] Need to repair items on inventory")
-			--end
-			--return true
-		--end
-	--end
+	for k,v in pairs(selfPlayer.Inventory.Items) do
+		if Bot.EnableDebug then
+			print ("[" .. os.date(Bot.UsedTimezone) .. "] Inv: " .. tostring(v.HasEndurance) .. " " .. tostring(v.EndurancePercent) .. " " .. tostring(v.ItemEnchantStaticStatus.IsFishingRod))
+		end
+		if v.HasEndurance and v.EndurancePercent <= 0 and v.ItemEnchantStaticStatus.IsFishingRod then
+			if Bot.EnableDebug then
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Need to repair items on inventory")
+			end
+			return true
+		end
+	end
 
 	return false
 end

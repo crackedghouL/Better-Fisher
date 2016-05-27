@@ -81,7 +81,7 @@ function MainWindow.DrawMainWindow()
 				if ImGui.MenuItem("Go to Warehouse", "ALT+W") then
 					if Bot.Running then
 						Bot.WarehouseState.ManualForced = true
-						if Bot.EnableDebug then
+						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
 							print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Warehouse")
 						end
 					else
@@ -91,7 +91,7 @@ function MainWindow.DrawMainWindow()
 				if ImGui.MenuItem("Go to Trader", "ALT+T") then
 					if Bot.Running then
 						Bot.TradeManagerState.ManualForced = true
-						if Bot.EnableDebug then
+						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
 							print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Trader")
 						end
 					else
@@ -101,7 +101,7 @@ function MainWindow.DrawMainWindow()
 				if ImGui.MenuItem("Go to Vendor", "ALT+V") then
 					if Bot.Running then
 						Bot.VendorState.ManualForced = true
-						if Bot.EnableDebug then
+						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
 							print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Vendor")
 						end
 					else
@@ -111,7 +111,7 @@ function MainWindow.DrawMainWindow()
 				if ImGui.MenuItem("Go Repair", "ALT+G") then
 					if Bot.Running then
 						Bot.RepairState.ManualForced = true
-						if Bot.EnableDebug then
+						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
 							print("[" .. os.date(Bot.UsedTimezone) .. "] Go Repair")
 						end
 					else

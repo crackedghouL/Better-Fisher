@@ -244,6 +244,7 @@ end
 function RepairState:GetItems()
     local items = {}
     local selfPlayer = GetSelfPlayer()
+
     if selfPlayer then
         for k,v in pairs(selfPlayer.EquippedItems) do
             if self.ItemCheckFunction then
@@ -256,6 +257,7 @@ function RepairState:GetItems()
                 end
             end
         end
+
         for k,v in pairs(selfPlayer.Inventory.Items) do
             if self.ItemCheckFunction then
                 if self.ItemCheckFunction(v) then
