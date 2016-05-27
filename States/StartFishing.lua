@@ -5,6 +5,8 @@ StartFishingState.Name = "Start fishing"
 StartFishingState.SETTINGS_ON_NORMAL_FISHING = 0
 StartFishingState.SETTINGS_ON_BOAT_FISHING = 1
 
+StartFishingState.GoodPosition = false
+
 setmetatable(StartFishingState, {
 	__call = function (cls, ...)
 		return cls.new(...)
@@ -176,35 +178,29 @@ function StartFishingState:Run()
 		end
 	else
 		if self.state == 0 then
-			if self.GoodPosition == nil then
-				self.GoodPosition = false
+			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
+			if StartFishingState.GoodPosition then -- thanks to DogGoneFish and Parog
+				selfPlayer:SetActionState(ACTION_FLAG_MOVE_FORWARD, 80)
+				StartFishingState.GoodPosition = false
 			end
-
 			self.state = 1
 			self.LastActionTime = Pyx.System.TickCount
 		elseif self.state == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then
-			if not self.GoodPosition then
-				selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation()) -- need to find a way to make it rotate for real...
-				selfPlayer:DoAction("RUN_LEFT", 100)
-				self.GoodPosition = true
-				self.state = 0
-			elseif self.GoodPosition then
-				if Bot.EnableDebug and Bot.EnableDebugStartFishingState then
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing...")
-				end
-
-				selfPlayer:DoAction("FISHING_START")
-				selfPlayer:DoAction("FISHING_ING_START")
-
-				if self.Settings.UseMaxEnergy then
-					selfPlayer:DoAction("FISHING_START_END_Lv10")
-				else
-					selfPlayer:DoAction("FISHING_START_END_Lv0")
-				end
-
-				self.state = 0
-				self.LastStartFishTickcount = Pyx.System.TickCount
+			if Bot.EnableDebug and Bot.EnableDebugStartFishingState then
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing...")
 			end
+
+			selfPlayer:DoAction("FISHING_START")
+			selfPlayer:DoAction("FISHING_ING_START")
+
+			if self.Settings.UseMaxEnergy then
+				selfPlayer:DoAction("FISHING_START_END_Lv10")
+			else
+				selfPlayer:DoAction("FISHING_START_END_Lv0")
+			end
+
+			self.state = 0
+			self.LastStartFishTickcount = Pyx.System.TickCount
 		end
 	end
 end

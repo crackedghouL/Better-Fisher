@@ -99,7 +99,7 @@ function RepairState:NeedToRun()
 	end
 
 	if self.Forced or self.ManualForced then
-		return false
+		return true
 	elseif not self.Forced or not self.ManualForced then
 		return false
 	end
@@ -185,7 +185,7 @@ function RepairState:Run()
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
 		self.state = 2
-		return true
+		return
 	end
 
 	if self.state == 2 then

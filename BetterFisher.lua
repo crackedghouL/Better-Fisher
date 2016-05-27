@@ -1,7 +1,7 @@
 Bot = { }
 Bot.Settings = Settings()
 
-Bot.Version = "Better Fisher v0.9b BETA"
+Bot.Version = "Better Fisher v0.9c BETA"
 
 Bot.Running = false
 Bot.PrintConsoleState = false
@@ -111,6 +111,9 @@ function Bot.Start()
 		Bot.RepairState.Forced = false
 		Bot.RepairState.ManualForced = false
 
+		Navigator.MeshConnects = ProfileEditor.CurrentProfile.MeshConnects
+		Navigator.ApproachDistance = 80
+
 		Bot.WarehouseState.Settings.NpcName = currentProfile.WarehouseNpcName
 		Bot.WarehouseState.Settings.NpcPosition = currentProfile.WarehouseNpcPosition
 		Bot.WarehouseState.CallWhenCompleted = Bot.StateComplete
@@ -127,7 +130,7 @@ function Bot.Start()
 		Bot.TradeManagerState.CallWhenCompleted = Bot.StateComplete
 		Bot.TradeManagerState.CallWhileMoving = Bot.StateMoving
 
-		Bot.DeathState.CallWhenCompleted = Bot.Death
+		Bot.DeathState.CallWhenCompleted = Bot.StateComplete
 
 		Bot.InventoryDeleteState.ItemCheckFunction = Bot.DeleteItemCheck
 
@@ -144,6 +147,7 @@ function Bot.Start()
 		if Bot.MeshDisabled ~= true then
 			ProfileEditor.Visible = false
 			Navigation.MesherEnabled = false
+			ProfileEditor.MeshConnectEnabled = false
 		end
 
 		if not currentProfile then
@@ -200,13 +204,14 @@ function Bot.Start()
 end
 
 function Bot.Stop()
-	Navigator.Stop()
+	Navigation.MesherEnabled = false
 	Bot.Running = false
 	Bot.FSM:Reset()
 	Bot.WarehouseState:Reset()
 	Bot.VendorState:Reset()
 	Bot.TradeManagerState:Reset()
 	Bot.DeathState:Reset()
+	Navigator.Stop()
 	Bot.Stats.TotalSession = Bot.Stats.TotalSession + (Pyx.System.TickCount - Bot.Stats.SessionStart)
 end
 
@@ -608,19 +613,6 @@ function Bot.StateMoving(state)
 	end
 end
 
-function Bot.Death(state)
-	if Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED then
-		Bot.Stop()
-	else
-		if not Bot.Settings.InvFullStop then
-			Bot.TradeManagerState:Reset()
-			Bot.WarehouseState:Reset()
-			Bot.VendorState:Reset()
-			Bot.RepairState:Reset()
-		end
-	end
-end
-
 function Bot.StateComplete(state)
 	if state == Bot.TradeManagerState then
 		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then -- DepositMethod = 1
@@ -641,6 +633,20 @@ function Bot.StateComplete(state)
 	elseif state == Bot.WarehouseState then
 		if Bot.Settings.RepairSettings.Enabled and Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then -- RepairMethod = 1
 			Bot.RepairState.Forced = true
+		end
+	elseif state == Bot.DeathState then
+		if 	Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED or
+			Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_NODE or
+			Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE
+		then
+			Bot.DeathState.Forced = true
+		else
+			if not Bot.Settings.InvFullStop then
+				Bot.TradeManagerState:Reset()
+				Bot.WarehouseState:Reset()
+				Bot.VendorState:Reset()
+				Bot.RepairState:Reset()
+			end
 		end
 	end
 

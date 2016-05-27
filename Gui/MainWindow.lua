@@ -12,7 +12,7 @@ MainWindow.ConfirmPopup = false
 -----------------------------------------------------------------------------
 
 function MainWindow.DrawMainWindow()
-	local _, shouldDisplay = ImGui.Begin(Bot.Version, true, ImVec2(320, 105), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
+	local _, shouldDisplay = ImGui.Begin(Bot.Version, true, ImVec2(320, 125), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
 
 	if shouldDisplay then
 		local selfPlayer = GetSelfPlayer()
@@ -182,6 +182,12 @@ function MainWindow.DrawMainWindow()
 		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", Bot.Hours, Bot.Minutes, Bot.Seconds))
 		ImGui.NextColumn()
 		ImGui.Text("Loots: " .. string.format("%i", Bot.Stats.Loots))
+
+		ImGui.Columns(1)
+		ImGui.Separator()
+
+		ImGui.Columns(1)
+		ImGui.Text("Fishing Level: " ..  Bot.FishingLevel)
 
 		ImGui.Columns(1)
 		ImGui.Separator()

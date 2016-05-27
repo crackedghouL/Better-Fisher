@@ -37,12 +37,12 @@ function MoveToFishingSpotState:NeedToRun()
 end
 
 function MoveToFishingSpotState:Run()
-	local selfPlayer = GetSelfPlayer()
-	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
+	local equippedItem = GetSelfPlayer():GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
 	if equippedItem and equippedItem.ItemEnchantStaticStatus.IsFishingRod then
-		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
+		GetSelfPlayer():UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
 	Navigator.MoveTo(ProfileEditor.CurrentProfile:GetFishSpotPosition())
+	StartFishingState.GoodPosition = true
 end

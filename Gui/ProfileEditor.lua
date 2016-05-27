@@ -6,15 +6,28 @@ ProfileEditor = {}
 ProfileEditor.Visible = false
 ProfileEditor.CurrentProfile = Profile()
 ProfileEditor.AvailablesProfilesSelectedIndex = 0
-ProfileEditor.AvailablesProfiles = { }
+ProfileEditor.AvailablesProfiles = {}
 ProfileEditor.CurrentProfileSaveName = "Unamed"
 ProfileEditor.WindowName = ""
+ProfileEditor.CurrentMeshConnect = {}
+ProfileEditor.MeshConnectEnabled = false
+ProfileEditor.LastPosition = Vector3(0, 0, 0)
 
 -----------------------------------------------------------------------------
 -- ProfileEditor Functions
 -----------------------------------------------------------------------------
 
 function ProfileEditor.DrawProfileEditor()
+	local selfPlayer = GetSelfPlayer()
+
+	if ProfileEditor.MeshConnectEnabled and ProfileEditor.LastPosition.Distance3DFromMe > 200 then
+		ProfileEditor.CurrentMeshConnect[#ProfileEditor.CurrentMeshConnect + 1] = {X = selfPlayer.Position.X, Y = selfPlayer.Position.Y, Z = selfPlayer.Position.Z}
+		ProfileEditor.LastPosition = selfPlayer.Position
+		if Bot.EnableDebug then
+			print("Connect Node: "..selfPlayer.Position)
+		end
+	end
+
 	if Bot.Running then
 		ProfileEditor.WindowName = "Profile"
 	elseif not Bot.Running then
