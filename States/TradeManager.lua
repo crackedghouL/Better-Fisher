@@ -89,15 +89,15 @@ function TradeManagerState:Reset()
 end
 
 function TradeManagerState:Exit()
+	if TradeMarket.IsTrading then
+		TradeMarket.Close()
+	end
+
+	if Dialog.IsTalking then
+		Dialog.ClickExit()
+	end
+
 	if self.state > 1 then
-		if TradeMarket.IsTrading then
-			TradeMarket.Close()
-		end
-
-		if Dialog.IsTalking then
-			Dialog.ClickExit()
-		end
-
 		self.LastTradeUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastTradeUseTimer:Start()
 		self.SleepTimer = nil
@@ -108,6 +108,7 @@ function TradeManagerState:Exit()
 end
 
 function TradeManagerState:Run()
+	local npcs = GetNpcs()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
@@ -137,8 +138,6 @@ function TradeManagerState:Run()
 	if self.SleepTimer ~= nil and self.SleepTimer:IsRunning() and not self.SleepTimer:Expired() then
 		return
 	end
-
-	local npcs = GetNpcs()
 
 	if table.length(npcs) < 1 then
 		print("[" .. os.date(Bot.UsedTimezone) .. "] Could not find any Trade Manager NPC's")
@@ -190,7 +189,7 @@ function TradeManagerState:Run()
 					self.SleepTimer:Start()
 					self.BargainState = 1
 				else
-					if Bot.EnableDebug then
+					if Bot.EnableDebug and Bot.EnableDebugTradeManagerState then
 						print("[" .. os.date(Bot.UsedTimezone) .. "] Not enought energy. Skipping bargain minigame")
 					end
 					self.SleepTimer = PyxTimer:New(2)
@@ -200,7 +199,7 @@ function TradeManagerState:Run()
 				end
 			elseif self.BargainState == 1 then
 				if BDOLua.Execute("return isTradeGameSuccess()") == true then
-					if Bot.EnableDebug then
+					if Bot.EnableDebug and Bot.EnableDebugTradeManagerState then
 						print("[" .. os.date(Bot.UsedTimezone) .. "] Bargain succes!")
 					end
 					self.SleepTimer = PyxTimer:New(2)
@@ -213,7 +212,7 @@ function TradeManagerState:Run()
 					self.state = 4
 					self.CurrentSellList = self:GetItems()
 				elseif self.BargainCount >= 3 then
-					if Bot.EnableDebug then
+					if Bot.EnableDebug and Bot.EnableDebugTradeManagerState then
 						print("[" .. os.date(Bot.UsedTimezone) .. "] Bargain fail")
 					end
 					BDOLua.Execute("Fglobal_TradeGame_Close()")
@@ -222,13 +221,13 @@ function TradeManagerState:Run()
 					self.BargainState = 0
 				else
 					if self.BargainDice == 0 then
-						if Bot.EnableDebug then
+						if Bot.EnableDebug and Bot.EnableDebugTradeManagerState then
 							print("[" .. os.date(Bot.UsedTimezone) .. "] Low dice")
 						end
 						BDOLua.Execute("tradeGame_LowDice()")
 						self.BargainDice = 1
 					else
-						if Bot.EnableDebug then
+						if Bot.EnableDebug and Bot.EnableDebugTradeManagerState then
 							print("[" .. os.date(Bot.UsedTimezone) .. "] High dice")
 						end
 						BDOLua.Execute("tradeGame_HighDice()")

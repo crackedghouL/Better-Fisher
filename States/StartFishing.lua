@@ -5,6 +5,8 @@ StartFishingState.Name = "Start fishing"
 StartFishingState.SETTINGS_ON_NORMAL_FISHING = 0
 StartFishingState.SETTINGS_ON_BOAT_FISHING = 1
 
+StartFishingState.GoodPosition = false
+
 setmetatable(StartFishingState, {
 	__call = function (cls, ...)
 		return cls.new(...)
@@ -21,6 +23,7 @@ function StartFishingState.new()
 	self.LastStartFishTickcount = 0
 	self.LastActionTime = 0
 	self.PlayersNearby = 0
+	self.GoodPosition = nil
 	self.EquippedState = 0
 	self.state = 0
 	return self
@@ -31,6 +34,7 @@ function StartFishingState:Reset()
 	self.LastStartFishTickcount = 0
 	self.LastActionTime = 0
 	self.PlayersNearby = 0
+	self.GoodPosition = nil
 	self.EquippedState = 0
 	self.state = 0
 end
@@ -47,7 +51,7 @@ function StartFishingState:NeedToRun()
 		return false
 	end
 
-	if Pyx.System.TickCount - self.LastStartFishTickcount < 4000 then
+	if Pyx.Win32.GetTickCount() - self.LastStartFishTickcount < 4000 then
 		return false
 	end
 
@@ -143,7 +147,7 @@ end
 function StartFishingState:Run()
 	local selfPlayer = GetSelfPlayer()
 
-	Bot.Stats.LastLootTick = Pyx.System.TickCount
+	Bot.Stats.LastLootTick = Pyx.Win32.GetTickCount()
 	Bot.SilverStats()
 
 	if selfPlayer.HealthPercent <= Bot.Settings.HealthPercent and Bot.Settings.AutoEscape and Bot.Counter == 0 then
@@ -174,14 +178,18 @@ function StartFishingState:Run()
 		end
 	else
 		if self.state == 0 then
-			selfPlayer:DoAction("MOVE_BACKWARD")
 			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
-			self.state = 1
-			self.LastActionTime = Pyx.System.TickCount
-		elseif self.state == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then
-			if Bot.EnableDebug then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing ...")
+			if StartFishingState.GoodPosition then -- thanks to DogGoneFish and Parog
+				selfPlayer:SetActionState(ACTION_FLAG_MOVE_FORWARD, 80)
+				StartFishingState.GoodPosition = false
 			end
+			self.state = 1
+			self.LastActionTime = Pyx.Win32.GetTickCount()
+		elseif self.state == 1 and Pyx.Win32.GetTickCount() - self.LastActionTime > 1000 then
+			if Bot.EnableDebug and Bot.EnableDebugStartFishingState then
+				print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing...")
+			end
+
 			selfPlayer:DoAction("FISHING_START")
 			selfPlayer:DoAction("FISHING_ING_START")
 
@@ -192,7 +200,7 @@ function StartFishingState:Run()
 			end
 
 			self.state = 0
-			self.LastStartFishTickcount = Pyx.System.TickCount
+			self.LastStartFishTickcount = Pyx.Win32.GetTickCount()
 		end
 	end
 end

@@ -7,13 +7,13 @@ BotSettings.Visible = false
 
 BotSettings.InventoryComboSelectedIndex = 0
 BotSettings.InventorySelectedIndex = 0
-BotSettings.InventoryName = { }
+BotSettings.InventoryName = {}
 
 BotSettings.WarehouseComboSelectedIndex = 0
 BotSettings.WarehouseSelectedIndex = 0
-BotSettings.WarehouseName = { }
+BotSettings.WarehouseName = {}
 
-BotSettings.BaitComboBoxItems = { }
+BotSettings.BaitComboBoxItems = {}
 BotSettings.BaitComboBoxSelected = 0
 
 -----------------------------------------------------------------------------
@@ -416,6 +416,54 @@ function BotSettings.DrawBotSettings()
 						_, Bot.EnableDebugInventory = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_inventory", Bot.EnableDebugInventory)
 						ImGui.SameLine()
 						ImGui.Text("Enable Inventory Debug")
+
+						_, Bot.EnableDebugDeathState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_deathstate", Bot.EnableDebugDeathState)
+						ImGui.SameLine()
+						ImGui.Text("Enable DeathState Debug")
+
+						_, Bot.EnableDebugEquipFishignRodState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_equipfishingrodstate", Bot.EnableDebugEquipFishignRodState)
+						ImGui.SameLine()
+						ImGui.Text("Enable EquipFishignRodState Debug")
+
+						_, Bot.EnableDebugEquipFloatState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_equipfloatstate", Bot.EnableDebugEquipFloatState)
+						ImGui.SameLine()
+						ImGui.Text("Enable EquipFloatState Debug")
+
+						_, Bot.EnableDebugHookFishState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_hookfishstate", Bot.EnableDebugHookFishState)
+						ImGui.SameLine()
+						ImGui.Text("Enable HookFishState Debug")
+
+						_, Bot.EnableDebugHookHandleGameState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_hookhandlegamestate", Bot.EnableDebugHookHandleGameState)
+						ImGui.SameLine()
+						ImGui.Text("Enable HookHandleGameState Debug")
+
+						_, Bot.EnableDebugInventoryDeleteState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_inventorydeletestate", Bot.EnableDebugInventoryDeleteState)
+						ImGui.SameLine()
+						ImGui.Text("Enable InventoryDeleteState Debug")
+
+						_, Bot.EnableDebugLootState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_lootstate", Bot.EnableDebugLootState)
+						ImGui.SameLine()
+						ImGui.Text("Enable LootState Debug")
+
+						_, Bot.EnableDebugRepairState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_repairstate", Bot.EnableDebugRepairState)
+						ImGui.SameLine()
+						ImGui.Text("Enable RepairState Debug")
+
+						_, Bot.EnableDebugStartFishingState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_startfishingstate", Bot.EnableDebugStartFishingState)
+						ImGui.SameLine()
+						ImGui.Text("Enable StartFishingState Debug")
+
+						_, Bot.EnableDebugTradeManagerState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_trademanagerstate", Bot.EnableDebugTradeManagerState)
+						ImGui.SameLine()
+						ImGui.Text("Enable TradeManagerState Debug")
+
+						_, Bot.EnableDebugVendorState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_vendorstate", Bot.EnableDebugVendorState)
+						ImGui.SameLine()
+						ImGui.Text("Enable VendorState Debug")
+
+						_, Bot.EnableDebugWarehouseState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_warehousestate", Bot.EnableDebugWarehouseState)
+						ImGui.SameLine()
+						ImGui.Text("Enable WarehouseState Debug")
 					end
 				end
 				ImGui.TreePop()

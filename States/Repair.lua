@@ -71,7 +71,8 @@ function RepairState:NeedToRun()
 	if not equippedItem then
 		for k,v in pairs(selfPlayer.Inventory.Items) do
 			if 	v.HasEndurance and v.EndurancePercent <= 0 and
-				(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
+				(v.ItemEnchantStaticStatus.IsFishingRod and
+				(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
 			then
 				if Navigator.CanMoveTo(self:GetPosition()) then
 					self.Forced = true
@@ -84,7 +85,8 @@ function RepairState:NeedToRun()
 	else
 		for k,v in pairs(selfPlayer.EquippedItems) do
 			if 	v.HasEndurance and v.EndurancePercent <= 0 and
-				(v.ItemEnchantStaticStatus.IsFishingRod and (v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
+				(v.ItemEnchantStaticStatus.IsFishingRod and
+				(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
 			then
 				if Navigator.CanMoveTo(self:GetPosition()) then
 					self.Forced = true
@@ -97,7 +99,7 @@ function RepairState:NeedToRun()
 	end
 
 	if self.Forced or self.ManualForced then
-		return false
+		return true
 	elseif not self.Forced or not self.ManualForced then
 		return false
 	end
@@ -139,6 +141,7 @@ function RepairState:Exit()
 end
 
 function RepairState:Run()
+	local npcs = GetNpcs()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
@@ -168,7 +171,6 @@ function RepairState:Run()
 		return
 	end
 
-	local npcs = GetNpcs()
 	if table.length(npcs) < 1 then
 		print("[" .. os.date(Bot.UsedTimezone) .. "] Repair could not find any NPC's")
 		self:Exit()
@@ -183,7 +185,7 @@ function RepairState:Run()
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
 		self.state = 2
-		return true
+		return
 	end
 
 	if self.state == 2 then
@@ -228,7 +230,9 @@ function RepairState:Run()
 	end
 
 	if self.state == 6 then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Repair done")
+		if Bot.EnableDebug and Bot.EnableDebugRepairState then
+			print("[" .. os.date(Bot.UsedTimezone) .. "] Repair done")
+		end
 		BDOLua.Execute("Repair_OpenPanel(false)\r\nFixEquip_Close()")
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
@@ -240,6 +244,7 @@ end
 function RepairState:GetItems()
     local items = {}
     local selfPlayer = GetSelfPlayer()
+
     if selfPlayer then
         for k,v in pairs(selfPlayer.EquippedItems) do
             if self.ItemCheckFunction then
@@ -252,6 +257,7 @@ function RepairState:GetItems()
                 end
             end
         end
+
         for k,v in pairs(selfPlayer.Inventory.Items) do
             if self.ItemCheckFunction then
                 if self.ItemCheckFunction(v) then

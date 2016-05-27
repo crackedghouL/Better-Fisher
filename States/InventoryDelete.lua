@@ -67,7 +67,7 @@ function InventoryDeleteState:Run()
 	local selfPlayer = GetSelfPlayer()
 
 	for k,v in pairs(self:GetItems()) do
-		if Bot.EnableDebug then
+		if Bot.EnableDebug and Bot.EnableDebugInventoryDeleteState then
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Deleting: "..v.item.ItemEnchantStaticStatus.Name)
 		end
 		selfPlayer.Inventory:DeleteItem(v.slot)

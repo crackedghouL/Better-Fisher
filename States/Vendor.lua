@@ -118,11 +118,11 @@ function VendorState:Reset()
 end
 
 function VendorState:Exit()
-	if self.state > 1 then
-		if Dialog.IsTalking then
-			Dialog.ClickExit()
-		end
+	if Dialog.IsTalking then
+		Dialog.ClickExit()
+	end
 
+	if self.state > 1 then
 		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastUseTimer:Start()
 		self.SleepTimer = nil
@@ -191,20 +191,20 @@ function VendorState:Run()
 		self.SleepTimer:Start()
 
 		if self.Settings.BuyEnabled and self.Settings.SellEnabled then
-			if Bot.EnableDebug then
+			if Bot.EnableDebug and Bot.EnableDebugVendorState then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Buy/Sell list done")
 			end
 			self.state = 3
 			self.CurrentSellList = self:GetSellItems()
 			self.CurrentBuyList = self:GetBuyItems(true)
 		elseif self.Settings.SellEnabled == true then
-			if Bot.EnableDebug then
+			if Bot.EnableDebug and Bot.EnableDebugVendorState then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Sell list done")
 			end
 			self.state = 3
 			self.CurrentSellList = self:GetSellItems()
 		elseif self.Settings.BuyEnabled == true then
-			if Bot.EnableDebug then
+			if Bot.EnableDebug and Bot.EnableDebugVendorState then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Buy list done")
 			end
 			self.state = 4
@@ -242,7 +242,7 @@ function VendorState:Run()
 
 	if self.state == 4 then -- 4 = buy items and clear buy list
 		if table.length(self.CurrentBuyList) < 1 then
-			if Bot.EnableDebug then
+			if Bot.EnableDebug and Bot.EnableDebugVendorState then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Buy from " .. self.Settings.NpcName .. " done")
 			end
 			self.SleepTimer = PyxTimer:New(2)
@@ -268,7 +268,7 @@ function VendorState:Run()
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
 		else
-			if Bot.EnableDebug then
+			if Bot.EnableDebug and Bot.EnableDebugVendorState then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Need to buy \"" .. item.name .. "\" quantity: " .. item.countNeeded .. " but  ".. self.Settings.NpcName .. " don't have it!")
 			end
 		end
@@ -346,7 +346,7 @@ function VendorState:NeedToBuy(itemName, count)
 	for k,v in pairs(self.Settings.BuyItems) do
 		if v.Name == itemName then
 			if (count - v.BuyAt) <= 0 then
-				if Bot.EnableDebug then
+				if Bot.EnableDebug and Bot.EnableDebugVendorState then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.Name .. " " .. count .. " " .. v.BuyAt .. " " .. v.BuyMax - count)
 				end
 				return v.BuyMax - count
@@ -374,7 +374,7 @@ function VendorState:GetBuyItems(stockUp)
 	local countNeeded = nil
 
 	if selfPlayer then
-		local tmpInventory = { }
+		local tmpInventory = {}
 		local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND) -- Check equipped and add to total (for fishing Rods)
 
 		if equippedItem ~= nil then
@@ -412,7 +412,7 @@ function VendorState:GetBuyItemByName(itemName)
 	for i = 0, NpcShop.BuyItemCount - 1 do
 		local item = NpcShop.GetBuyItemByIndex(i)
 
-		if Bot.EnableDebug then
+		if Bot.EnableDebug and Bot.EnableDebugVendorState then
 			print(item.ItemEnchantStaticStatus.Name)
 			print(itemName)
 		end

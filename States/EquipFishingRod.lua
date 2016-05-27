@@ -40,7 +40,7 @@ function EquipFishingRodState:NeedToRun()
 		return false
 	end
 
-	if Pyx.System.TickCount - self.LastEquipTickCount < 4000 then
+	if Pyx.Win32.GetTickCount() - self.LastEquipTickCount < 4000 then
 		return false
 	end
 
@@ -50,7 +50,7 @@ function EquipFishingRodState:NeedToRun()
 
 	for k,v in pairs(selfPlayer.Inventory.Items, function(t,a,b) return t[a].Endurance < t[b].Endurance end) do
 		if v.HasEndurance then
-			if Bot.EnableDebug then
+			if Bot.EnableDebug and Bot.EnableDebugEquipFishignRodState then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.ItemEnchantStaticStatus.Name .. " which have durability found")
 			end
 			self.EquipState = 1
@@ -58,7 +58,7 @@ function EquipFishingRodState:NeedToRun()
 
 		if self.EquipState == 1 then -- 1 = item have endurance
 			if v.Endurance > 0 then
-				if Bot.EnableDebug then
+				if Bot.EnableDebug and Bot.EnableDebugEquipFishignRodState then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.ItemEnchantStaticStatus.Name .. " have more than 0 durability left")
 				end
 				self.EquipState = 2
@@ -67,14 +67,14 @@ function EquipFishingRodState:NeedToRun()
 
 		if self.EquipState == 2 then -- 2 = normal rod
 			if v.ItemEnchantStaticStatus.IsFishingRod then
-				if Bot.EnableDebug then
+				if Bot.EnableDebug and Bot.EnableDebugEquipFishignRodState then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] IsFishingRod = " .. tostring(v.ItemEnchantStaticStatus.IsFishingRod) .. ", so is a normal rod")
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
 				end
 				self.ItemToEquip = v
 				break
 			else
-				if Bot.EnableDebug then
+				if Bot.EnableDebug and Bot.EnableDebugEquipFishignRodState then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Maybe " .. v.ItemEnchantStaticStatus.Name .. " is a enhanced rod?")
 				end
 				self.EquipState = 3
@@ -83,14 +83,14 @@ function EquipFishingRodState:NeedToRun()
 
 		if self.EquipState == 3 then -- 3 = this is for enhanced rod
 			if string.find(tostring(v.ItemEnchantStaticStatus.Name), "Fishing Rod") then
-				if Bot.EnableDebug then
+				if Bot.EnableDebug and Bot.EnableDebugEquipFishignRodState then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] The item have in the a '+' in the name, so is a enhanced rod")
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
 				end
 				self.ItemToEquip = v
 				break
 			else
-				if Bot.EnableDebug then
+				if Bot.EnableDebug and Bot.EnableDebugEquipFishignRodState then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Maybe " .. v.ItemEnchantStaticStatus.Name .. " is a know rod?")
 				end
 				self.EquipState = 4
@@ -155,7 +155,7 @@ function EquipFishingRodState:NeedToRun()
 				v.ItemEnchantStaticStatus.ItemId == 540452 or -- Calpheon Rod
 				v.ItemEnchantStaticStatus.ItemId == 540453	  -- Mediah Rod
 			then
-				if Bot.EnableDebug then
+				if Bot.EnableDebug and Bot.EnableDebugEquipFishignRodState then
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
 				end
 				self.ItemToEquip = v
@@ -256,5 +256,5 @@ end
 function EquipFishingRodState:Run()
 	local selfPlayer = GetSelfPlayer()
 	self.ItemToEquip:UseItem()
-	self.LastEquipTickCount = Pyx.System.TickCount
+	self.LastEquipTickCount = Pyx.Win32.GetTickCount()
 end

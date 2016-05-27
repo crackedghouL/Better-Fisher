@@ -12,7 +12,7 @@ MainWindow.ConfirmPopup = false
 -----------------------------------------------------------------------------
 
 function MainWindow.DrawMainWindow()
-	local _, shouldDisplay = ImGui.Begin("Better Fisher v0.9b BETA", true, ImVec2(320, 105), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
+	local _, shouldDisplay = ImGui.Begin(Bot.Version, true, ImVec2(320, 125), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
 
 	if shouldDisplay then
 		local selfPlayer = GetSelfPlayer()
@@ -81,7 +81,7 @@ function MainWindow.DrawMainWindow()
 				if ImGui.MenuItem("Go to Warehouse", "ALT+W") then
 					if Bot.Running then
 						Bot.WarehouseState.ManualForced = true
-						if Bot.EnableDebug then
+						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
 							print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Warehouse")
 						end
 					else
@@ -91,7 +91,7 @@ function MainWindow.DrawMainWindow()
 				if ImGui.MenuItem("Go to Trader", "ALT+T") then
 					if Bot.Running then
 						Bot.TradeManagerState.ManualForced = true
-						if Bot.EnableDebug then
+						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
 							print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Trader")
 						end
 					else
@@ -101,7 +101,7 @@ function MainWindow.DrawMainWindow()
 				if ImGui.MenuItem("Go to Vendor", "ALT+V") then
 					if Bot.Running then
 						Bot.VendorState.ManualForced = true
-						if Bot.EnableDebug then
+						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
 							print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Vendor")
 						end
 					else
@@ -111,7 +111,7 @@ function MainWindow.DrawMainWindow()
 				if ImGui.MenuItem("Go Repair", "ALT+G") then
 					if Bot.Running then
 						Bot.RepairState.ManualForced = true
-						if Bot.EnableDebug then
+						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
 							print("[" .. os.date(Bot.UsedTimezone) .. "] Go Repair")
 						end
 					else
@@ -126,7 +126,9 @@ function MainWindow.DrawMainWindow()
 						'   ~Fishing is love, fishing is life~   ',
 						' ~So Long, and Thanks for All the Fish~ ',
 						'     ~The whole world is my hotspot~    ',
-						'  ~The power of fish makes us infinite~ '
+						'  ~The power of fish makes us infinite~ ',
+						'  ~I only fish on days that end in “Y”~ ',
+						'     ~Born to fish...Forced to work~    '
 					}
 
 					print("[" .. os.date(Bot.UsedTimezone) .. "] ##########################################")
@@ -145,7 +147,7 @@ function MainWindow.DrawMainWindow()
 		ImGui.Separator()
 		ImGui.Text("State:")
 		ImGui.SameLine()
-		if not Bot.EnableDebugMainWindow then
+		if not Bot.EnableDebug and not Bot.EnableDebugMainWindow then
 			if Bot.Running and Bot.FSM.CurrentState then
 				ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Running")
 			elseif selfPlayer.Inventory.FreeSlots == 0 then
@@ -180,6 +182,12 @@ function MainWindow.DrawMainWindow()
 		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", Bot.Hours, Bot.Minutes, Bot.Seconds))
 		ImGui.NextColumn()
 		ImGui.Text("Loots: " .. string.format("%i", Bot.Stats.Loots))
+
+		ImGui.Columns(1)
+		ImGui.Separator()
+
+		ImGui.Columns(1)
+		ImGui.Text("Fishing Level: " ..  Bot.FishingLevel)
 
 		ImGui.Columns(1)
 		ImGui.Separator()
