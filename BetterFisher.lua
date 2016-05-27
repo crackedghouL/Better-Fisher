@@ -7,6 +7,7 @@ Bot.Running = false
 Bot.PrintConsoleState = false
 Bot.EnableDebug = false
 Bot.EnableDebugMainWindow = false
+Bot.EnableDebugProfileEditor = false
 Bot.EnableDebugInventory = false
 Bot.EnableDebugDeathState = false
 Bot.EnableDebugEquipFishignRodState = false

@@ -23,7 +23,7 @@ function ProfileEditor.DrawProfileEditor()
 	if ProfileEditor.MeshConnectEnabled and ProfileEditor.LastPosition.Distance3DFromMe > 200 then
 		ProfileEditor.CurrentMeshConnect[#ProfileEditor.CurrentMeshConnect + 1] = {X = selfPlayer.Position.X, Y = selfPlayer.Position.Y, Z = selfPlayer.Position.Z}
 		ProfileEditor.LastPosition = selfPlayer.Position
-		if Bot.EnableDebug then
+		if Bot.EnableDebug and Bot.EnableDebugProfileEditor then
 			print("Connect Node: "..selfPlayer.Position)
 		end
 	end
@@ -57,12 +57,54 @@ function ProfileEditor.DrawProfileEditor()
 			end
 
 			if ImGui.CollapsingHeader("Mesher", "id_gui_profile_editor_mesh", true, true) then
-				_,Navigation.MesherEnabled = ImGui.Checkbox("Enable mesher##id_guid_profile_enable_mesher", Navigation.MesherEnabled)
-				ImGui.SameLine();
+				if not Navigator.MeshConnectEnabled then
+					_, Navigation.MesherEnabled = ImGui.Checkbox("Enable mesher##profile_enable_mesher", Navigation.MesherEnabled)
+					ImGui.SameLine();
+				end
 				_,Navigation.RenderMesh = ImGui.Checkbox("Draw geometry##id_guid_profile_draw_mesher", Navigation.RenderMesh)
 				if ImGui.Button("Build navigation", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 					Navigation.BuildNavigation()
 				end
+
+				if ImGui.Button("Add Connect##id_guid_profile_add_connect", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+					if not Navigator.MeshConnectEnabled then
+						Navigation.MesherEnabled = false
+						ProfileEditor.MeshConnectEnabled = true
+						ProfileEditor.CurrentMeshConnect = { }
+						ProfileEditor.CurrentMeshConnect[#ProfileEditor.CurrentMeshConnect + 1] = {X=selfPlayer.Position.X,Y=selfPlayer.Position.Y,Z=selfPlayer.Position.Z}
+						ProfileEditor.LastPosition = selfPlayer.Position
+						ProfileEditor.CurrentProfile.MeshConnects[#ProfileEditor.CurrentProfile.MeshConnects + 1] = ProfileEditor.CurrentMeshConnect
+					end
+				end
+				ImGui.Columns(3)
+				for key, value in pairs(ProfileEditor.CurrentProfile.MeshConnects) do
+					if ProfileEditor.MeshConnectEnabled and key == table.length(ProfileEditor.CurrentProfile.MeshConnects) then
+						ImGui.Text("Running...")
+						ImGui.NextColumn()
+						local dispDistance = Vector3(value[1].X,value[1].Y,value[1].Z)
+						ImGui.Text(math.floor(dispDistance.Distance3DFromMe) / 100)
+						ImGui.NextColumn()
+						if ImGui.Button("Set End##id_guid_profile_end_connect") then
+							-- , ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+							value[#value + 1] = {X=selfPlayer.Position.X,Y=selfPlayer.Position.Y,Z=selfPlayer.Position.Z}
+							ProfileEditor.MeshConnectEnabled = false
+						end
+						ImGui.NextColumn()
+					else
+						if ImGui.SmallButton("Delete") then
+							table.remove(ProfileEditor.CurrentProfile.MeshConnects,key)
+						else
+							ImGui.NextColumn()
+							local dispDistance = Vector3(value[1].X,value[1].Y,value[1].Z)
+							ImGui.Text(math.floor(dispDistance.Distance3DFromMe) / 100)
+							ImGui.NextColumn()
+							dispDistance = Vector3(value[#value].X,value[#value].Y,value[#value].Z)
+							ImGui.Text(math.floor(dispDistance.Distance3DFromMe) / 100)
+							ImGui.NextColumn()
+						end
+					end
+				end
+            	ImGui.Columns(1)
 			end
 
 			if ImGui.CollapsingHeader("Fishing spot", "id_gui_profile_editor_fishing_spot", true, false) then
@@ -281,6 +323,12 @@ function ProfileEditor.OnRender3D()
 	if Navigation.RenderMesh then
 		if ProfileEditor.CurrentProfile:HasFishSpot() then
 			Renderer.Draw3DTrianglesList(GetInvertedTriangleList(ProfileEditor.CurrentProfile.FishSpotPosition.X, ProfileEditor.CurrentProfile.FishSpotPosition.Y + 100, ProfileEditor.CurrentProfile.FishSpotPosition.Z, 20, 50, 0xAAFF0000, 0xAAFF00FF))
+		end
+
+		for key,value in pairs(ProfileEditor.CurrentProfile.MeshConnects) do
+			for k,v in pairs(value) do
+				Renderer.Draw3DTrianglesList(GetInvertedTriangleList(v.X, v.Y + 25, v.Z, 25, 38, 0xAAFF0000, 0xAAFF00FF))
+			end
 		end
 	end
 end
