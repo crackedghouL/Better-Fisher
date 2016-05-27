@@ -37,7 +37,7 @@ function HookFishState:NeedToRun()
 		return false
 	end
 
-	if Pyx.System.TickCount - self.LastHookFishTickCount < 4000 then
+	if Pyx.Win32.GetTickCount() - self.LastHookFishTickCount < 4000 then
 		return false
 	end
 
@@ -50,13 +50,13 @@ function HookFishState:Run()
 		if Bot.EnableDebug and Bot.EnableDebugHookFishState then
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Got something!")
 		end
-		self.LastHookStateTick = Pyx.System.TickCount
+		self.LastHookStateTick = Pyx.Win32.GetTickCount()
 		self.RandomWaitTime = math.random(500,1000)
 		self.state = 1
-	elseif self.state == 1 and Pyx.System.TickCount - self.LastHookStateTick > self.RandomWaitTime then
+	elseif self.state == 1 and Pyx.Win32.GetTickCount() - self.LastHookStateTick > self.RandomWaitTime then
 		selfPlayer:DoAction("FISHING_HOOK_DELAY")
 		self.LastHookStateTick = 0
 		self.state = 0
-		self.LastHookFishTickCount = Pyx.System.TickCount
+		self.LastHookFishTickCount = Pyx.Win32.GetTickCount()
 	end
 end

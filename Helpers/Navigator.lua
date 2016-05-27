@@ -65,7 +65,7 @@ function Navigator.MoveTo(destination, forceRecalculate, playerRun)
 	end
 
 	if 	(forceRecalculate == nil or not forceRecalculate) and Navigator.Destination == destination and
-		Pyx.System.TickCount - Navigator.LastFindPathTick < 500 and
+		Pyx.Win32.GetTickCount() - Navigator.LastFindPathTick < 500 and
 		(table.length(Navigator.Waypoints) > 0 or Navigator.LastWayPoint) and
 		Navigator.LastPosition.Distance2DFromMe < 150
 	then
@@ -85,7 +85,7 @@ function Navigator.MoveTo(destination, forceRecalculate, playerRun)
 		table.remove(waypoints, 1)
 	end
 
-	Navigator.LastFindPathTick = Pyx.System.TickCount
+	Navigator.LastFindPathTick = Pyx.Win32.GetTickCount()
 	Navigator.Waypoints = waypoints
 	Navigator.Destination = destination
 	Navigator.Running = true
@@ -110,19 +110,19 @@ function Navigator.OnPulse()
 	local selfPlayer = GetSelfPlayer()
 
 	if selfPlayer and not selfPlayer.IsRunning then
-		Navigator.LastStuckCheckTickcount = Pyx.System.TickCount
+		Navigator.LastStuckCheckTickcount = Pyx.Win32.GetTickCount()
 		Navigator.LastStuckCheckPosition = selfPlayer.Position
 	end
 
 	if Navigator.Running and selfPlayer then
 		Navigator.LastPosition = selfPlayer.Position
 
-		if Pyx.System.TickCount - Navigator.LastObstacleCheckTick > 1000 then
+		if Pyx.Win32.GetTickCount() - Navigator.LastObstacleCheckTick > 1000 then
 			-- Navigation.UpdateObstacles() -- Do not use for now, it's coming :)
-			Navigator.LastObstacleCheckTick = Pyx.System.TickCount
+			Navigator.LastObstacleCheckTick = Pyx.Win32.GetTickCount()
 		end
 
-		if Pyx.System.TickCount - Navigator.LastStuckCheckTickcount > 400 then
+		if Pyx.Win32.GetTickCount() - Navigator.LastStuckCheckTickcount > 400 then
 			if (Navigator.LastStuckCheckPosition.Distance2DFromMe < 40) then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] I'm stuck, jump forward !")
 				if Navigator.StuckCount < 20 then
@@ -143,7 +143,7 @@ function Navigator.OnPulse()
 				Navigator.StuckCount = 0
 			end
 
-			Navigator.LastStuckCheckTickcount = Pyx.System.TickCount
+			Navigator.LastStuckCheckTickcount = Pyx.Win32.GetTickCount()
 			Navigator.LastStuckCheckPosition = selfPlayer.Position
 		end
 

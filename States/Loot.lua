@@ -243,7 +243,7 @@ function LootState:Run()
 
 			if Bot.Stats.LastLootTick ~= 0 then
 				Bot.Stats.LootTimeCount = Bot.Stats.LootTimeCount + 1
-				FishGameTime = Pyx.System.TickCount - Bot.Stats.LastLootTick
+				FishGameTime = Pyx.Win32.GetTickCount() - Bot.Stats.LastLootTick
 				Bot.Stats.TotalLootTime = Bot.Stats.TotalLootTime + FishGameTime
 				FishGameTime = math.ceil(FishGameTime / 1000)
 				Bot.Stats.AverageLootTime = math.ceil((Bot.Stats.TotalLootTime / Bot.Stats.LootTimeCount) / 1000)

@@ -40,7 +40,7 @@ function EquipFishingRodState:NeedToRun()
 		return false
 	end
 
-	if Pyx.System.TickCount - self.LastEquipTickCount < 4000 then
+	if Pyx.Win32.GetTickCount() - self.LastEquipTickCount < 4000 then
 		return false
 	end
 
@@ -256,5 +256,5 @@ end
 function EquipFishingRodState:Run()
 	local selfPlayer = GetSelfPlayer()
 	self.ItemToEquip:UseItem()
-	self.LastEquipTickCount = Pyx.System.TickCount
+	self.LastEquipTickCount = Pyx.Win32.GetTickCount()
 end

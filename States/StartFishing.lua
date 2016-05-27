@@ -51,7 +51,7 @@ function StartFishingState:NeedToRun()
 		return false
 	end
 
-	if Pyx.System.TickCount - self.LastStartFishTickcount < 4000 then
+	if Pyx.Win32.GetTickCount() - self.LastStartFishTickcount < 4000 then
 		return false
 	end
 
@@ -147,7 +147,7 @@ end
 function StartFishingState:Run()
 	local selfPlayer = GetSelfPlayer()
 
-	Bot.Stats.LastLootTick = Pyx.System.TickCount
+	Bot.Stats.LastLootTick = Pyx.Win32.GetTickCount()
 	Bot.SilverStats()
 
 	if selfPlayer.HealthPercent <= Bot.Settings.HealthPercent and Bot.Settings.AutoEscape and Bot.Counter == 0 then
@@ -184,8 +184,8 @@ function StartFishingState:Run()
 				StartFishingState.GoodPosition = false
 			end
 			self.state = 1
-			self.LastActionTime = Pyx.System.TickCount
-		elseif self.state == 1 and Pyx.System.TickCount - self.LastActionTime > 1000 then
+			self.LastActionTime = Pyx.Win32.GetTickCount()
+		elseif self.state == 1 and Pyx.Win32.GetTickCount() - self.LastActionTime > 1000 then
 			if Bot.EnableDebug and Bot.EnableDebugStartFishingState then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing...")
 			end
@@ -200,7 +200,7 @@ function StartFishingState:Run()
 			end
 
 			self.state = 0
-			self.LastStartFishTickcount = Pyx.System.TickCount
+			self.LastStartFishTickcount = Pyx.Win32.GetTickCount()
 		end
 	end
 end

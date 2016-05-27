@@ -89,15 +89,15 @@ function TradeManagerState:Reset()
 end
 
 function TradeManagerState:Exit()
+	if TradeMarket.IsTrading then
+		TradeMarket.Close()
+	end
+
+	if Dialog.IsTalking then
+		Dialog.ClickExit()
+	end
+
 	if self.state > 1 then
-		if TradeMarket.IsTrading then
-			TradeMarket.Close()
-		end
-
-		if Dialog.IsTalking then
-			Dialog.ClickExit()
-		end
-
 		self.LastTradeUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastTradeUseTimer:Start()
 		self.SleepTimer = nil

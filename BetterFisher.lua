@@ -83,7 +83,7 @@ function Bot.ResetStats()
 		LootTimeCount = 0,
 		LastLootTick = 0,
 		TotalLootTime = 0,
-		SessionStart = Pyx.System.TickCount,
+		SessionStart = Pyx.Win32.GetTickCount(),
 		TotalSession = 0,
 	}
 end
@@ -100,7 +100,7 @@ function Bot.Start()
 	if not Bot.Running then
 		local currentProfile = ProfileEditor.CurrentProfile
 
-		Bot.Stats.SessionStart = Pyx.System.TickCount
+		Bot.Stats.SessionStart = Pyx.Win32.GetTickCount()
 		Bot.SaveSettings()
 
 		Bot.TradeManagerState.Forced = false
@@ -213,7 +213,7 @@ function Bot.Stop()
 	Bot.TradeManagerState:Reset()
 	Bot.DeathState:Reset()
 	Navigator.Stop()
-	Bot.Stats.TotalSession = Bot.Stats.TotalSession + (Pyx.System.TickCount - Bot.Stats.SessionStart)
+	Bot.Stats.TotalSession = Bot.Stats.TotalSession + (Pyx.Win32.GetTickCount() - Bot.Stats.SessionStart)
 end
 
 function Bot.OnPulse()
@@ -539,7 +539,7 @@ function Bot.OnPulse()
 	if Bot.Running then
 		Bot.FSM:Pulse()
 
-		Bot.Time = math.ceil((Bot.Stats.TotalSession + Pyx.System.TickCount - Bot.Stats.SessionStart) / 1000)
+		Bot.Time = math.ceil((Bot.Stats.TotalSession + Pyx.Win32.GetTickCount() - Bot.Stats.SessionStart) / 1000)
 		Bot.Seconds = Bot.Time % 60
 		Bot.Minutes = math.floor(Bot.Time / 60) % 60
 		Bot.Hours = math.floor(Bot.Time / (60 * 60))

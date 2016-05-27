@@ -118,11 +118,11 @@ function VendorState:Reset()
 end
 
 function VendorState:Exit()
-	if self.state > 1 then
-		if Dialog.IsTalking then
-			Dialog.ClickExit()
-		end
+	if Dialog.IsTalking then
+		Dialog.ClickExit()
+	end
 
+	if self.state > 1 then
 		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastUseTimer:Start()
 		self.SleepTimer = nil
