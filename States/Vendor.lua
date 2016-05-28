@@ -284,7 +284,7 @@ function VendorState:Run()
 
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
-		Bot.SilverStats()
+		Bot.SilverStats(false)
 		self.state = 6
 		return
 	end

@@ -266,7 +266,7 @@ function TradeManagerState:Run()
 			TradeMarket.Close()
 		end
 
-		Bot.SilverStats()
+		Bot.SilverStats(false)
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
 		self.state = 6

@@ -148,7 +148,7 @@ function StartFishingState:Run()
 	local selfPlayer = GetSelfPlayer()
 
 	Bot.Stats.LastLootTick = Pyx.Win32.GetTickCount()
-	Bot.SilverStats()
+	Bot.SilverStats(false)
 
 	if selfPlayer.HealthPercent <= Bot.Settings.HealthPercent and Bot.Settings.AutoEscape and Bot.Counter == 0 then
 		local players = GetCharacters()

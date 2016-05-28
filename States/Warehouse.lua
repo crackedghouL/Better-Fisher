@@ -216,9 +216,10 @@ function WarehouseState:Run()
 
 	if self.state == 4 then -- 4 = deposit items
 		if table.length(self.CurrentDepositList) < 1 then
-			Bot.Stats.SilverGained = Bot.Stats.SilverGained + 1
+			Bot.Stats.SilverGained = Bot.Stats.SilverGained - 1
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
+			Bot.SilverStats(true)
 			self.DepositItems = true
 			self.state = 5
 			return
