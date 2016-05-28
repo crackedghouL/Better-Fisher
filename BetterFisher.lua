@@ -24,6 +24,8 @@ Bot.EnableDebugWarehouseState = false
 
 Bot.FishingLevel = 0
 
+Bot.WasRunning = false
+
 Bot.Time = nil
 Bot.Hours = nil
 Bot.Minutes = nil
@@ -537,35 +539,45 @@ function Bot.OnPulse()
 		Bot.FishingLevel = "N/A"
 	end
 
-	if Bot.Running then
-		Bot.FSM:Pulse()
+	if Bot.Running or Bot.WasRunning then
+		if Bot.Running then
+			Bot.FSM:Pulse()
 
-		Bot.Time = math.ceil((Bot.Stats.TotalSession + Pyx.Win32.GetTickCount() - Bot.Stats.SessionStart) / 1000)
-		Bot.Seconds = Bot.Time % 60
-		Bot.Minutes = math.floor(Bot.Time / 60) % 60
-		Bot.Hours = math.floor(Bot.Time / (60 * 60))
+			Bot.Time = math.ceil((Bot.Stats.TotalSession + Pyx.Win32.GetTickCount() - Bot.Stats.SessionStart) / 1000)
+			Bot.Seconds = Bot.Time % 60
+			Bot.Minutes = math.floor(Bot.Time / 60) % 60
+			Bot.Hours = math.floor(Bot.Time / (60 * 60))
 
-		if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe < 500 then
-			if selfPlayer.IsSwimming then
-				selfPlayer:DoAction("JUMP_F_A")
+			if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe < 500 then
+				if selfPlayer.IsSwimming then
+					selfPlayer:DoAction("JUMP_F_A")
+				end
 			end
 		end
 
-		if Bot.Settings.StopWhenPeopleNearby then
+		if Bot.Settings.StopWhenPeopleNearby and (Bot.FSM.CurrentState.Name == Bot.StartFishingState.Name or Bot.WasRunning) then
 			local me = selfPlayer
 			local players = GetCharacters()
 			local count = 0
 			local SafeDistance = Bot.Settings.StopWhenPeopleNearbyDistance
 
 			for k,v in pairs(players, function(t,a,b) return t[a].Position.Distance3DFromMe < t[b].Position.Distance3DFromMe end) do
-				if (v.IsPlayer and v.Name ~= me.Name) and math.floor(me.Position.Distance3DFromMe) <= SafeDistance then -- not string.match(me.Key, v.Key)
+				if (v.IsPlayer and v.Name ~= me.Name) and math.floor(v.Position.Distance3DFromMe) <= SafeDistance then -- not string.match(me.Key, v.Key)
 					count = count + 1
 				end
 			end
 
 			if count > 0 then
 				print("[" .. os.date(Bot.UsedTimezone) .. "] Someone is near you, the bot is stopped for security.")
-				Bot.Stop()
+				if Bot.Running then
+					Bot.Stop()
+					Bot.WasRunning = true
+				end
+			else
+				if not Bot.Running then
+					Bot.Start()
+					Bot.WasRunning = false
+				end
 			end
 
 			return count
