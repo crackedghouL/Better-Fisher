@@ -93,7 +93,7 @@ end
 function Bot.SilverStats(deposit)
 	if not deposit then
 		Bot.Stats.SilverGained = Bot.Stats.SilverGained + (GetSelfPlayer().Inventory.Money - Bot.Stats.SilverInitial)
-	end	
+	end
 	Bot.Stats.SilverInitial = GetSelfPlayer().Inventory.Money
 end
 
@@ -343,6 +343,13 @@ function Bot.OnPulse()
 
 	if Bot.Counter > 0 then
 		Bot.Counter = Bot.Counter - 1
+	end
+
+	if Bot.FSM.CurrentState == Bot.MoveToFishingSpotState then
+		local randomDistance = math.random(75,80)
+		if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance2DFromMe <= randomDistance then
+			GetSelfPlayer():DoAction("RUN_SHORTSTOP")
+		end
 	end
 
 	if selfPlayer then

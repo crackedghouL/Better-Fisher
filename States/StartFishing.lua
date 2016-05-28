@@ -180,7 +180,7 @@ function StartFishingState:Run()
 		if self.state == 0 then
 			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
 			if StartFishingState.GoodPosition then -- thanks to DogGoneFish and Parog
-				selfPlayer:SetActionState(ACTION_FLAG_MOVE_FORWARD, 80)
+				-- selfPlayer:SetActionState(ACTION_FLAG_MOVE_FORWARD, 100)
 				StartFishingState.GoodPosition = false
 			end
 			self.state = 1

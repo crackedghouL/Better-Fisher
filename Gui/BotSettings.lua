@@ -355,23 +355,27 @@ function BotSettings.DrawBotSettings()
 		end
 
 		if ImGui.CollapsingHeader("Death action", "id_gui_death_action", true, false) then
-			if ImGui.RadioButton("Stop bot##death_action_stop_bot", Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED) then
+			if ImGui.RadioButton("Stop bot##id_guid_death_action_stop_bot", Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED) then
 				Bot.Settings.DeathSettings.ReviveMethod = DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED
 			end
-			if ImGui.RadioButton("Revive at nearest node##death_action_revive_node", Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_NODE) then
+			if ImGui.RadioButton("Revive at nearest node##id_guid_death_action_revive_node", Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_NODE) then
 				Bot.Settings.DeathSettings.ReviveMethod = DeathState.SETTINGS_ON_DEATH_REVIVE_NODE
 			end
-			if ImGui.RadioButton("Revive at nearest village##death_action_revive_village", Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE) then
+			if ImGui.RadioButton("Revive at nearest village##id_guid_death_action_revive_village", Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE) then
 				Bot.Settings.DeathSettings.ReviveMethod = DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE
 			end
+			_, Bot.Settings.DeathSettings.EnableDeathDelay =  ImGui.Checkbox("##id_guid_death_action_dealy_after_death", Bot.Settings.DeathSettings.EnableDeathDelay)
+			ImGui.SameLine()
+			ImGui.Text("Enable delay before come back to spot")
+			_, Bot.Settings.DeathSettings.DelaySeconds = ImGui.SliderInt("Delay on Seconds##id_guid_death_action_delay_seconds", Bot.Settings.DeathSettings.DelaySeconds , 5, 500)
 		end
 
 		if ImGui.CollapsingHeader("Anti-PK", "id_gui_antipk_option", true, false) then
-			_, Bot.Settings.AutoEscape =  ImGui.Checkbox("##id_gui_antipk_autoescape", Bot.Settings.AutoEscape)
+			_, Bot.Settings.AutoEscape =  ImGui.Checkbox("##id_guid_antipk_autoescape", Bot.Settings.AutoEscape)
 			ImGui.SameLine()
 			ImGui.Text("Enable /Escape")
-			_, Bot.Settings.HealthPercent = ImGui.SliderInt("Health percent##id_gui_antipk_health_percent", Bot.Settings.HealthPercent, 1, 95)
-			_, Bot.Settings.MinPeopleBeforeAutoEscape = ImGui.SliderInt("Minimun people for Auto Escape##id_gui_antipk_min_people_before_autoescape", Bot.Settings.MinPeopleBeforeAutoEscape, 0, 10)
+			_, Bot.Settings.HealthPercent = ImGui.SliderInt("Health percent##id_guid_antipk_health_percent", Bot.Settings.HealthPercent, 1, 95)
+			_, Bot.Settings.MinPeopleBeforeAutoEscape = ImGui.SliderInt("Minimun people for Auto Escape##id_guid_antipk_min_people_before_autoescape", Bot.Settings.MinPeopleBeforeAutoEscape, 0, 10)
 		end
 
 		if ImGui.CollapsingHeader("Advanced options", "id_gui_adv_option", true, false) then

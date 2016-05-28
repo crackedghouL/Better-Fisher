@@ -33,7 +33,7 @@ function MoveToFishingSpotState:NeedToRun()
 		return false
 	end
 
-	return ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe > 100
+	return ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe >= 100
 end
 
 function MoveToFishingSpotState:Run()
@@ -43,6 +43,6 @@ function MoveToFishingSpotState:Run()
 		GetSelfPlayer():UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
-	Navigator.MoveTo(ProfileEditor.CurrentProfile:GetFishSpotPosition())
+	Navigator.MoveTo(ProfileEditor.CurrentProfile:GetFishSpotPosition(), nil, Bot.Settings.PlayerRun)
 	StartFishingState.GoodPosition = true
 end

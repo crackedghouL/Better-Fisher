@@ -63,15 +63,19 @@ function ProfileEditor.DrawProfileEditor()
 				end
 				_,Navigation.RenderMesh = ImGui.Checkbox("Draw geometry##id_guid_profile_draw_mesher", Navigation.RenderMesh)
 				if ImGui.Button("Build navigation", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
-					Navigation.BuildNavigation()
+					if ProfileEditor.CurrentProfile:HasFishSpot() then
+						Navigation.BuildNavigation()
+					else
+						print("[" .. os.date(Bot.UsedTimezone) .. "] Can't build navigation, cause the fishing spot is missing")
+					end
 				end
 
 				if ImGui.Button("Add Connect##id_guid_profile_add_connect", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 					if not Navigator.MeshConnectEnabled then
 						Navigation.MesherEnabled = false
 						ProfileEditor.MeshConnectEnabled = true
-						ProfileEditor.CurrentMeshConnect = { }
-						ProfileEditor.CurrentMeshConnect[#ProfileEditor.CurrentMeshConnect + 1] = {X=selfPlayer.Position.X,Y=selfPlayer.Position.Y,Z=selfPlayer.Position.Z}
+						ProfileEditor.CurrentMeshConnect = {}
+						ProfileEditor.CurrentMeshConnect[#ProfileEditor.CurrentMeshConnect + 1] = {X=selfPlayer.Position.X, Y=selfPlayer.Position.Y, Z=selfPlayer.Position.Z}
 						ProfileEditor.LastPosition = selfPlayer.Position
 						ProfileEditor.CurrentProfile.MeshConnects[#ProfileEditor.CurrentProfile.MeshConnects + 1] = ProfileEditor.CurrentMeshConnect
 					end
@@ -86,7 +90,7 @@ function ProfileEditor.DrawProfileEditor()
 						ImGui.NextColumn()
 						if ImGui.Button("Set End##id_guid_profile_end_connect") then
 							-- , ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
-							value[#value + 1] = {X=selfPlayer.Position.X,Y=selfPlayer.Position.Y,Z=selfPlayer.Position.Z}
+							value[#value + 1] = {X=selfPlayer.Position.X, Y=selfPlayer.Position.Y, Z=selfPlayer.Position.Z}
 							ProfileEditor.MeshConnectEnabled = false
 						end
 						ImGui.NextColumn()

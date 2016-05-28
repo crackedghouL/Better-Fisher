@@ -221,6 +221,7 @@ function WarehouseState:Run()
 			self.SleepTimer:Start()
 			Bot.SilverStats(true)
 			self.DepositItems = true
+			Bot.SilverStats()
 			self.state = 5
 			return
 		end

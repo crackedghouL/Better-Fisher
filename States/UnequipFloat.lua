@@ -1,4 +1,4 @@
-UnequipFloatState = {} 
+UnequipFloatState = {}
 UnequipFloatState.__index = UnequipFloatState
 UnequipFloatState.Name = "Unequip float"
 

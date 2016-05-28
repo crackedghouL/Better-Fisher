@@ -14,7 +14,11 @@ setmetatable(DeathState, {
 
 function DeathState.new()
 	local self = setmetatable({}, DeathState)
-	self.Settings = { ReviveMethod = DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED }
+	self.Settings = {
+		EnableDeathDelay = false,
+		DelaySeconds = 200,
+		ReviveMethod = DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED
+	}
 	self.SleepTimer = nil
 	self.CallWhenCompleted = nil
 	self.Forced = false
@@ -45,8 +49,10 @@ end
 function DeathState:Run()
 	local selfPlayer = GetSelfPlayer()
 
-	if self.Forced then
+	if self.Settings.EnableDeathDelay and self.SleepTimer == nil then
 		self.state = 0
+	else
+		self.state = 1
 	end
 
 	if self.SleepTimer ~= nil and self.SleepTimer:IsRunning() and not self.SleepTimer:Expired() then
@@ -54,13 +60,13 @@ function DeathState:Run()
 	end
 
 	if self.state == 0 then
-		self.SleepTimer = PyxTimer:New(10)
+		self.SleepTimer = PyxTimer:New(self.Settings.DelaySeconds)
 		self.SleepTimer:Start()
 		self.state = 1
 		return
 	end
 
-	if self.state == 1 and self.SleepTimer:Expired() then
+	if self.state == 1 then
 		if Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED then
 			Bot.Stop()
 		elseif self.Settings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_NODE then
@@ -81,7 +87,13 @@ function DeathState:Run()
 		end
 	end
 
-	return false
+	self:Exit()
+end
+
+function DeathState:Exit()
+	self.SleepTimer = nil
+	self.Forced = false
+	self.state = 0
 end
 
 function DeathState:Reset()
