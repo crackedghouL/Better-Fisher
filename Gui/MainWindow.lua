@@ -12,7 +12,7 @@ MainWindow.ConfirmPopup = false
 -----------------------------------------------------------------------------
 
 function MainWindow.DrawMainWindow()
-	local _, shouldDisplay = ImGui.Begin(Bot.Version, true, ImVec2(320, 125), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
+	local _, shouldDisplay = ImGui.Begin(Bot.Version, true, ImVec2(260, 150), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
 
 	if shouldDisplay then
 		local selfPlayer = GetSelfPlayer()

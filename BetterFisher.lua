@@ -88,10 +88,11 @@ function Bot.ResetStats()
 	}
 end
 
-function Bot.SilverStats()
-	if Bot.Stats.SilverInitial < GetSelfPlayer().Inventory.Money then
-		Bot.Stats.SilverGained = GetSelfPlayer().Inventory.Money - Bot.Stats.SilverInitial
-	end
+function Bot.SilverStats(deposit)
+	if not deposit then
+		Bot.Stats.SilverGained = Bot.Stats.SilverGained + (GetSelfPlayer().Inventory.Money - Bot.Stats.SilverInitial)
+	end	
+	Bot.Stats.SilverInitial = GetSelfPlayer().Inventory.Money
 end
 
 Bot.ResetStats()
