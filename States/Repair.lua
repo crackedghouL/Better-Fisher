@@ -15,7 +15,7 @@ function RepairState.new()
 	local self = setmetatable({}, RepairState)
 	self.Settings = {
 		Enabled = true,
-		NpcName = "",
+		NpcName = nil,
 		NpcPosition = { X = 0, Y = 0, Z = 0 },
 		RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE,
 		SecondsBetweenTries = 300
@@ -74,10 +74,9 @@ function RepairState:NeedToRun()
 				(v.ItemEnchantStaticStatus.IsFishingRod and
 				(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
 			then
-				if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+				if self:HasNpc() and (Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun) then
 					self.Forced = true
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Repair! Can not find path to NPC: " .. self.Settings.NpcName)
 					self.Forced = false
 				end
 			end
@@ -88,10 +87,9 @@ function RepairState:NeedToRun()
 				(v.ItemEnchantStaticStatus.IsFishingRod and
 				(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
 			then
-				if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+				if self:HasNpc() and (Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun) then
 					self.Forced = true
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Repair! Can not find path to NPC: " .. self.Settings.NpcName)
 					self.Forced = false
 				end
 			end
@@ -172,7 +170,7 @@ function RepairState:Run()
 	end
 
 	if table.length(npcs) < 1 then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Repair could not find any NPC's")
+		print("Repair could not find any NPC's")
 		self:Exit()
 		return
 	end
@@ -198,7 +196,7 @@ function RepairState:Run()
 
 	if self.state == 3 then
 		if not Dialog.IsTalking then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Repair dialog didn't open")
+			print("Repair dialog didn't open")
 			self:Exit()
 			return
 		end
@@ -231,7 +229,7 @@ function RepairState:Run()
 
 	if self.state == 6 then
 		if Bot.EnableDebug and Bot.EnableDebugRepairState then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Repair done")
+			print("Repair done")
 		end
 		BDOLua.Execute("Repair_OpenPanel(false)\r\nFixEquip_Close()")
 		self.SleepTimer = PyxTimer:New(3)

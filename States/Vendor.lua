@@ -74,7 +74,7 @@ function VendorState:NeedToRun()
 		self.Forced = false
 	end
 
-	if not Navigator.CanMoveTo(self:GetPosition()) and not Bot.Settings.UseAutorun then
+	if not Navigator.CanMoveTo(self:GetPosition()) then
 		self.Forced = false
 	end
 
@@ -163,7 +163,7 @@ function VendorState:Run()
 	end
 
 	if table.length(npcs) < 1 then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Could not find any Vendor NPC's")
+		print("Could not find any Vendor NPC's")
 		self:Exit()
 		return false
 	end
@@ -181,7 +181,7 @@ function VendorState:Run()
 
 	if self.state == 2 then -- 2 = create buy and/or sell lists
 		if not Dialog.IsTalking then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] " .. self.Settings.NpcName " dialog didn't open")
+			print(self.Settings.NpcName " dialog didn't open")
 			self:Exit()
 			return false
 		end
@@ -192,20 +192,20 @@ function VendorState:Run()
 
 		if self.Settings.BuyEnabled and self.Settings.SellEnabled then
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Buy/Sell list done")
+				print("Buy/Sell list done")
 			end
 			self.state = 3
 			self.CurrentSellList = self:GetSellItems()
 			self.CurrentBuyList = self:GetBuyItems(true)
 		elseif self.Settings.SellEnabled == true then
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Sell list done")
+				print("Sell list done")
 			end
 			self.state = 3
 			self.CurrentSellList = self:GetSellItems()
 		elseif self.Settings.BuyEnabled == true then
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Buy list done")
+				print("Buy list done")
 			end
 			self.state = 4
 			self.CurrentBuyList = self:GetBuyItems(true)
@@ -230,7 +230,7 @@ function VendorState:Run()
 		local item = self.CurrentSellList[1]
 		local itemPtr = selfPlayer.Inventory:GetItemByName(item.name)
 		if itemPtr ~= nil then
-			print(itemPtr.InventoryIndex .. " [" .. os.date(Bot.UsedTimezone) .. "] Item sold: " .. itemPtr.ItemEnchantStaticStatus.Name)
+			print(itemPtr.InventoryIndex .. " Item sold: " .. itemPtr.ItemEnchantStaticStatus.Name)
 			itemPtr:RequestSellItem(npc)
 			self.SleepTimer = PyxTimer:New(2)
 			self.SleepTimer:Start()
@@ -243,7 +243,7 @@ function VendorState:Run()
 	if self.state == 4 then -- 4 = buy items and clear buy list
 		if table.length(self.CurrentBuyList) < 1 then
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Buy from " .. self.Settings.NpcName .. " done")
+				print("Buy from " .. self.Settings.NpcName .. " done")
 			end
 			self.SleepTimer = PyxTimer:New(2)
 			self.SleepTimer:Start()
@@ -251,7 +251,7 @@ function VendorState:Run()
 			return
 		else
 			if selfPlayer.Inventory.FreeSlots <= 0 then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Inventory is full")
+				print("Inventory is full")
 				self.state = 5
 				return
 			end
@@ -260,7 +260,7 @@ function VendorState:Run()
 		local item = self.CurrentBuyList[1]
 		local itemPtr = self:GetBuyItemByName(item.name)
 		if itemPtr ~= nil then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Buying \"" .. item.name .. "\" quantity: " .. item.countNeeded)
+			print("Buying \"" .. item.name .. "\" quantity: " .. item.countNeeded)
 			for cnt = 1, item.countNeeded do
 				itemPtr:Buy(1)
 			end
@@ -269,7 +269,7 @@ function VendorState:Run()
 			self.SleepTimer:Start()
 		else
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Need to buy \"" .. item.name .. "\" quantity: " .. item.countNeeded .. " but  ".. self.Settings.NpcName .. " don't have it!")
+				print("Need to buy \"" .. item.name .. "\" quantity: " .. item.countNeeded .. " but  ".. self.Settings.NpcName .. " don't have it!")
 			end
 		end
 
@@ -347,7 +347,7 @@ function VendorState:NeedToBuy(itemName, count)
 		if v.Name == itemName then
 			if (count - v.BuyAt) <= 0 then
 				if Bot.EnableDebug and Bot.EnableDebugVendorState then
-					print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.Name .. " " .. count .. " " .. v.BuyAt .. " " .. v.BuyMax - count)
+					print(v.Name .. " " .. count .. " " .. v.BuyAt .. " " .. v.BuyMax - count)
 				end
 				return v.BuyMax - count
 			end

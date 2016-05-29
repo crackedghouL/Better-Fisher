@@ -50,14 +50,14 @@ function HookFishHandleGameState:Run()
 	elseif self.state == 1 and Pyx.Win32.GetTickCount() - self.LastGameTick > self.RandomWaitTime then -- Time spacebar minigame
 		if self.Settings.NoDelay or self.Settings.AlwaysPerfect or math.random(10) == 10 then -- Make perfects from options or 10% chance
 			if Bot.EnableDebug and Bot.EnableDebugHookHandleGameState then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Perfect timing!")
+				print("Perfect timing!")
 			end
 			BDOLua.Execute("getSelfPlayer():get():SetMiniGameResult(3)")
 			BDOLua.Execute("Panel_Minigame_SinGauge_End()")
 			self.state = 0
 		else -- Normal timing
 			if Bot.EnableDebug and Bot.EnableDebugHookHandleGameState then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Normal timing!")
+				print("Normal timing!")
 			end
 			BDOLua.Execute("getSelfPlayer():get():SetMiniGameResult(11)")
 			self.RandomWaitTime = math.random(3500,4500) -- May need some tweaking ?

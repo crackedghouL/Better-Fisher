@@ -18,6 +18,8 @@ function Settings.new()
 	self.InvFullStop = false
 	self.StopWhenPeopleNearby = false
 	self.StopWhenPeopleNearbyDistance = 5000
+	self.PauseWhenPeopleNearby = false
+	self.PauseWhenPeopleNearbySeconds = 300
 	self.TradeManagerSettings = {}
 	self.WarehouseSettings = {}
 	self.VendorSettings = {}

@@ -51,6 +51,14 @@ function StartFishingState:NeedToRun()
 		return false
 	end
 
+	if Bot.LastPauseTick ~= nil and Bot.Paused then
+		return false
+	end
+
+	if Bot.Paused and Bot.PausedManual and Bot.LoopCounter > 0 then
+		return false
+	end
+
 	if Pyx.Win32.GetTickCount() - self.LastStartFishTickcount < 4000 then
 		return false
 	end
@@ -177,17 +185,17 @@ function StartFishingState:Run()
 			Bot.Stop()
 		end
 	else
-		if self.state == 0 then
+		if self.state == 0 and not Bot.Paused then
 			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
 			if StartFishingState.GoodPosition then -- thanks to DogGoneFish and Parog
 				-- selfPlayer:SetActionState(ACTION_FLAG_MOVE_FORWARD, 100)
 				StartFishingState.GoodPosition = false
 			end
-			self.state = 1
+			self.state = 2
 			self.LastActionTime = Pyx.Win32.GetTickCount()
-		elseif self.state == 1 and Pyx.Win32.GetTickCount() - self.LastActionTime > 1000 then
+		elseif self.state == 2 and Pyx.Win32.GetTickCount() - self.LastActionTime > 1000 then
 			if Bot.EnableDebug and Bot.EnableDebugStartFishingState then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Fishing...")
+				print("Fishing...")
 			end
 
 			selfPlayer:DoAction("FISHING_START")

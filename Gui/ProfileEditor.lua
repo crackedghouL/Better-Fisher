@@ -66,11 +66,11 @@ function ProfileEditor.DrawProfileEditor()
 					if ProfileEditor.CurrentProfile:HasFishSpot() then
 						Navigation.BuildNavigation()
 					else
-						print("[" .. os.date(Bot.UsedTimezone) .. "] Can't build navigation, cause the fishing spot is missing")
+						print("Can't build navigation, cause the fishing spot is missing")
 					end
 				end
 
-				if ImGui.Button("Add Connect##id_guid_profile_add_connect", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
+				if ImGui.Button("Add Mesh Connect##id_guid_profile_add_connect", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 					if not Navigator.MeshConnectEnabled then
 						Navigation.MesherEnabled = false
 						ProfileEditor.MeshConnectEnabled = true
@@ -285,9 +285,9 @@ function ProfileEditor.SaveProfile(name)
 
 	--Navigation.ExportWavefrontObject(objFilename)
 
-	print("[" .. os.date(Bot.UsedTimezone) .. "] Save mesh: " .. meshFilename)
+	print("Save mesh: " .. meshFilename)
 	if not Navigation.SaveMesh(meshFilename) then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Unable to save .mesh !")
+		print("Unable to save .mesh !")
 		return
 	end
 
@@ -302,9 +302,9 @@ function ProfileEditor.LoadProfile(name)
 	local profileFilename = "\\Profiles\\" .. name .. ".json"
 	local meshFilename = "\\Profiles\\" .. name .. ".mesh"
 
-	print("[" .. os.date(Bot.UsedTimezone) .. "] Load mesh: " .. meshFilename)
+	print("Load mesh: " .. meshFilename)
 	if not Navigation.LoadMesh(meshFilename) then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Unable to load .mesh !")
+		print("Unable to load .mesh !")
 		return
 	end
 

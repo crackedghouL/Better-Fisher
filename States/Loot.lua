@@ -57,7 +57,7 @@ function LootState:Run()
 	self.state = 0 -- 0 = nothing
 
 	if Bot.EnableDebug and Bot.EnableDebugLootState then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Item to loot: " .. numLoots)
+		print("Item to loot: " .. numLoots)
 	end
 
 	-- if numLoots ~= 0 then
@@ -77,7 +77,7 @@ function LootState:Run()
 
 			if Bot.EnableDebug and Bot.EnableDebugLootState then
 				print(i)
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Trying to loot: " .. numLoots .. "x " .. lootItemName)
+				print("Trying to loot: " .. numLoots .. "x " .. lootItemName)
 			end
 
 			if 	not self.Settings.LootWhite and not self.Settings.LootGreen and
@@ -250,12 +250,12 @@ function LootState:Run()
 			end
 
 			if self.state == 8 then -- 8 = loot the item
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ")")
+				print("Looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ")")
 				Looting.Take(i)
 			end
 
 			if self.state == 9 then -- 9 = don't loot the item
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Not looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ")")
+				print("Not looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ")")
 			end
 		end
 	--end

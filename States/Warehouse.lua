@@ -69,24 +69,24 @@ function WarehouseState:NeedToRun()
 		self.Forced = false
 	end
 
-	if not Navigator.CanMoveTo(self:GetPosition()) and not Bot.Settings.UseAutorun then
+	if not Navigator.CanMoveTo(self:GetPosition()) then
 		self.Forced = false
 	end
 
 	if selfPlayer.WeightPercent >= 95 then
-		if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+		if Navigator.CanMoveTo(self:GetPosition())	then
 			self.Forced = true
 		else
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Deposit money! Can not find path to NPC: " .. self.Settings.NpcName)
+			print("Need to Deposit money! Can not find path to NPC: " .. self.Settings.NpcName)
 			self.Forced = false
 		end
 	end
 
 	if table.length(self:GetItems()) > 0 and (selfPlayer.Inventory.FreeSlots <= 3 or selfPlayer.WeightPercent >= 95) then
-		if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+		if Navigator.CanMoveTo(self:GetPosition()) then
 			self.Forced = true
 		else
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Deposit items! Can not find path to NPC: " .. self.Settings.NpcName)
+			print("Need to Deposit items! Can not find path to NPC: " .. self.Settings.NpcName)
 			self.Forced = false
 		end
 	end
@@ -159,7 +159,7 @@ function WarehouseState:Run()
 	end
 
 	if table.length(npcs) < 1 then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Could not find any Warehouse NPC's")
+		print("Could not find any Warehouse NPC's")
 		self:Exit()
 		return
 	end
@@ -177,7 +177,7 @@ function WarehouseState:Run()
 
 	if self.state == 2 then -- 2 = create deposit list
 		if not Dialog.IsTalking then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] " .. self.Settings.NpcName " dialog didn't open")
+			print(self.Settings.NpcName " dialog didn't open")
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
 			return
@@ -189,7 +189,7 @@ function WarehouseState:Run()
 
 		if self.Settings.DepositItems or (not self.Settings.DepositItems and self.ManualForced) then
 			if Bot.EnableDebug and Bot.EnableDebugWarehouseState then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Deposit list done")
+				print("Deposit list done")
 			end
 			self.CurrentDepositList = self:GetItems()
 		end
@@ -229,7 +229,7 @@ function WarehouseState:Run()
 		local item = self.CurrentDepositList[1]
 		local itemPtr = selfPlayer.Inventory:GetItemByName(item.name)
 		if itemPtr ~= nil then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Deposited: " .. itemPtr.ItemEnchantStaticStatus.Name)
+			print("Deposited: " .. itemPtr.ItemEnchantStaticStatus.Name)
 			itemPtr:PushToWarehouse(npc)
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()

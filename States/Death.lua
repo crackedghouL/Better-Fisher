@@ -70,10 +70,10 @@ function DeathState:Run()
 		if Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED then
 			Bot.Stop()
 		elseif self.Settings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_NODE then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Trying to revive at nearest node...");
+			print("Trying to revive at nearest node...");
 			selfPlayer:ReviveAtNode()
 		elseif self.Settings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Trying to revive at nearest village...");
+			print("Trying to revive at nearest village...");
 			selfPlayer:ReviveAtVillage()
 		end
 

@@ -51,7 +51,7 @@ function EquipFloatState:NeedToRun()
 	for k,v in pairs(selfPlayer.Inventory.Items, function(t,a,b) return t[a].Endurance < t[b].Endurance end) do
 		if v.HasEndurance then
 			if Bot.EnableDebug and Bot.EnableDebugEquipFloatState then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.ItemEnchantStaticStatus.Name .. " which have durability found")
+				print(v.ItemEnchantStaticStatus.Name .. " which have durability found")
 			end
 			self.EquipState = 1
 		end
@@ -59,7 +59,7 @@ function EquipFloatState:NeedToRun()
 		if self.EquipState == 1 then -- 1 = item have endurance
 			if v.Endurance > 0 then
 				if Bot.EnableDebug and Bot.EnableDebugEquipFloatState then
-					print("[" .. os.date(Bot.UsedTimezone) .. "] " .. v.ItemEnchantStaticStatus.Name .. " have more than 0 durability left")
+					print(v.ItemEnchantStaticStatus.Name .. " have more than 0 durability left")
 				end
 				self.EquipState = 2
 			end
@@ -69,14 +69,14 @@ function EquipFloatState:NeedToRun()
 		if self.EquipState == 2 then -- 2 = this is for enhanced float
 			if string.find(tostring(v.ItemEnchantStaticStatus.Name), "Float") then
 				if Bot.EnableDebug and Bot.EnableDebugEquipFloatState then
-					print("[" .. os.date(Bot.UsedTimezone) .. "] The item have in the a '+' in the name, so is a enhanced float")
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
+					print("The item have in the a '+' in the name, so is a enhanced float")
+					print("Equipped: " .. v.ItemEnchantStaticStatus.Name)
 				end
 				self.ItemToEquip = v
 				break
 			else
 				if Bot.EnableDebug and Bot.EnableDebugEquipFloatState then
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Maybe " .. v.ItemEnchantStaticStatus.Name .. " is a know float?")
+					print("Maybe " .. v.ItemEnchantStaticStatus.Name .. " is a know float?")
 				end
 				self.EquipState = 3
 			end
@@ -109,7 +109,7 @@ function EquipFloatState:NeedToRun()
 															  -- Palm Tree Float +5
 			then
 				if Bot.EnableDebug and Bot.EnableDebugEquipFloatState then
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. v.ItemEnchantStaticStatus.Name)
+					print("Equipped: " .. v.ItemEnchantStaticStatus.Name)
 				end
 				self.ItemToEquip = v
 				break

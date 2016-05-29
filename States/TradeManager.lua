@@ -63,7 +63,7 @@ function TradeManagerState:NeedToRun()
 		self.Forced = false
 	end
 
-	if not Navigator.CanMoveTo(self:GetPosition()) and not Bot.Settings.UseAutorun then
+	if not Navigator.CanMoveTo(self:GetPosition()) then
 		self.Forced = false
 	end
 
@@ -140,7 +140,7 @@ function TradeManagerState:Run()
 	end
 
 	if table.length(npcs) < 1 then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Could not find any Trade Manager NPC's")
+		print("Could not find any Trade Manager NPC's")
 		self:Exit()
 		return
 	end
@@ -157,7 +157,7 @@ function TradeManagerState:Run()
 
 	if self.state == 2 then -- 2 = create sell list
 		if not Dialog.IsTalking then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] "  .. self.Settings.NpcName .. " dialog didn't open")
+			print(self.Settings.NpcName .. " dialog didn't open")
 			self:Exit()
 			return
 		end
@@ -190,7 +190,7 @@ function TradeManagerState:Run()
 					self.BargainState = 1
 				else
 					if Bot.EnableDebug and Bot.EnableDebugTradeManagerState then
-						print("[" .. os.date(Bot.UsedTimezone) .. "] Not enought energy. Skipping bargain minigame")
+						print("Not enought energy. Skipping bargain minigame")
 					end
 					self.SleepTimer = PyxTimer:New(2)
 					self.SleepTimer:Start()
@@ -200,7 +200,7 @@ function TradeManagerState:Run()
 			elseif self.BargainState == 1 then
 				if BDOLua.Execute("return isTradeGameSuccess()") == true then
 					if Bot.EnableDebug and Bot.EnableDebugTradeManagerState then
-						print("[" .. os.date(Bot.UsedTimezone) .. "] Bargain succes!")
+						print("Bargain succes!")
 					end
 					self.SleepTimer = PyxTimer:New(2)
 					self.SleepTimer:Start()
@@ -213,7 +213,7 @@ function TradeManagerState:Run()
 					self.CurrentSellList = self:GetItems()
 				elseif self.BargainCount >= 3 then
 					if Bot.EnableDebug and Bot.EnableDebugTradeManagerState then
-						print("[" .. os.date(Bot.UsedTimezone) .. "] Bargain fail")
+						print("Bargain fail")
 					end
 					BDOLua.Execute("Fglobal_TradeGame_Close()")
 					self.SleepTimer = PyxTimer:New(2)
@@ -222,13 +222,13 @@ function TradeManagerState:Run()
 				else
 					if self.BargainDice == 0 then
 						if Bot.EnableDebug and Bot.EnableDebugTradeManagerState then
-							print("[" .. os.date(Bot.UsedTimezone) .. "] Low dice")
+							print("Low dice")
 						end
 						BDOLua.Execute("tradeGame_LowDice()")
 						self.BargainDice = 1
 					else
 						if Bot.EnableDebug and Bot.EnableDebugTradeManagerState then
-							print("[" .. os.date(Bot.UsedTimezone) .. "] High dice")
+							print("High dice")
 						end
 						BDOLua.Execute("tradeGame_HighDice()")
 						self.BargainDice = 0
@@ -248,7 +248,7 @@ function TradeManagerState:Run()
 	if self.state == 4 then -- 4 = sell all
 		if table.length(self.CurrentSellList) < 1 then
 			if Bot.EnableDebug then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Sell list created")
+				print("Sell list created")
 			end
 			self:Exit()
 			return

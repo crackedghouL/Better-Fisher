@@ -28,12 +28,12 @@ function BotSettings.DrawBotSettings()
 
 		if ImGui.Button("Save settings", ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
 			Bot.SaveSettings()
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Settings saved")
+			print("Settings saved")
 		end
 		ImGui.SameLine()
 		if ImGui.Button("Load settings", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 			Bot.LoadSettings()
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Settings loaded")
+			print("Settings loaded")
 		end
 
 		ImGui.Spacing()
@@ -62,7 +62,7 @@ function BotSettings.DrawBotSettings()
 			valueChanged, BotSettings.BaitComboBoxSelected = ImGui.Combo("##id_guid_fisher_option_bait_to_use", table.findIndex(BotSettings.BaitComboBoxItems, Bot.Settings.ConsumablesSettings.Consumables[1].Name), BotSettings.BaitComboBoxItems)
 			if valueChanged then
 				Bot.Settings.ConsumablesSettings.Consumables[1].Name = BotSettings.BaitComboBoxItems[BotSettings.BaitComboBoxSelected]
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Bait selected: " .. Bot.Settings.ConsumablesSettings.Consumables[1].Name)
+				print("Bait selected: " .. Bot.Settings.ConsumablesSettings.Consumables[1].Name)
 			end
 
 			ImGui.Text("Mins Lasts for")
@@ -384,11 +384,6 @@ function BotSettings.DrawBotSettings()
 					_, Bot.Settings.PlayerRun = ImGui.Checkbox("##id_guid_adv_option_fish_alone_boat_sprint", Bot.Settings.PlayerRun)
 					ImGui.SameLine()
 					ImGui.Text("Sprint when moving instead of walking")
-					_, Bot.Settings.UseAutorun = ImGui.Checkbox("##id_guid_adv_option_fish_alone_boat_use_autorun", Bot.Settings.UseAutorun)
-					ImGui.SameLine()
-					ImGui.Text("Use autorun to a certain distance of destination")
-					_, Bot.Settings.UseAutorunDistance = ImGui.SliderInt("Distance##id_guid_adv_option_use_autorun_until_distance", Bot.Settings.UseAutorunDistance, 550, 10000)
-				
 				end
 				if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_BOAT_FISHING then
 					_, Bot.Settings.InvFullStop = ImGui.Checkbox("##id_guid_adv_option_invfullstop", Bot.Settings.InvFullStop)
@@ -404,7 +399,15 @@ function BotSettings.DrawBotSettings()
 				_, Bot.Settings.StopWhenPeopleNearby = ImGui.Checkbox("##id_guid_adv_option_stop_bot_when_someone_nearby", Bot.Settings.StopWhenPeopleNearby)
 				ImGui.SameLine()
 				ImGui.TextColored(ImVec4(1,0,0,1), "Stop bot when someone is nearby")
-				_, Bot.Settings.StopWhenPeopleNearbyDistance = ImGui.SliderInt("Distance##id_guid_adv_option_stop_bot_when_someone_nearby_distance", Bot.Settings.StopWhenPeopleNearbyDistance, 0, 10000)
+				if Bot.Settings.StopWhenPeopleNearby then
+					_, Bot.Settings.StopWhenPeopleNearbyDistance = ImGui.SliderInt("Distance##id_guid_adv_option_stop_bot_when_someone_nearby_distance", Bot.Settings.StopWhenPeopleNearbyDistance, 0, 10000)
+				end
+				_, Bot.Settings.PauseWhenPeopleNearby = ImGui.Checkbox("##id_guid_adv_option_pause_bot_when_someone_nearby", Bot.Settings.PauseWhenPeopleNearby)
+				ImGui.SameLine()
+				ImGui.TextColored(ImVec4(1,0,0,1), "Enable pause when someone is nearby")
+				if Bot.Settings.PauseWhenPeopleNearby then
+					_, Bot.Settings.PauseWhenPeopleNearbySeconds = ImGui.SliderInt("Seconds##id_guid_adv_option_stop_bot_when_someone_nearby_seconds", Bot.Settings.PauseWhenPeopleNearbySeconds, 30, 3600)
+				end
 				ImGui.TreePop()
 			end
 

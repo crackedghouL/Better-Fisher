@@ -14,7 +14,7 @@ SilverGained = 0
 
 function Stats.DrawStats()
 	if Stats.Visible then
-		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 260), -1.0)
+		_, Stats.Visible = ImGui.Begin("Stats", Stats.Visible, ImVec2(350, 260), -1.0)
 
 		if Bot.Stats.Loots > 0 then
 			statsWhites = string.format("%i - %.02f%%%%", Bot.Stats.LootQuality[0] or 0, (Bot.Stats.LootQuality[0] or 0) / Bot.Stats.Loots * 100)

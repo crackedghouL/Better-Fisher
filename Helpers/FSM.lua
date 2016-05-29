@@ -17,15 +17,15 @@ end
 
 function FSM:AddState(state)
 	if type(state.Name) ~= "string" then
-		error("[" .. os.date(Bot.UsedTimezone) .. "] State must have .Name defined !")
+		error("State must have .Name defined !")
 	end
 
 	if type(state.NeedToRun) ~= "function" then
-		error("[" .. os.date(Bot.UsedTimezone) .. "] State must have :NeedToRun() defined !")
+		error("State must have :NeedToRun() defined !")
 	end
 
 	if type(state.Run) ~= "function" then
-		error("[" .. os.date(Bot.UsedTimezone) .. "] State must have :Run() defined !")
+		error("State must have :Run() defined !")
 	end
 
 	table.insert(self.States, state)
@@ -36,7 +36,7 @@ function FSM:Pulse()
 		if state:NeedToRun() then
 			if self.CurrentState ~= nil and self.CurrentState ~= state then
 				if self.ShowOutput then
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Exit state : " .. self.CurrentState.Name)
+					print("Exit state : " .. self.CurrentState.Name)
 				end
 
 				if self.CurrentState.Exit ~= nil then
@@ -47,7 +47,7 @@ function FSM:Pulse()
 			if self.CurrentState ~= state then
 				self.CurrentState = state
 				if self.ShowOutput then
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Enter state : " .. state.Name)
+					print("Enter state : " .. state.Name)
 				end
 
 				if self.CurrentState.Enter ~= nil then

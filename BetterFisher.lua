@@ -4,6 +4,7 @@ Bot.Settings = Settings()
 Bot.Version = "Better Fisher v0.9d DEV"
 
 Bot.Running = false
+Bot.Paused = false
 Bot.PrintConsoleState = false
 Bot.EnableDebug = false
 Bot.EnableDebugMainWindow = false
@@ -23,8 +24,14 @@ Bot.EnableDebugVendorState = false
 Bot.EnableDebugWarehouseState = false
 
 Bot.FishingLevel = 0
+Bot.FishingPercentExp = 0
 
 Bot.WasRunning = false
+
+Bot.SleepTimer = nil
+Bot.LastPauseTick = nil
+
+Bot.LoopCounter = 0
 
 Bot.Time = nil
 Bot.Hours = nil
@@ -52,12 +59,6 @@ Bot.VendorState = VendorState()
 Bot.RepairState = RepairState()
 Bot.UnequipFishingRodState = UnequipFishingRodState()
 Bot.UnequipFloatState = UnequipFloatState()
-
-if Bot.EnableDebug then -- more info at http://www.lua.org/pil/22.1.html
-	Bot.UsedTimezone = "%c"
-else
-	Bot.UsedTimezone = "%X"
-end
 
 function Bot.FormatMoney(amount)
 	while true do
@@ -155,12 +156,12 @@ function Bot.Start()
 		end
 
 		if not currentProfile then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] No profile loaded!")
+			print("No profile loaded!")
 			return
 		end
 
 		if not currentProfile:HasFishSpot() then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Profile require a fish spot!")
+			print("Profile require a fish spot!")
 			return
 		end
 
@@ -227,10 +228,10 @@ function Bot.OnPulse()
 			if Bot._startHotKeyPressed ~= true then
 				Bot._startHotKeyPressed = true
 				if Bot.Running then
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Stopping bot from hotkey")
+					print("Stopping bot from hotkey")
 					Bot.Stop()
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Starting bot from hotkey")
+					print("Starting bot from hotkey")
 					Bot.Start()
 				end
 			end
@@ -285,10 +286,10 @@ function Bot.OnPulse()
 				if Bot.Running then
 					Bot.WarehouseState.ManualForced = true
 					if Bot.EnableDebug then
-						print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Warehouse")
+						print("Go to Warehouse")
 					end
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the bot first!")
+					print("Start the bot first!")
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('T')) then
@@ -297,10 +298,10 @@ function Bot.OnPulse()
 				if Bot.Running then
 					Bot.TradeManagerState.ManualForced = true
 					if Bot.EnableDebug then
-						print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Trader")
+						print("Go to Trader")
 					end
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the bot first!")
+					print("Start the bot first!")
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('V')) then
@@ -309,10 +310,10 @@ function Bot.OnPulse()
 				if Bot.Running then
 					Bot.VendorState.ManualForced = true
 					if Bot.EnableDebug then
-						print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Vendor")
+						print("Go to Vendor")
 					end
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the bot first!")
+					print("Start the bot first!")
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('G')) then
@@ -321,10 +322,10 @@ function Bot.OnPulse()
 				if Bot.Running then
 					Bot.RepairState.ManualForced = true
 					if Bot.EnableDebug then
-						print("[" .. os.date(Bot.UsedTimezone) .. "] Go Repair")
+						print("Go Repair")
 					end
 				else
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Start the bot first!")
+					print("Start the bot first!")
 				end
 			end
 		else
@@ -341,213 +342,50 @@ function Bot.OnPulse()
 		end
 	end
 
+	if Bot.Paused and Bot.PausedManual then
+		Bot.LoopCounter = Bot.LoopCounter + 1
+	end
+
 	if Bot.Counter > 0 then
 		Bot.Counter = Bot.Counter - 1
 	end
 
 	if Bot.FSM.CurrentState == Bot.MoveToFishingSpotState then
-		local randomDistance = math.random(75,80)
-		if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance2DFromMe <= randomDistance then
-			GetSelfPlayer():DoAction("RUN_SHORTSTOP")
+		local randomDistance = math.random(90,110)
+		if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe <= randomDistance then
+			Navigator.Stop(true) -- seem to work better than the doaction
 		end
 	end
 
 	if selfPlayer then
-		local rawLevel = tonumber(BDOLua.Execute([[return getSelfPlayer():get():getLifeExperienceLevel(1)]]))
+		local rawLevel = tonumber(BDOLua.Execute("return tostring(getSelfPlayer():get():getLifeExperienceLevel(1))"))
+		local currentExp = tonumber(BDOLua.Execute("return tostring(getSelfPlayer():get():getCurrLifeExperiencePoint(1))"))
+		local demandExp = tonumber(BDOLua.Execute("return tostring(getSelfPlayer():get():getDemandLifeExperiencePoint(1))"))
 
 		if rawLevel <= 10 then -- 1 to 10 = Beginner
-			if rawLevel == 1 then
-				Bot.FishingLevel = "Beginner 1"
-			elseif rawLevel == 2 then
-				Bot.FishingLevel = "Beginner 2"
-			elseif rawLevel == 3 then
-				Bot.FishingLevel = "Beginner 3"
-			elseif rawLevel == 4 then
-				Bot.FishingLevel = "Beginner 4"
-			elseif rawLevel == 5 then
-				Bot.FishingLevel = "Beginner 5"
-			elseif rawLevel == 6 then
-				Bot.FishingLevel = "Beginner 6"
-			elseif rawLevel == 7 then
-				Bot.FishingLevel = "Beginner 7"
-			elseif rawLevel == 8 then
-				Bot.FishingLevel = "Beginner 8"
-			elseif rawLevel == 9 then
-				Bot.FishingLevel = "Beginner 9"
-			elseif rawLevel == 10 then
-				Bot.FishingLevel = "Beginner 10"
-			else
-				Bot.FishingLevel = "Beginner ???"
-			end
-		elseif rawLevel >= 11 and rawLevel <= 20 then -- 11 to 20 = Apprentice
-			if rawLevel == 11 then
-				Bot.FishingLevel = "Apprentice 1"
-			elseif rawLevel == 12 then
-				Bot.FishingLevel = "Apprentice 2"
-			elseif rawLevel == 13 then
-				Bot.FishingLevel = "Apprentice 3"
-			elseif rawLevel == 14 then
-				Bot.FishingLevel = "Apprentice 4"
-			elseif rawLevel == 15 then
-				Bot.FishingLevel = "Apprentice 5"
-			elseif rawLevel == 16 then
-				Bot.FishingLevel = "Apprentice 6"
-			elseif rawLevel == 17 then
-				Bot.FishingLevel = "Apprentice 7"
-			elseif rawLevel == 18 then
-				Bot.FishingLevel = "Apprentice 8"
-			elseif rawLevel == 19 then
-				Bot.FishingLevel = "Apprentice 9"
-			elseif rawLevel == 20 then
-				Bot.FishingLevel = "Apprentice 10"
-			else
-				Bot.FishingLevel = "Apprentice ???"
-			end
-		elseif rawLevel >= 21 and rawLevel <= 30 then -- 21 to 30 = Skilled
-			if rawLevel == 21 then
-				Bot.FishingLevel = "Skilled 1"
-			elseif rawLevel == 22 then
-				Bot.FishingLevel = "Skilled 2"
-			elseif rawLevel == 23 then
-				Bot.FishingLevel = "Skilled 3"
-			elseif rawLevel == 24 then
-				Bot.FishingLevel = "Skilled 4"
-			elseif rawLevel == 25 then
-				Bot.FishingLevel = "Skilled 5"
-			elseif rawLevel == 26 then
-				Bot.FishingLevel = "Skilled 6"
-			elseif rawLevel == 27 then
-				Bot.FishingLevel = "Skilled 7"
-			elseif rawLevel == 28 then
-				Bot.FishingLevel = "Skilled 8"
-			elseif rawLevel == 29 then
-				Bot.FishingLevel = "Skilled 9"
-			elseif rawLevel == 30 then
-				Bot.FishingLevel = "Skilled 10"
-			else
-				Bot.FishingLevel = "Skilled ???"
-			end
-		elseif rawLevel >= 31 and rawLevel <= 40 then -- 31 to 40 = Professional
-			if rawLevel == 31 then
-				Bot.FishingLevel = "Professional 1"
-			elseif rawLevel == 32 then
-				Bot.FishingLevel = "Professional 2"
-			elseif rawLevel == 33 then
-				Bot.FishingLevel = "Professional 3"
-			elseif rawLevel == 34 then
-				Bot.FishingLevel = "Professional 4"
-			elseif rawLevel == 35 then
-				Bot.FishingLevel = "Professional 5"
-			elseif rawLevel == 36 then
-				Bot.FishingLevel = "Professional 6"
-			elseif rawLevel == 37 then
-				Bot.FishingLevel = "Professional 7"
-			elseif rawLevel == 38 then
-				Bot.FishingLevel = "Professional 8"
-			elseif rawLevel == 39 then
-				Bot.FishingLevel = "Professional 9"
-			elseif rawLevel == 40 then
-				Bot.FishingLevel = "Professional 10"
-			else
-				Bot.FishingLevel = "Professional ???"
-			end
-		elseif rawLevel >= 41 and rawLevel <= 50 then -- 41 to 50 = Artisan
-			if rawLevel == 41 then
-				Bot.FishingLevel = "Artisan 1"
-			elseif rawLevel == 42 then
-				Bot.FishingLevel = "Artisan 2"
-			elseif rawLevel == 43 then
-				Bot.FishingLevel = "Artisan 3"
-			elseif rawLevel == 44 then
-				Bot.FishingLevel = "Artisan 4"
-			elseif rawLevel == 45 then
-				Bot.FishingLevel = "Artisan 5"
-			elseif rawLevel == 46 then
-				Bot.FishingLevel = "Artisan 6"
-			elseif rawLevel == 47 then
-				Bot.FishingLevel = "Artisan 7"
-			elseif rawLevel == 48 then
-				Bot.FishingLevel = "Artisan 8"
-			elseif rawLevel == 49 then
-				Bot.FishingLevel = "Artisan 9"
-			elseif rawLevel == 50 then
-				Bot.FishingLevel = "Artisan 10"
-			else
-				Bot.FishingLevel = "Artisan ???"
-			end
-		elseif rawLevel >= 51 then -- 51 to 80 = Master
-			if rawLevel == 51 then
-				Bot.FishingLevel = "Master 1"
-			elseif rawLevel == 52 then
-				Bot.FishingLevel = "Master 2"
-			elseif rawLevel == 53 then
-				Bot.FishingLevel = "Master 3"
-			elseif rawLevel == 54 then
-				Bot.FishingLevel = "Master 4"
-			elseif rawLevel == 55 then
-				Bot.FishingLevel = "Master 5"
-			elseif rawLevel == 56 then
-				Bot.FishingLevel = "Master 6"
-			elseif rawLevel == 57 then
-				Bot.FishingLevel = "Master 7"
-			elseif rawLevel == 58 then
-				Bot.FishingLevel = "Master 8"
-			elseif rawLevel == 59 then
-				Bot.FishingLevel = "Master 9"
-			elseif rawLevel == 60 then
-				Bot.FishingLevel = "Master 10"
-			elseif rawLevel == 61 then
-				Bot.FishingLevel = "Master 11"
-			elseif rawLevel == 62 then
-				Bot.FishingLevel = "Master 12"
-			elseif rawLevel == 63 then
-				Bot.FishingLevel = "Master 13"
-			elseif rawLevel == 64 then
-				Bot.FishingLevel = "Master 14"
-			elseif rawLevel == 65 then
-				Bot.FishingLevel = "Master 15"
-			elseif rawLevel == 66 then
-				Bot.FishingLevel = "Master 16"
-			elseif rawLevel == 67 then
-				Bot.FishingLevel = "Master 17"
-			elseif rawLevel == 68 then
-				Bot.FishingLevel = "Master 18"
-			elseif rawLevel == 69 then
-				Bot.FishingLevel = "Master 19"
-			elseif rawLevel == 70 then
-				Bot.FishingLevel = "Master 20"
-			elseif rawLevel == 71 then
-				Bot.FishingLevel = "Master 21"
-			elseif rawLevel == 72 then
-				Bot.FishingLevel = "Master 22"
-			elseif rawLevel == 73 then
-				Bot.FishingLevel = "Master 23"
-			elseif rawLevel == 74 then
-				Bot.FishingLevel = "Master 24"
-			elseif rawLevel == 75 then
-				Bot.FishingLevel = "Master 25"
-			elseif rawLevel == 76 then
-				Bot.FishingLevel = "Master 26"
-			elseif rawLevel == 77 then
-				Bot.FishingLevel = "Master 27"
-			elseif rawLevel == 78 then
-				Bot.FishingLevel = "Master 28"
-			elseif rawLevel == 79 then
-				Bot.FishingLevel = "Master 29"
-			elseif rawLevel == 80 then
-				Bot.FishingLevel = "Master 30"
-			else
-				Bot.FishingLevel = "Master ???"
-			end
-		else
-			Bot.FishingLevel = "???"
+			Bot.FishingLevel = "Beginner " .. rawLevel
+		elseif 11 <= rawLevel and rawLevel <= 20 then -- 11 to 20 = Apprentice
+			Bot.FishingLevel = "Apprentice " .. rawLevel - 10
+		elseif 21 <= rawLevel and rawLevel <= 30 then -- 21 to 30 = Skilled
+			Bot.FishingLevel = "Skilled " .. rawLevel - 20
+		elseif 31 <= rawLevel and rawLevel <= 40 then -- 31 to 40 = Professional
+			Bot.FishingLevel = "Professional " .. rawLevel - 30
+		elseif 41 <= rawLevel and rawLevel <= 50 then -- 41 to 50 = Artisan
+			Bot.FishingLevel = "Artisan " .. rawLevel - 40
+		elseif 51 <= rawLevel and rawLevel <= 80 then -- 51 to 80 = Master
+			Bot.FishingLevel = "Master " .. rawLevel - 50
+		elseif 81 <= rawLevel and rawLevel <= 100 then -- 81 to 100 = Guru
+			Bot.FishingLevel = "Guru " .. rawLevel - 80
 		end
+
+		Bot.FishingPercentExp = (currentExp * 100) / demandExp
 	else
 		Bot.FishingLevel = "N/A"
+		Bot.FishingPercentExp = "0"
 	end
 
 	if Bot.Running or Bot.WasRunning then
-		if Bot.Running then
+		if Bot.Running and (not Bot.Paused or not Bot.PausedManual or Bot.LoopCounter == 0) then
 			Bot.FSM:Pulse()
 
 			Bot.Time = math.ceil((Bot.Stats.TotalSession + Pyx.Win32.GetTickCount() - Bot.Stats.SessionStart) / 1000)
@@ -562,32 +400,32 @@ function Bot.OnPulse()
 			end
 		end
 
-		if Bot.Settings.StopWhenPeopleNearby and (Bot.FSM.CurrentState.Name == Bot.StartFishingState.Name or Bot.WasRunning) then
-			local me = selfPlayer
-			local players = GetCharacters()
-			local count = 0
-			local SafeDistance = Bot.Settings.StopWhenPeopleNearbyDistance
-
-			for k,v in pairs(players, function(t,a,b) return t[a].Position.Distance3DFromMe < t[b].Position.Distance3DFromMe end) do
-				if (v.IsPlayer and v.Name ~= me.Name) and math.floor(v.Position.Distance3DFromMe) <= SafeDistance then -- not string.match(me.Key, v.Key)
-					count = count + 1
-				end
-			end
-
-			if count > 0 then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Someone is near you, the bot is stopped for security.")
+		if Bot.Settings.StopWhenPeopleNearby then
+			if Bot.CheckForNearbyPeople() then
+				print("Someone is near you, the bot is stopped for security.")
 				if Bot.Running then
 					Bot.Stop()
-					Bot.WasRunning = true
-				end
-			else
-				if not Bot.Running then
-					Bot.Start()
 					Bot.WasRunning = false
+				elseif not Bot.Running then
+					Bot.Start()
 				end
 			end
-
-			return count
+		elseif Bot.Settings.PauseWhenPeopleNearby then
+			if Bot.CheckForNearbyPeople() then
+				if (Bot.Running and not Bot.Paused) and Bot.LastPauseTick == nil then
+					Bot.SleepTimer = Bot.Settings.PauseWhenPeopleNearbySeconds * 1000
+					Bot.LastPauseTick = Pyx.Win32.GetTickCount()
+					Bot.WasRunning = false
+					Bot.Paused = true
+					print("Someone is near you, the bot is paused for security.")
+				elseif (not Bot.WasRunning and Bot.Paused) and Bot.LastPauseTick ~= nil then
+					if Pyx.Win32.GetTickCount() - Bot.LastPauseTick > Bot.SleepTimer then
+						Bot.WasRunning = true
+						Bot.Paused = false
+						Bot.LastPauseTick = nil
+					end
+				end
+			end
 		end
 	end
 end
@@ -672,7 +510,28 @@ function Bot.StateComplete(state)
 	end
 
 	if Bot.EnableDebug then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] " .. tostring(state) .. " Complete!")
+		print(tostring(state) .. " Complete!")
+	end
+end
+
+function Bot.CheckForNearbyPeople()
+	if Bot.FSM.CurrentState == Bot.StartFishingState or Bot.WasRunning then
+		local players = GetCharacters()
+		local count = 0
+		local safeDistance = Bot.Settings.StopWhenPeopleNearbyDistance
+
+		for k,v in pairs(players, function(t,a,b) return t[a].Position.Distance3DFromMe < t[b].Position.Distance3DFromMe end) do
+			if math.floor(v.Position.Distance3DFromMe) <= safeDistance then -- not string.match(me.Key, v.Key)
+				count = count + 1
+			end
+		end
+
+		if count > 0 then
+			return true
+		end
+
+		count = count - 1
+		return false
 	end
 end
 
@@ -713,12 +572,12 @@ function Bot.RepairCheck()
 
 	for k,v in pairs(selfPlayer.EquippedItems) do
 		if Bot.EnableDebug then
-			print ("[" .. os.date(Bot.UsedTimezone) .. "] Equipped: " .. tostring(v.HasEndurance) .. " " .. tostring(v.EndurancePercent) .. " " .. tostring(v.ItemEnchantStaticStatus.IsFishingRod))
+			print ("Equipped: " .. tostring(v.HasEndurance) .. " " .. tostring(v.EndurancePercent) .. " " .. tostring(v.ItemEnchantStaticStatus.IsFishingRod))
 		end
 
 		if v.HasEndurance and v.EndurancePercent <= 0 and v.ItemEnchantStaticStatus.IsFishingRod then
 			if Bot.EnableDebug then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Need to repair equipped items")
+				print("Need to repair equipped items")
 			end
 
 			return true
@@ -727,11 +586,11 @@ function Bot.RepairCheck()
 
 	for k,v in pairs(selfPlayer.Inventory.Items) do
 		if Bot.EnableDebug then
-			print ("[" .. os.date(Bot.UsedTimezone) .. "] Inv: " .. tostring(v.HasEndurance) .. " " .. tostring(v.EndurancePercent) .. " " .. tostring(v.ItemEnchantStaticStatus.IsFishingRod))
+			print ("Inv: " .. tostring(v.HasEndurance) .. " " .. tostring(v.EndurancePercent) .. " " .. tostring(v.ItemEnchantStaticStatus.IsFishingRod))
 		end
 		if v.HasEndurance and v.EndurancePercent <= 0 and v.ItemEnchantStaticStatus.IsFishingRod then
 			if Bot.EnableDebug then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Need to repair items on inventory")
+				print("Need to repair items on inventory")
 			end
 			return true
 		end

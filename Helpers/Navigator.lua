@@ -137,7 +137,7 @@ function Navigator.GetPath(startPoint, endPoint)
 		end
 	else
 		if Bot.EnableDebug then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] At least the endpoint must be on a mesh")
+			print("At least the endpoint must be on a mesh")
 		end
 	end
 
@@ -225,9 +225,9 @@ function Navigator.MoveTo(destination, forceRecalculate, playerRun)
 
 		local waypoints = Navigator.GetPath(selfPlayer.Position, destination)
 		if waypoints == nil then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Cannot find path !")
 			return false
 		end
+		print("Cannot find path!")
 
 		if waypoints[#waypoints]:GetDistance3D(destination) > Navigator.ApproachDistance then
 			table.insert(waypoints, destination)
@@ -283,7 +283,7 @@ function Navigator.OnPulse()
 
 		if Navigator.LastStuckTimer:Expired() then
 			if (Navigator.LastStuckCheckPosition.Distance2DFromMe < 35) then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] I'm stuck, jump forward !")
+				print("I'm stuck, jump forward !")
 				if Navigator.StuckCount < 20 then
 					Keybindings.HoldByActionId(KEYBINDING_ACTION_JUMP, 500)
 					--[[
@@ -298,7 +298,7 @@ function Navigator.OnPulse()
 				end
 				Navigator.StuckCount = Navigator.StuckCount + 1
 				if Navigator.StuckCount == 3 then
-					print("[" .. os.date(Bot.UsedTimezone) .. "] Still stuck. Lets try to re-generate path")
+					print("Still stuck. Lets try to re-generate path")
 					Navigator.MoveTo(Navigator.Destination, true)
 				end
 				if Navigator.OnStuckCall ~= nil then

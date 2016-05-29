@@ -36,6 +36,19 @@ function MainWindow.DrawMainWindow()
 						Bot.Stop()
 					end
 				end
+				if ImGui.MenuItem("Pause", "") then
+					if Bot.Running then
+						if Bot.Paused then
+							Bot.PausedManual = false
+							Bot.Paused = false
+						else
+							Bot.PausedManual = true
+							Bot.Paused = true
+						end
+					else
+						print("Start the Script first!")
+					end
+				end
 				ImGui.Separator()
 				if ImGui.MenuItem("Open Profile Editor", "ALT+P", ProfileEditor.Visible) then
 					if not ProfileEditor.Visible then
@@ -82,40 +95,40 @@ function MainWindow.DrawMainWindow()
 					if Bot.Running then
 						Bot.WarehouseState.ManualForced = true
 						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
-							print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Warehouse")
+							print("Go to Warehouse")
 						end
 					else
-						print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+						print("Start the Script first!")
 					end
 				end
 				if ImGui.MenuItem("Go to Trader", "ALT+T") then
 					if Bot.Running then
 						Bot.TradeManagerState.ManualForced = true
 						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
-							print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Trader")
+							print("Go to Trader")
 						end
 					else
-						print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+						print("Start the Script first!")
 					end
 				end
 				if ImGui.MenuItem("Go to Vendor", "ALT+V") then
 					if Bot.Running then
 						Bot.VendorState.ManualForced = true
 						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
-							print("[" .. os.date(Bot.UsedTimezone) .. "] Go to Vendor")
+							print("Go to Vendor")
 						end
 					else
-						print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+						print("Start the Script first!")
 					end
 				end
 				if ImGui.MenuItem("Go Repair", "ALT+G") then
 					if Bot.Running then
 						Bot.RepairState.ManualForced = true
 						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
-							print("[" .. os.date(Bot.UsedTimezone) .. "] Go Repair")
+							print("Go Repair")
 						end
 					else
-						print("[" .. os.date(Bot.UsedTimezone) .. "] Start the Script first!")
+						print("Start the Script first!")
 					end
 				end
 				ImGui.EndMenu()
@@ -131,12 +144,12 @@ function MainWindow.DrawMainWindow()
 						'     ~Born to fish...Forced to work~    '
 					}
 
-					print("[" .. os.date(Bot.UsedTimezone) .. "] ##########################################")
-					print("[" .. os.date(Bot.UsedTimezone) .. "] #     Made with love by spearmint <3     #")
-					print("[" .. os.date(Bot.UsedTimezone) .. "] #   Thanks to: gklt, Akafist, tyty123    #")
-					print("[" .. os.date(Bot.UsedTimezone) .. "] #   pat, Pookie, borek24 and MrUnreal.   #")
-					print("[" .. os.date(Bot.UsedTimezone) .. "] #" .. motto[math.random(#motto)] .. "#")
-					print("[" .. os.date(Bot.UsedTimezone) .. "] ##########################################")
+					print("##########################################")
+					print("#     Made with love by spearmint <3     #")
+					print("#   Thanks to: gklt, Akafist, tyty123    #")
+					print("#   pat, Pookie, borek24 and MrUnreal.   #")
+					print("#" .. motto[math.random(#motto)] .. "#")
+					print("##########################################")
 				end
 				ImGui.EndMenu()
 			end
@@ -148,8 +161,10 @@ function MainWindow.DrawMainWindow()
 		ImGui.Text("State:")
 		ImGui.SameLine()
 		if not Bot.EnableDebug and not Bot.EnableDebugMainWindow then
-			if Bot.Running and Bot.FSM.CurrentState then
+			if Bot.Running and Bot.FSM.CurrentState and not Bot.Paused then
 				ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Running")
+			elseif (not Bot.WasRunning and Bot.Paused) or (Bot.Paused and Bot.PausedManual and Bot.LoopCounter > 0) then
+				ImGui.TextColored(ImVec4(1,0.8,0.2,1), "Paused")
 			elseif selfPlayer.Inventory.FreeSlots == 0 then
 				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Inv. Full")
 			else
@@ -187,7 +202,7 @@ function MainWindow.DrawMainWindow()
 		ImGui.Separator()
 
 		ImGui.Columns(1)
-		ImGui.Text("Fishing Level: " ..  Bot.FishingLevel)
+		ImGui.Text("Fishing Level: " ..  Bot.FishingLevel .. " (" .. string.format("%.2f", Bot.FishingPercentExp) .. "%%)")
 
 		ImGui.Columns(1)
 		ImGui.Separator()
