@@ -384,6 +384,11 @@ function BotSettings.DrawBotSettings()
 					_, Bot.Settings.PlayerRun = ImGui.Checkbox("##id_guid_adv_option_fish_alone_boat_sprint", Bot.Settings.PlayerRun)
 					ImGui.SameLine()
 					ImGui.Text("Sprint when moving instead of walking")
+					_, Bot.Settings.UseAutorun = ImGui.Checkbox("##id_guid_adv_option_fish_alone_boat_use_autorun", Bot.Settings.UseAutorun)
+					ImGui.SameLine()
+					ImGui.Text("Use autorun to a certain distance of destination")
+					_, Bot.Settings.UseAutorunDistance = ImGui.SliderInt("Distance##id_guid_adv_option_use_autorun_until_distance", Bot.Settings.UseAutorunDistance, 550, 10000)
+				
 				end
 				if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_BOAT_FISHING then
 					_, Bot.Settings.InvFullStop = ImGui.Checkbox("##id_guid_adv_option_invfullstop", Bot.Settings.InvFullStop)

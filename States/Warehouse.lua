@@ -69,12 +69,12 @@ function WarehouseState:NeedToRun()
 		self.Forced = false
 	end
 
-	if not Navigator.CanMoveTo(self:GetPosition()) then
+	if not Navigator.CanMoveTo(self:GetPosition()) and not Bot.Settings.UseAutorun then
 		self.Forced = false
 	end
 
 	if selfPlayer.WeightPercent >= 95 then
-		if Navigator.CanMoveTo(self:GetPosition())	then
+		if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
 			self.Forced = true
 		else
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Deposit money! Can not find path to NPC: " .. self.Settings.NpcName)
@@ -83,7 +83,7 @@ function WarehouseState:NeedToRun()
 	end
 
 	if table.length(self:GetItems()) > 0 and (selfPlayer.Inventory.FreeSlots <= 3 or selfPlayer.WeightPercent >= 95) then
-		if Navigator.CanMoveTo(self:GetPosition()) then
+		if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
 			self.Forced = true
 		else
 			print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Deposit items! Can not find path to NPC: " .. self.Settings.NpcName)

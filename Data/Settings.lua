@@ -27,5 +27,7 @@ function Settings.new()
 	self.StartFishingSettings = {}
 	self.HookFishHandleGameSettings = {}
 	self.LootSettings = {}
+	self.UseAutorun = false
+	self.UseAutorunDistance = 800
 	return self
 end
