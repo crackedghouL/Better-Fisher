@@ -63,7 +63,7 @@ function TradeManagerState:NeedToRun()
 		self.Forced = false
 	end
 
-	if not Navigator.CanMoveTo(self:GetPosition()) then
+	if not Navigator.CanMoveTo(self:GetPosition()) and not Bot.Settings.UseAutorun then
 		self.Forced = false
 	end
 

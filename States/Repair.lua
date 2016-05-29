@@ -64,7 +64,7 @@ function RepairState:NeedToRun()
 		self.Forced = false
 	end
 
-	if not Navigator.CanMoveTo(self:GetPosition()) then
+	if not Navigator.CanMoveTo(self:GetPosition()) and not Bot.Settings.UseAutorun then
 		self.Forced = false
 	end
 
@@ -74,7 +74,7 @@ function RepairState:NeedToRun()
 				(v.ItemEnchantStaticStatus.IsFishingRod and
 				(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
 			then
-				if Navigator.CanMoveTo(self:GetPosition()) then
+				if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
 					self.Forced = true
 				else
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Repair! Can not find path to NPC: " .. self.Settings.NpcName)
@@ -88,7 +88,7 @@ function RepairState:NeedToRun()
 				(v.ItemEnchantStaticStatus.IsFishingRod and
 				(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
 			then
-				if Navigator.CanMoveTo(self:GetPosition()) then
+				if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
 					self.Forced = true
 				else
 					print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Repair! Can not find path to NPC: " .. self.Settings.NpcName)
