@@ -364,17 +364,17 @@ function Bot.OnPulse()
 
 		if rawLevel <= 10 then -- 1 to 10 = Beginner
 			Bot.FishingLevel = "Beginner " .. rawLevel
-		elseif 11 <= rawLevel and rawLevel <= 20 then -- 11 to 20 = Apprentice
+		elseif rawLevel >= 11 and rawLevel <= 20 then -- 11 to 20 = Apprentice
 			Bot.FishingLevel = "Apprentice " .. rawLevel - 10
-		elseif 21 <= rawLevel and rawLevel <= 30 then -- 21 to 30 = Skilled
+		elseif rawLevel >= 21 and rawLevel <= 30 then -- 21 to 30 = Skilled
 			Bot.FishingLevel = "Skilled " .. rawLevel - 20
-		elseif 31 <= rawLevel and rawLevel <= 40 then -- 31 to 40 = Professional
+		elseif rawLevel >= 31 and rawLevel <= 40 then -- 31 to 40 = Professional
 			Bot.FishingLevel = "Professional " .. rawLevel - 30
-		elseif 41 <= rawLevel and rawLevel <= 50 then -- 41 to 50 = Artisan
+		elseif rawLevel >= 41 and rawLevel <= 50 then -- 41 to 50 = Artisan
 			Bot.FishingLevel = "Artisan " .. rawLevel - 40
-		elseif 51 <= rawLevel and rawLevel <= 80 then -- 51 to 80 = Master
+		elseif rawLevel >= 51 and rawLevel <= 80 then -- 51 to 80 = Master
 			Bot.FishingLevel = "Master " .. rawLevel - 50
-		elseif 81 <= rawLevel and rawLevel <= 100 then -- 81 to 100 = Guru
+		elseif rawLevel >= 81 and rawLevel <= 100 then -- 81 to 100 = Guru
 			Bot.FishingLevel = "Guru " .. rawLevel - 80
 		end
 
