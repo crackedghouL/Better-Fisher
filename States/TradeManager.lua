@@ -266,6 +266,14 @@ function TradeManagerState:Run()
 	end
 
 	if self.state == 6 then -- 6 = state complete
+		if  Bot.Settings.RepairSettings.Enabled == true and Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then
+			Bot.RepairState.ManualForced = true
+			print("Forcing repair after trader...")
+		end
+		if Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then
+			Bot.WarehouseState.ManualForced = true
+			print("Forcing deposit after trader...")
+		end
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end
