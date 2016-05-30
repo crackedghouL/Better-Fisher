@@ -43,8 +43,12 @@ function EquipFishingRodState:NeedToRun()
 	if Pyx.Win32.GetTickCount() - self.LastEquipTickCount < 4000 then
 		return false
 	end
+	
+	if selfPlayer.CurrentActionName ~= "WAIT" then 
+		return false 
+	end 
 
-	if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe > 100 then
+	if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe > Bot.Settings.FishingSpotRadius then
 		return false
 	end
 
