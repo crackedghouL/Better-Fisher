@@ -64,7 +64,7 @@ function RepairState:NeedToRun()
 		self.Forced = false
 	end
 
-	if not Navigator.CanMoveTo(self:GetPosition()) and not Bot.Settings.UseAutorun then
+	if not Navigator.CanMoveTo(self:GetPosition()) then
 		self.Forced = false
 	end
 
@@ -74,7 +74,7 @@ function RepairState:NeedToRun()
 				(v.ItemEnchantStaticStatus.IsFishingRod and
 				(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
 			then
-				if self:HasNpc() and (Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun) then
+				if self:HasNpc() and Navigator.CanMoveTo(self:GetPosition()) then
 					self.Forced = true
 				else
 					self.Forced = false
@@ -87,7 +87,7 @@ function RepairState:NeedToRun()
 				(v.ItemEnchantStaticStatus.IsFishingRod and
 				(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
 			then
-				if self:HasNpc() and (Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun) then
+				if self:HasNpc() and Navigator.CanMoveTo(self:GetPosition()) then
 					self.Forced = true
 				else
 					self.Forced = false

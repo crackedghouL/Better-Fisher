@@ -31,6 +31,6 @@ function Settings.new()
 	self.LootSettings = {}
 	self.UseAutorun = false
 	self.UseAutorunDistance = 800
-	self.FishingSpotRadius = 250
+	self.FishingSpotRadius = 300
 	return self
 end

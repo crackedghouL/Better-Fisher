@@ -154,6 +154,10 @@ function Navigator.CanMoveTo(destination)
 	if not selfPlayer then
 		return false
 	end
+	
+	if Bot.Settings.UseAutorun and destination.Distance3DFromMe >= Bot.Settings.UseAutorunDistance then
+		return true
+	end
 
 	local waypoints = Navigator.GetPath(selfPlayer.Position, destination)
 	if waypoints == nil then

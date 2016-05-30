@@ -29,7 +29,7 @@ function MoveToFishingSpotState:NeedToRun()
 		return false
 	end
 
-	if not Navigator.CanMoveTo(ProfileEditor.CurrentProfile:GetFishSpotPosition()) and not Bot.Settings.UseAutorun then
+	if not Navigator.CanMoveTo(ProfileEditor.CurrentProfile:GetFishSpotPosition()) then
 		return false
 	end
 
