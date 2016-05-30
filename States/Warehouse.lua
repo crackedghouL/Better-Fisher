@@ -222,6 +222,10 @@ function WarehouseState:Run()
 	end
 
 	if self.state == 5 then -- 5 = state complete
+		if  Bot.Settings.RepairSettings.Enabled == true and Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then
+			Bot.RepairState.ManualForced = true
+			print("Forcing repair after warehouse...")
+		end
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end
