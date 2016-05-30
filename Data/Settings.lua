@@ -18,7 +18,7 @@ function Settings.new()
 	self.InvFullStop = false
 	self.UseAutorun = false
 	self.UseAutorunDistance = 800
-	self.FishingSpotRadius = 250
+	self.FishingSpotRadius = 300
 	self.StopWhenPeopleNearby = false
 	self.StopWhenPeopleNearbyDistance = 5000
 	self.PauseWhenPeopleNearby = false
@@ -32,11 +32,5 @@ function Settings.new()
 	self.StartFishingSettings = {}
 	self.HookFishHandleGameSettings = {}
 	self.LootSettings = {}
-<<<<<<< HEAD
-	self.UseAutorun = false
-	self.UseAutorunDistance = 800
-	self.FishingSpotRadius = 300
-=======
->>>>>>> develop
 	return self
 end
