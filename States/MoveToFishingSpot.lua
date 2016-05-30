@@ -37,9 +37,7 @@ function MoveToFishingSpotState:NeedToRun()
 end
 
 function MoveToFishingSpotState:Run()
-	local equippedItem = GetSelfPlayer():GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
-
-	if equippedItem and equippedItem.ItemEnchantStaticStatus.IsFishingRod then
+	if Bot.CheckIfRodIsEquipped() then
 		GetSelfPlayer():UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 

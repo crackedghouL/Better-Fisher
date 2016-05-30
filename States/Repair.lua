@@ -42,7 +42,6 @@ end
 
 function RepairState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
-	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
 	if not selfPlayer then
 		self.Forced = false
@@ -64,11 +63,15 @@ function RepairState:NeedToRun()
 		self.Forced = false
 	end
 
+<<<<<<< HEAD
 	if not Navigator.CanMoveTo(self:GetPosition()) then
 		self.Forced = false
 	end
 
 	if not equippedItem then
+=======
+	if not selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND) then
+>>>>>>> develop
 		for k,v in pairs(selfPlayer.Inventory.Items) do
 			if 	v.HasEndurance and v.EndurancePercent <= 0 and
 				(v.ItemEnchantStaticStatus.IsFishingRod and
@@ -98,7 +101,7 @@ function RepairState:NeedToRun()
 
 	if self.Forced or self.ManualForced then
 		return true
-	elseif not self.Forced or not self.ManualForced then
+	else
 		return false
 	end
 
@@ -142,9 +145,8 @@ function RepairState:Run()
 	local npcs = GetNpcs()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
-	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
-	if equippedItem then
+	if Bot.CheckIfRodIsEquipped() then
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
@@ -153,7 +155,7 @@ function RepairState:Run()
 			self.CallWhileMoving(self)
 		end
 
-		Navigator.MoveTo(vendorPosition,nil,Bot.Settings.PlayerRun)
+		Navigator.MoveTo(vendorPosition, nil, Bot.Settings.PlayerRun)
 		if self.state > 1 then
 			self:Exit()
 			return
@@ -170,7 +172,7 @@ function RepairState:Run()
 	end
 
 	if table.length(npcs) < 1 then
-		print("Repair could not find any NPC's")
+		print("Could not find any Repair NPC's")
 		self:Exit()
 		return
 	end
@@ -178,7 +180,7 @@ function RepairState:Run()
 	table.sort(npcs, function(a,b) return a.Position:GetDistance3D(vendorPosition) < b.Position:GetDistance3D(vendorPosition) end)
 	local npc = npcs[1]
 
-	if self.state == 1 then
+	if self.state == 1 then -- 1 = open npc dialog
 		npc:InteractNpc()
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
@@ -186,7 +188,7 @@ function RepairState:Run()
 		return
 	end
 
-	if self.state == 2 then
+	if self.state == 2 then -- 2 = open repair panel
 		self.state = 3
 		BDOLua.Execute("Repair_OpenPanel(true)")
 		self.SleepTimer = PyxTimer:New(3)
@@ -194,20 +196,19 @@ function RepairState:Run()
 		return
 	end
 
-	if self.state == 3 then
+	if self.state == 3 then -- 3 = just a little dealy
 		if not Dialog.IsTalking then
 			print("Repair dialog didn't open")
 			self:Exit()
 			return
 		end
-
 		self.state = 4
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
 		return
 	end
 
-	if self.state == 4 then
+	if self.state == 4 then -- 4 = repair all equipped items
 		self.state = 5
 		if self.RepairEquipped then
 			selfPlayer:RepairAllEquippedItems(npc)
@@ -217,7 +218,7 @@ function RepairState:Run()
 		return
 	end
 
-	if self.state == 5 then
+	if self.state == 5 then -- 6 = repair all items in the inventory
 		self.state = 6
 		if self.RepairInventory then
 			selfPlayer:RepairAllInventoryItems(npc)
@@ -227,16 +228,25 @@ function RepairState:Run()
 		return
 	end
 
-	if self.state == 6 then
+	if self.state == 6 then -- 6 = close repair panel
 		if Bot.EnableDebug and Bot.EnableDebugRepairState then
 			print("Repair done")
 		end
 		BDOLua.Execute("Repair_OpenPanel(false)\r\nFixEquip_Close()")
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
+		self.state = 7
+		return
+	end
+
+	if self.state == 7 then -- 7 = state complete
+		if self.CallWhenCompleted then
+			self.CallWhenCompleted(self)
+		end
 	end
 
 	self:Exit()
+	return false
 end
 
 function RepairState:GetItems()

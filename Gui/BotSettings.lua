@@ -46,8 +46,8 @@ function BotSettings.DrawBotSettings()
 		if ImGui.RadioButton("Boat settings", Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_BOAT_FISHING) then
 			Bot.Settings.StartFishingSettings.FishingMethod = StartFishingState.SETTINGS_ON_BOAT_FISHING
 		end
-		ImGui.Columns(1)
 
+		ImGui.Columns(1)
 		ImGui.Spacing()
 
 		if ImGui.CollapsingHeader("Fishing options", "if_gui_fishing_option", true, false) then

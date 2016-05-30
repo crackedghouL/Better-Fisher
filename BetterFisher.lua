@@ -60,15 +60,53 @@ Bot.RepairState = RepairState()
 Bot.UnequipFishingRodState = UnequipFishingRodState()
 Bot.UnequipFloatState = UnequipFloatState()
 
-function Bot.FormatMoney(amount)
+function comma_value(amount) -- add comma to separate thousands
+	local formatted = amount
 	while true do
-		amount, k = string.gsub(amount, "^(-?%d+)(%d%d%d)", '%1.%2')
-		if k == 0 then
+		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+		if (k == 0) then
 			break
 		end
 	end
+	return formatted
+end
 
-	return amount
+function round(val, decimal) -- rounds a number to the nearest decimal places
+	if (decimal) then
+		return math.floor((val * 10^decimal) + 0.5) / (10^decimal)
+	else
+		return math.floor(val+0.5)
+	end
+end
+
+function Bot.FormatMoney(amount, decimal, neg_prefix) -- used the example from here: http://lua-users.org/wiki/FormattingNumbers
+	local formatted, famount, remain
+
+	decimal = decimal or 0  -- default 2 decimal places
+	neg_prefix = neg_prefix or "-" -- default negative sign
+
+	if decimal ~= 0 then
+		famount = math.abs(round(amount, decimal))
+  		famount = math.floor(famount)
+		remain = round(math.abs(amount) - famount, decimal)
+	end
+
+	formatted = comma_value(famount) -- comma to separate the thousands
+
+	if decimal > 0 then -- attach the decimal portion
+		remain = string.sub(tostring(remain), 3)
+		formatted = formatted .. "." .. remain .. string.rep("0", decimal - string.len(remain))
+	end
+
+	if amount < 0 then -- if value is negative then format accordingly
+		if neg_prefix == "()" then
+			formatted = "("..formatted ..")"
+		else
+			formatted = neg_prefix .. formatted
+		end
+	end
+
+	return formatted
 end
 
 function Bot.ResetStats()
@@ -385,7 +423,7 @@ function Bot.OnPulse()
 	end
 
 	if Bot.Running or Bot.WasRunning then
-		if Bot.Running and (not Bot.Paused or not Bot.PausedManual or Bot.LoopCounter == 0) then
+		if Bot.Running then
 			Bot.FSM:Pulse()
 
 			Bot.Time = math.ceil((Bot.Stats.TotalSession + Pyx.Win32.GetTickCount() - Bot.Stats.SessionStart) / 1000)
@@ -462,41 +500,38 @@ function Bot.LoadSettings()
 end
 
 function Bot.StateMoving(state)
-	local selfPlayer = GetSelfPlayer()
-	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
-
-	if equippedItem ~= nil then
-		if equippedItem.ItemEnchantStaticStatus.IsFishingRod then
-			selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
-		end
+	if Bot.CheckIfRodIsEquipped() then
+		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 end
 
 function Bot.StateComplete(state)
-	if state == Bot.TradeManagerState then
-		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then -- DepositMethod = 1
-			Bot.WarehouseState.Forced = true
+	if Bot.Settings.WarehouseSettings.Enabled then
+		if state == Bot.TradeManagerState then
+			if Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then -- DepositMethod = 1
+				Bot.WarehouseState.Forced = true
+			end
+		elseif state == Bot.VendorState then
+			if Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then -- DepositMethod = 0
+				Bot.WarehouseState.Forced = true
+			end
+		elseif state == Bot.RepairState then
+			if Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then -- DepositMethod = 2
+				Bot.WarehouseState.Forced = true
+			end
 		end
-	elseif state == Bot.VendorState then
-		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then -- DepositMethod = 0
-			Bot.WarehouseState.Forced = true
-		end
-	elseif state == Bot.RepairState then
-		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then -- DepositMethod = 2
-			Bot.WarehouseState.Forced = true
-		end
-	elseif state == Bot.WarehouseState then
-		if Bot.Settings.RepairSettings.Enabled and Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then -- RepairMethod = 0
-			Bot.RepairState.Forced = true
-		end
-	elseif state == Bot.WarehouseState then
-		if Bot.Settings.RepairSettings.Enabled and Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then -- RepairMethod = 1
-			Bot.RepairState.Forced = true
+	elseif Bot.Settings.RepairSettings.Enabled then
+		if state == Bot.WarehouseState then
+			if 	Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE or	-- RepairMethod = 0
+				Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then	-- RepairMethod = 1
+			then
+				Bot.RepairState.Forced = true
+			end
 		end
 	elseif state == Bot.DeathState then
-		if 	Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED or
-			Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_NODE or
-			Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE
+		if 	Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED or -- DeathState = 0
+			Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_REVIVE_NODE or				-- DeathState = 1
+			Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE				-- DeathState = 2
 		then
 			Bot.DeathState.Forced = true
 		else
@@ -535,6 +570,17 @@ function Bot.CheckForNearbyPeople()
 	end
 end
 
+function Bot.CheckIfRodIsEquipped()
+	local selfPlayer = GetSelfPlayer()
+	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
+
+	if equippedItem ~= nil and equippedItem.ItemEnchantStaticStatus.IsFishingRod then then
+		return true
+	end
+
+	return false
+end
+
 function Bot.DeleteItemCheck(item)
 	if table.find(Bot.Settings.InventoryDeleteSettings.DeleteItems, item.ItemEnchantStaticStatus.Name) then
 		return true
@@ -546,12 +592,8 @@ function Bot.DeleteItemCheck(item)
 end
 
 function Bot.ConsumablesCustomRunCheck()
-	local selfPlayer = GetSelfPlayer()
-
 	if selfPlayer.CurrentActionName == "WAIT" then
-		local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
-
-		if equippedItem ~= nil and equippedItem.ItemEnchantStaticStatus.IsFishingRod then
+		if Bot.CheckIfRodIsEquipped() then
 			return true
 		end
 	end

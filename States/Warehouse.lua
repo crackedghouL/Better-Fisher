@@ -65,30 +65,18 @@ function WarehouseState:NeedToRun()
 		self.Forced = false
 	end
 
-	if not self.Settings.Enabled then
-		self.Forced = false
-	end
-
 	if not Navigator.CanMoveTo(self:GetPosition()) then
 		self.Forced = false
 	end
 
-	if selfPlayer.WeightPercent >= 95 then
-		if Navigator.CanMoveTo(self:GetPosition())	then
-			self.Forced = true
-		else
-			print("Need to Deposit money! Can not find path to NPC: " .. self.Settings.NpcName)
-			self.Forced = false
+	if self.Settings.Enabled then
+		if table.length(self:GetItems()) > 0 and (selfPlayer.Inventory.FreeSlots <= 3 or selfPlayer.WeightPercent >= 95) then
+			if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+				self.Forced = true
+			end
 		end
-	end
-
-	if table.length(self:GetItems()) > 0 and (selfPlayer.Inventory.FreeSlots <= 3 or selfPlayer.WeightPercent >= 95) then
-		if Navigator.CanMoveTo(self:GetPosition()) then
-			self.Forced = true
-		else
-			print("Need to Deposit items! Can not find path to NPC: " .. self.Settings.NpcName)
-			self.Forced = false
-		end
+	elseif not self.Settings.Enabled then
+		self.Forced = false
 	end
 
 	if self.Forced or self.ManualForced then
@@ -131,9 +119,8 @@ function WarehouseState:Run()
 	local npcs = GetNpcs()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
-	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
-	if equippedItem then
+	if Bot.CheckIfRodIsEquipped() then
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
@@ -182,18 +169,15 @@ function WarehouseState:Run()
 			self.SleepTimer:Start()
 			return
 		end
-
 		BDOLua.Execute("Warehouse_OpenPanelFromDialog()")
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
-
 		if self.Settings.DepositItems or (not self.Settings.DepositItems and self.ManualForced) then
 			if Bot.EnableDebug and Bot.EnableDebugWarehouseState then
 				print("Deposit list done")
 			end
 			self.CurrentDepositList = self:GetItems()
 		end
-
 		self.state = 3
 		return
 	end
@@ -207,7 +191,6 @@ function WarehouseState:Run()
 				self.SleepTimer = PyxTimer:New(3)
 				self.SleepTimer:Start()
 			end
-
 			self.DepositedMoney = true
 			self.state = 4
 			return
@@ -234,7 +217,6 @@ function WarehouseState:Run()
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
 		end
-
 		table.remove(self.CurrentDepositList, 1)
 		return
 	end
