@@ -17,6 +17,10 @@ function MainWindow.DrawMainWindow()
 	if shouldDisplay then
 		local selfPlayer = GetSelfPlayer()
 
+		if not selfPlayer then
+			return
+		end
+
 		if Bot.Hours == nil then
 			Bot.Hours = 0
 			Bot.Minutes = 0

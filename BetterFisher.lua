@@ -60,10 +60,10 @@ Bot.RepairState = RepairState()
 Bot.UnequipFishingRodState = UnequipFishingRodState()
 Bot.UnequipFloatState = UnequipFloatState()
 
-function comma_value(amount) -- add comma to separate thousands
+function Bot.CommaFormat(amount) -- add comma to separate thousands
 	local formatted = amount
 	while true do
-		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+		formatted, k = string.gsub(amount, "^(-?%d+)(%d%d%d)", '%1.%2')
 		if (k == 0) then
 			break
 		end
@@ -71,32 +71,11 @@ function comma_value(amount) -- add comma to separate thousands
 	return formatted
 end
 
-function round(val, decimal) -- rounds a number to the nearest decimal places
-	if (decimal) then
-		return math.floor((val * 10^decimal) + 0.5) / (10^decimal)
-	else
-		return math.floor(val+0.5)
-	end
-end
-
-function Bot.FormatMoney(amount, decimal, neg_prefix) -- used the example from here: http://lua-users.org/wiki/FormattingNumbers
-	local formatted, famount, remain
-
-	decimal = decimal or 0  -- default 2 decimal places
+function Bot.FormatMoney(amount, neg_prefix) -- used the example from here: http://lua-users.org/wiki/FormattingNumbers
+	local formatted
 	neg_prefix = neg_prefix or "-" -- default negative sign
 
-	if decimal ~= 0 then
-		famount = math.abs(round(amount, decimal))
-  		famount = math.floor(famount)
-		remain = round(math.abs(amount) - famount, decimal)
-	end
-
-	formatted = comma_value(famount) -- comma to separate the thousands
-
-	if decimal > 0 then -- attach the decimal portion
-		remain = string.sub(tostring(remain), 3)
-		formatted = formatted .. "." .. remain .. string.rep("0", decimal - string.len(remain))
-	end
+	formatted = Bot.CommaFormat(amount) -- comma to separate the thousands
 
 	if amount < 0 then -- if value is negative then format accordingly
 		if neg_prefix == "()" then
