@@ -462,13 +462,8 @@ function Bot.LoadSettings()
 end
 
 function Bot.StateMoving(state)
-	local selfPlayer = GetSelfPlayer()
-	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
-
-	if equippedItem ~= nil then
-		if equippedItem.ItemEnchantStaticStatus.IsFishingRod then
-			selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
-		end
+	if Bot.CheckIfRodIsEquipped() then
+		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 end
 
@@ -535,6 +530,17 @@ function Bot.CheckForNearbyPeople()
 	end
 end
 
+function Bot.CheckIfRodIsEquipped()
+	local selfPlayer = GetSelfPlayer()
+	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
+
+	if equippedItem ~= nil and equippedItem.ItemEnchantStaticStatus.IsFishingRod then then
+		return true
+	end
+
+	return false
+end
+
 function Bot.DeleteItemCheck(item)
 	if table.find(Bot.Settings.InventoryDeleteSettings.DeleteItems, item.ItemEnchantStaticStatus.Name) then
 		return true
@@ -546,12 +552,8 @@ function Bot.DeleteItemCheck(item)
 end
 
 function Bot.ConsumablesCustomRunCheck()
-	local selfPlayer = GetSelfPlayer()
-
 	if selfPlayer.CurrentActionName == "WAIT" then
-		local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
-
-		if equippedItem ~= nil and equippedItem.ItemEnchantStaticStatus.IsFishingRod then
+		if Bot.CheckIfRodIsEquipped() then
 			return true
 		end
 	end
