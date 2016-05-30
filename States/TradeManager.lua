@@ -59,16 +59,16 @@ function TradeManagerState:NeedToRun()
 		self.Forced = false
 	end
 
-	if not self.Settings.Enabled then
-		self.Forced = false
-	end
-
 	if not Navigator.CanMoveTo(self:GetPosition()) then
 		self.Forced = false
 	end
 
-	if selfPlayer.Inventory.FreeSlots <= 3 and table.length(self:GetItems()) > 0 and not Looting.IsLooting then
-		self.Forced = true
+	if self.Settings.Enabled then
+		if selfPlayer.Inventory.FreeSlots <= 3 and table.length(self:GetItems()) > 0 and not Looting.IsLooting then
+			self.Forced = true
+		end
+	elseif not self.Settings.Enabled then
+		self.Forced = false
 	end
 
 	if self.Forced or self.ManualForced then
@@ -121,13 +121,12 @@ function TradeManagerState:Run()
 			self.CallWhileMoving(self)
 		end
 
-		Navigator.MoveTo(vendorPosition,false,Bot.Settings.PlayerRun)
+		Navigator.MoveTo(vendorPosition, nil, Bot.Settings.PlayerRun)
 		if self.state > 1 then
 			self:Exit()
 			return
 		end
 
-		valueChanged = true
 		self.state = 1
 		return
 	end
@@ -146,6 +145,7 @@ function TradeManagerState:Run()
 
 	table.sort(npcs, function(a,b) return a.Position:GetDistance3D(vendorPosition) < b.Position:GetDistance3D(vendorPosition) end)
 	local npc = npcs[1]
+
 	if self.state == 1 then -- 1 = open npc dialog
 		npc:InteractNpc()
 		self.SleepTimer = PyxTimer:New(3)
@@ -160,7 +160,6 @@ function TradeManagerState:Run()
 			self:Exit()
 			return
 		end
-
 		BDOLua.Execute("npcShop_requestList()")
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
@@ -177,13 +176,11 @@ function TradeManagerState:Run()
 					BDOLua.Execute("click_TradeGameStart()")
 					BDOLua.Execute("messageBox_YesButtonUp()")
 					self.BargainCount = 0
-
 					if math.random(2) == 2 then
 						self.BargainDice = 0
 					else
 						self.BargainDice = 1
 					end
-
 					self.SleepTimer = PyxTimer:New(2)
 					self.SleepTimer:Start()
 					self.BargainState = 1
@@ -203,7 +200,6 @@ function TradeManagerState:Run()
 					end
 					self.SleepTimer = PyxTimer:New(2)
 					self.SleepTimer:Start()
-
 					BDOLua.Execute("Fglobal_TradeGame_Close()")
 					self.SleepTimer = PyxTimer:New(2)
 					self.SleepTimer:Start()
@@ -232,7 +228,6 @@ function TradeManagerState:Run()
 						BDOLua.Execute("tradeGame_HighDice()")
 						self.BargainDice = 0
 					end
-
 					self.SleepTimer = PyxTimer:New(2)
 					self.SleepTimer:Start()
 					self.BargainCount = self.BargainCount + 1
@@ -252,7 +247,6 @@ function TradeManagerState:Run()
 			self:Exit()
 			return
 		end
-
 		TradeMarket.SellAll() -- Currently only Sell All is supported
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
@@ -264,7 +258,6 @@ function TradeManagerState:Run()
 		if TradeMarket.IsTrading then
 			TradeMarket.Close()
 		end
-
 		Bot.SilverStats(false)
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()

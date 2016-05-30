@@ -66,30 +66,26 @@ function VendorState:NeedToRun()
 		self.Forced = false
 	end
 
-	if not self.Settings.Enabled then
-		self.Forced = false
-	end
-
-	if not self.Settings.SellEnabled and not self.Settings.BuyEnabled then
-		self.Forced = false
-	end
-
 	if not Navigator.CanMoveTo(self:GetPosition()) then
 		self.Forced = false
 	end
 
-	if self.Settings.SellEnabled then
-		if self.Settings.VendorOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3 and table.length(self:GetSellItems()) > 0 then
-			self.Forced = true
-		elseif self.Settings.VendorOnWeight and selfPlayer.WeightPercent >= 95 and table.length(self:GetSellItems()) > 0 then
-			self.Forced = true
+	if self.Settings.Enabled then
+		if self.Settings.SellEnabled then
+			if table.length(self:GetSellItems()) > 0 then
+				if (self.Settings.VendorOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3) or (self.Settings.VendorOnWeight and selfPlayer.WeightPercent >= 95) then
+					self.Forced = true
+				end
+			end
+		elseif self.Settings.BuyEnabled then
+			if self.Settings.BuyItems and table.length(self:GetBuyItems(false)) > 0 then
+				self.Forced = true
+			end
+		elseif not self.Settings.SellEnabled and not self.Settings.BuyEnabled then
+			self.Forced = false
 		end
-	end
-
-	if self.Settings.BuyEnabled then
-		if self.Settings.BuyItems and table.length(self:GetBuyItems(false)) > 0 then
-			self.Forced = true
-		end
+	elseif not self.Settings.Enabled then
+		self.Forced = false
 	end
 
 	if self.Forced or self.ManualForced then
@@ -146,11 +142,12 @@ function VendorState:Run()
 			self.CallWhileMoving(self)
 		end
 
-		Navigator.MoveTo(vendorPosition,nil,Bot.Settings.PlayerRun)
+		Navigator.MoveTo(vendorPosition, nil, Bot.Settings.PlayerRun)
 		if self.state > 1 then
 			self:Exit()
 			return
 		end
+
 		self.state = 1
 		return
 	end
@@ -158,13 +155,13 @@ function VendorState:Run()
 	Navigator.Stop()
 
 	if self.SleepTimer ~= nil and self.SleepTimer:IsRunning() and not self.SleepTimer:Expired() then
-		return false
+		return
 	end
 
 	if table.length(npcs) < 1 then
 		print("Could not find any Vendor NPC's")
 		self:Exit()
-		return false
+		return
 	end
 
 	table.sort(npcs, function(a,b) return a.Position:GetDistance3D(vendorPosition) < b.Position:GetDistance3D(vendorPosition) end)
@@ -182,13 +179,11 @@ function VendorState:Run()
 		if not Dialog.IsTalking then
 			print(self.Settings.NpcName " dialog didn't open")
 			self:Exit()
-			return false
+			return
 		end
-
 		BDOLua.Execute("npcShop_requestList()")
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
-
 		if self.Settings.BuyEnabled and self.Settings.SellEnabled then
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
 				print("Buy/Sell list done")
@@ -211,7 +206,6 @@ function VendorState:Run()
 		else
 			self.state = 5
 		end
-
 		return
 	end
 
@@ -234,7 +228,6 @@ function VendorState:Run()
 			self.SleepTimer = PyxTimer:New(2)
 			self.SleepTimer:Start()
 		end
-
 		table.remove(self.CurrentSellList, 1)
 		return
 	end
@@ -263,7 +256,6 @@ function VendorState:Run()
 			for cnt = 1, item.countNeeded do
 				itemPtr:Buy(1)
 			end
-
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
 		else
@@ -271,7 +263,6 @@ function VendorState:Run()
 				print("Need to buy \"" .. item.name .. "\" quantity: " .. item.countNeeded .. " but  ".. self.Settings.NpcName .. " don't have it!")
 			end
 		end
-
 		table.remove(self.CurrentBuyList, 1)
 		return
 	end
@@ -301,17 +292,11 @@ end
 function VendorState:CanSellGrade(item)
 	if self.Settings.VendorWhite and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_WHITE then
 		return true
-	end
-
-	if self.Settings.VendorGreen and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_GREEN then
+	elseif self.Settings.VendorGreen and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_GREEN then
 		return true
-	end
-
-	if self.Settings.VendorBlue and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_BLUE then
+	elseif self.Settings.VendorBlue and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_BLUE then
 		return true
-	end
-
-	if self.Settings.VendorGold and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_GOLD then
+	elseif self.Settings.VendorGold and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_GOLD then
 		return true
 	end
 
@@ -368,7 +353,7 @@ function VendorState:StockUpToBuy(itemName, count)
 end
 
 function VendorState:GetBuyItems(stockUp)
-	local items = { }
+	local items = {}
 	local selfPlayer = GetSelfPlayer()
 	local countNeeded = nil
 
