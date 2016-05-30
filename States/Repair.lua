@@ -63,15 +63,11 @@ function RepairState:NeedToRun()
 		self.Forced = false
 	end
 
-<<<<<<< HEAD
 	if not Navigator.CanMoveTo(self:GetPosition()) then
 		self.Forced = false
 	end
 
-	if not equippedItem then
-=======
 	if not selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND) then
->>>>>>> develop
 		for k,v in pairs(selfPlayer.Inventory.Items) do
 			if 	v.HasEndurance and v.EndurancePercent <= 0 and
 				(v.ItemEnchantStaticStatus.IsFishingRod and
