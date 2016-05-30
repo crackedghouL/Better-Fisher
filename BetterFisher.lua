@@ -500,6 +500,7 @@ function Bot.LoadSettings()
 end
 
 function Bot.StateMoving(state)
+	local selfPlayer = GetSelfPlayer()
 	if Bot.CheckIfRodIsEquipped() then
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
@@ -523,7 +524,7 @@ function Bot.StateComplete(state)
 	elseif Bot.Settings.RepairSettings.Enabled then
 		if state == Bot.WarehouseState then
 			if 	Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE or	-- RepairMethod = 0
-				Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then	-- RepairMethod = 1
+				Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER			-- RepairMethod = 1
 			then
 				Bot.RepairState.Forced = true
 			end
@@ -574,7 +575,7 @@ function Bot.CheckIfRodIsEquipped()
 	local selfPlayer = GetSelfPlayer()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
-	if equippedItem ~= nil and equippedItem.ItemEnchantStaticStatus.IsFishingRod then then
+	if equippedItem ~= nil and equippedItem.ItemEnchantStaticStatus.IsFishingRod then
 		return true
 	end
 
@@ -592,6 +593,7 @@ function Bot.DeleteItemCheck(item)
 end
 
 function Bot.ConsumablesCustomRunCheck()
+	local selfPlayer = GetSelfPlayer()
 	if selfPlayer.CurrentActionName == "WAIT" then
 		if Bot.CheckIfRodIsEquipped() then
 			return true
