@@ -351,7 +351,7 @@ function Bot.OnPulse()
 	end
 
 	if Bot.FSM.CurrentState == Bot.MoveToFishingSpotState then
-		local randomDistance = math.random(90,110)
+		local randomDistance = math.random(Bot.Settings.FishingSpotRadius - 20, Bot.Settings.FishingSpotRadius)
 		if ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe <= randomDistance then
 			Navigator.Stop(true) -- seem to work better than the doaction
 		end

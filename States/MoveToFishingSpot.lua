@@ -33,7 +33,7 @@ function MoveToFishingSpotState:NeedToRun()
 		return false
 	end
 
-	return ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe >= 100
+	return ProfileEditor.CurrentProfile:GetFishSpotPosition().Distance3DFromMe >= Bot.Settings.FishingSpotRadius
 end
 
 function MoveToFishingSpotState:Run()

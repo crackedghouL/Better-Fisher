@@ -1,6 +1,9 @@
 Navigator = {}
 Navigator.Running = false
 Navigator.IsAutoRunning = false
+Navigator.LastAutorunTick = 0
+Navigator.AutorunState = 0
+Navigator.AutorunFinish = false
 Navigator.Destination = Vector3(0, 0, 0)
 Navigator.Waypoints = {}
 Navigator.ApproachDistance = 100
@@ -177,7 +180,13 @@ function Navigator.MoveTo(destination, forceRecalculate, playerRun)
 		return false
 	end
 
-	if Bot.Settings.UseAutorun and destination.Distance3DFromMe > Bot.Settings.UseAutorunDistance then
+	if Bot.Settings.UseAutorun and destination.Distance3DFromMe > Bot.Settings.UseAutorunDistance and not Navigator.AutorunFinish then
+		if Navigator.LastAutorunTick == 0 or Pyx.Win32.GetTickCount() - Navigator.LastAutorunTick < 500 then
+			if Navigator.LastAutorunTick == 0 then
+				Navigator.LastAutorunTick = Pyx.Win32.GetTickCount()
+			end
+			return true
+		end
 		local newDest = false
 		if Navigator.Destination.X ~= destination.X or
 			Navigator.Destination.Y ~= destination.Y or
@@ -186,31 +195,47 @@ function Navigator.MoveTo(destination, forceRecalculate, playerRun)
 			newDest = true
 			if Navigator.IsAutoRunning then
 				print("New destination. Stopping.")
-				GetSelfPlayer():DoAction("RUN_SHORTSTOP")
+				Navigator.Stop()
 			end
 		end
 
 		if not Navigator.IsAutoRunning or newDest then
-			print("Starting Autorun...")
-			Navigator.Destination = destination
-			local code = string.format([[
-				ToClient_DeleteNaviGuideByGroup(0)
-				local target = float3(%f, %f, %f)
-				local repairNaviKey = ToClient_WorldMapNaviStart( target, NavigationGuideParam(), true, true )
-				local selfPlayer = getSelfPlayer():get()
-				selfPlayer:setNavigationMovePath(key)
-				selfPlayer:checkNaviPathUI(key)
-			]], destination.X, destination.Y, destination.Z)
-			BDOLua.Execute(code)
-			Navigator.IsAutoRunning = true
+			if Navigator.AutorunState == 0 then
+				if selfPlayer.CurrentActionName ~= "RUN_SHORTSTOP" and selfPlayer.CurrentActionName ~= "WAIT" then
+					GetSelfPlayer():DoAction("RUN_SHORTSTOP")
+				end
+				Navigator.LastAutorunTick = Pyx.Win32.GetTickCount()
+				Navigator.AutorunState = 1
+			end
+			if Navigator.AutorunState == 1 and (Navigator.LastAutorunTick == 0 or Pyx.Win32.GetTickCount() - Navigator.LastAutorunTick > 500) then 
+				print("Starting Autorun...")
+				Navigator.Destination = destination
+				local code = string.format([[
+					ToClient_DeleteNaviGuideByGroup(0)
+					local target = float3(%f, %f, %f)
+					local repairNaviKey = ToClient_WorldMapNaviStart( target, NavigationGuideParam(), true, true )
+					local selfPlayer = getSelfPlayer():get()
+					selfPlayer:setNavigationMovePath(key)
+					selfPlayer:checkNaviPathUI(key)
+				]], destination.X, destination.Y, destination.Z)
+				BDOLua.Execute(code)
+				Navigator.IsAutoRunning = true
+				Navigator.AutorunState = 0
+			end
 		end
 	else
 		if Navigator.IsAutoRunning then
 				print("Destination is close, stopping autorun.")
+				GetSelfPlayer():DoAction("RUN_SHORTSTOP")
 				Navigator.IsAutoRunning = false
+				Navigator.AutorunFinish = true
 				forceRecalculate = true
 				BDOLua.Execute("ToClient_DeleteNaviGuideByGroup(0)")
+				Navigator.LastAutorunTick = Pyx.Win32.GetTickCount()
 				return true
+		end
+		if Bot.Settings.UseAutorun and Navigator.AutorunState == 0 and Pyx.Win32.GetTickCount() - Navigator.LastAutorunTick < 500 then
+			return true
 		end
 		if (forceRecalculate == nil or not forceRecalculate) and
 			Navigator.Destination.X == destination.X and
@@ -225,9 +250,10 @@ function Navigator.MoveTo(destination, forceRecalculate, playerRun)
 
 		local waypoints = Navigator.GetPath(selfPlayer.Position, destination)
 		if waypoints == nil then
+			print("Cannot find path!")
 			return false
 		end
-		print("Cannot find path!")
+		
 
 		if waypoints[#waypoints]:GetDistance3D(destination) > Navigator.ApproachDistance then
 			table.insert(waypoints, destination)
@@ -247,7 +273,7 @@ function Navigator.MoveTo(destination, forceRecalculate, playerRun)
 end
 
 function Navigator.Stop()
-	if Navigator.IsAutoRunning then
+	if Navigator.Running or Navigator.IsAutoRunning then
 		GetSelfPlayer():DoAction("RUN_SHORTSTOP")
 	end
 	Navigator.Waypoints = {}
@@ -256,6 +282,7 @@ function Navigator.Stop()
 	Navigator.Destination = Vector3(0, 0, 0)
 	Navigator.LastWayPoint = false
 	Navigator.StuckCount = 0
+	Navigator.AutorunFinish = false
 
 	local selfPlayer = GetSelfPlayer()
 	if selfPlayer then
@@ -266,11 +293,11 @@ end
 function Navigator.OnPulse()
 	local selfPlayer = GetSelfPlayer()
 
-	if selfPlayer ~= nil and not selfPlayer.IsRunning and not selfPlayer.IsSwimming then
+	if selfPlayer ~= nil and not selfPlayer.IsRunning and not Navigator.IsAutoRunning and not selfPlayer.IsSwimming then
 		-- Navigator.LastStuckCheckTickcount = Pyx.Win32.GetTickCount()
 		Navigator.LastStuckTimer:Reset()
 		Navigator.LastStuckTimer:Start()
-		Navigator.LastStuckCheckPosition = selfPlayer.Position
+		-- Navigator.LastStuckCheckPosition = selfPlayer.Position
 	end
 
 	if (Navigator.Running or Navigator.IsAutoRunning) and selfPlayer then
@@ -281,7 +308,10 @@ function Navigator.OnPulse()
 			Navigator.LastObstacleCheckTick = Pyx.Win32.GetTickCount()
 		end
 
-		if Navigator.LastStuckTimer:Expired() then
+		-- if Navigator.LastStuckTimer:Expired() then
+		if (Navigator.LastStuckCheckTickcount == 0 or Pyx.Win32.GetTickCount() - Navigator.LastStuckCheckTickcount > 1000)
+			and not (Navigator.AutorunFinish and Pyx.Win32.GetTickCount() - Navigator.LastStuckCheckTickcount < 3000)
+		then
 			if (Navigator.LastStuckCheckPosition.Distance2DFromMe < 35) then
 				print("I'm stuck, jump forward !")
 				if Navigator.StuckCount < 20 then
@@ -307,6 +337,7 @@ function Navigator.OnPulse()
 			else
 				Navigator.StuckCount = 0
 			end
+			Navigator.LastStuckCheckTickcount = Pyx.Win32.GetTickCount()
 			Navigator.LastStuckTimer:Reset()
 			Navigator.LastStuckTimer:Start()
 			Navigator.LastStuckCheckPosition = selfPlayer.Position
@@ -325,11 +356,11 @@ function Navigator.OnPulse()
 				end
 			end
 		end
-		if  Pyx.Win32.GetTickCount() - Navigator.LastSprintTick < 500 and not Navigator.LastWayPoint and Bot.Settings.PlayerRun and selfPlayer.StaminaPercent >= 100 
-			and not selfPlayer.IsSwimming and table.length(Navigator.Waypoints) > 6 or (Navigator.IsAutoRunning and selfPlayer.StaminaPercent >= 100)
+		if  (Navigator.LastSprintTick == 0 or Pyx.Win32.GetTickCount() - Navigator.LastSprintTick > 1000) and (not Navigator.LastWayPoint and Bot.Settings.PlayerRun and selfPlayer.StaminaPercent >= 100 
+			and not selfPlayer.IsSwimming and table.length(Navigator.Waypoints) > 6 or (Navigator.IsAutoRunning and selfPlayer.StaminaPercent >= 100))
 		then
 			if not selfPlayer.IsBattleMode then
-			   selfPlayer:DoAction("RUN_SPRINT_FAST_ST")
+			    selfPlayer:DoAction("RUN_SPRINT_FAST_ST")
 			else
 				selfPlayer:DoAction("BT_RUN_SPRINT")
 			end
