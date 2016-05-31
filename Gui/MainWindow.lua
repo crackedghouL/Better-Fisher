@@ -140,20 +140,19 @@ function MainWindow.DrawMainWindow()
 			if ImGui.BeginMenu("Info") then
 				if ImGui.MenuItem("Aboud BF", "") then
 					local motto = {
-						'   ~Fishing is love, fishing is life~   ',
+						' ~~~~Fishing is love, fishing is life~~~ ',
 						' ~So Long, and Thanks for All the Fish~ ',
-						'     ~The whole world is my hotspot~    ',
-						'  ~The power of fish makes us infinite~ ',
-						'  ~I only fish on days that end in “Y”~ ',
-						'     ~Born to fish...Forced to work~    '
+						'~~~The whole world is my hotspot~~~',
+						' ~The power of fish makes us infinite~ ',
+						' ~~I only fish on days that end in "Y"~~ ',
+						' ~~~Born to fish ... Forced to work~~~ '
 					}
-
-					print("##########################################")
-					print("#     Made with love by spearmint <3     #")
-					print("#   Thanks to: gklt, Akafist, tyty123    #")
-					print("#   pat, Pookie, borek24 and MrUnreal.   #")
-					print("#" .. motto[math.random(#motto)] .. "#")
-					print("##########################################")
+					print("*******************************************")
+					print("***** Made with love by spearmint <3 ****")
+					print("***** Thanks to: gklt, Akafist, tyty123 *****")
+					print("*** pat, Pookie, borek24 and MrUnreal. ***")
+					print("*" .. motto[math.random(#motto)] .. "*")
+					print("*******************************************")
 				end
 				ImGui.EndMenu()
 			end
