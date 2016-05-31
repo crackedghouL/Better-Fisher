@@ -154,6 +154,13 @@ function MainWindow.DrawMainWindow()
 					print("*" .. motto[math.random(#motto)] .. "*")
 					print("*******************************************")
 				end
+				if ImGui.MenuItem("Check for update", "") then
+					if string.find(tostring(Bot.Version), "DEV") then
+						os.execute("start https://github.com/miracle091/Better-Fisher/tree/develop")
+					else
+						os.execute("start https://github.com/miracle091/Better-Fisher/releases")
+					end
+				end
 				ImGui.EndMenu()
 			end
 			ImGui.EndMenuBar()
@@ -165,13 +172,13 @@ function MainWindow.DrawMainWindow()
 		ImGui.SameLine()
 		if not Bot.EnableDebug and not Bot.EnableDebugMainWindow then
 			if Bot.Running and Bot.FSM.CurrentState and not Bot.Paused then
-				ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Running")
+				ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Running") -- green
 			elseif (not Bot.WasRunning and Bot.Paused) or (Bot.Paused and Bot.PausedManual and Bot.LoopCounter > 0) then
-				ImGui.TextColored(ImVec4(1,0.8,0.2,1), "Paused")
+				ImGui.TextColored(ImVec4(1,0.8,0.2,1), "Paused") -- yellow
 			elseif selfPlayer.Inventory.FreeSlots == 0 then
-				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Inv. Full")
+				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Inv. Full") -- red
 			else
-				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Stopped")
+				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Stopped") -- red
 			end
 		else
 			ImGui.Text(selfPlayer.CurrentActionName)
@@ -197,7 +204,13 @@ function MainWindow.DrawMainWindow()
 		ImGui.Separator()
 
 		ImGui.Columns(2)
-		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", Bot.Hours, Bot.Minutes, Bot.Seconds))
+		if (not Bot.WasRunning and Bot.Paused) or (Bot.Paused and Bot.PausedManual and Bot.LoopCounter > 0) then
+			ImGui.Text("Time:")
+			ImGui.SameLine()
+			ImGui.TextColored(ImVec4(1,0.8,0.2,1), string.format("%02.f:%02.f:%02.f", Bot.Hours, Bot.Minutes, Bot.Seconds)) -- yellow
+		else
+			ImGui.Text(string.format("Time: %02.f:%02.f:%02.f", Bot.Hours, Bot.Minutes, Bot.Seconds))
+		end
 		ImGui.NextColumn()
 		ImGui.Text("Loots: " .. string.format("%i", Bot.Stats.Loots))
 

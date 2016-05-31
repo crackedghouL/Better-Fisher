@@ -60,31 +60,14 @@ Bot.RepairState = RepairState()
 Bot.UnequipFishingRodState = UnequipFishingRodState()
 Bot.UnequipFloatState = UnequipFloatState()
 
-function Bot.CommaFormat(amount) -- add comma to separate thousands
+function Bot.FormatMoney(amount) -- used the example from here: http://lua-users.org/wiki/FormattingNumbers
 	local formatted = amount
 	while true do
-		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1.%2')
+		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1.%2') -- comma to separate the thousands
 		if (k == 0) then
 			break
 		end
 	end
-	return formatted
-end
-
-function Bot.FormatMoney(amount) -- used the example from here: http://lua-users.org/wiki/FormattingNumbers
-	-- neg_prefix is useless here, we are working with integers already !
-
-	-- neg_prefix = neg_prefix or "-" -- default negative sign
-	--[[if amount < 0 then -- if value is negative then format accordingly
-		if neg_prefix == "()" then
-			formatted = "("..formatted ..")"
-		else
-			formatted = neg_prefix .. formatted
-		end
-	end]]
-	
-	local formatted
-	formatted = Bot.CommaFormat(amount) -- comma to separate the thousands
 	return formatted
 end
 
