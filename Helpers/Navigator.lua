@@ -335,6 +335,23 @@ function Navigator.OnPulse()
 					print("Still stuck. Lets try to re-generate path")
 					Navigator.MoveTo(Navigator.Destination, true)
 				end
+				if Navigator.StuckCount == 4 then
+                			print("Still stuck. Autorun still active?")
+                			if Bot.Settings.UseAutorun and not Navigator.AutorunFinish then
+                			print("Autorun should be active but isn't. Activating Autorun")
+                        		local code = string.format([[
+                        		ToClient_DeleteNaviGuideByGroup(0)
+                        		local target = float3(%f, %f, %f)
+                        		local repairNaviKey = ToClient_WorldMapNaviStart( target, NavigationGuideParam(), true, true )
+                        		local selfPlayer = getSelfPlayer():get()
+                        		selfPlayer:setNavigationMovePath(key)
+                        		selfPlayer:checkNaviPathUI(key)
+                        		]], Navigator.Destination.X, Navigator.Destination.Y, Navigator.Destination.Z)
+                        		BDOLua.Execute(code)
+                        		Navigator.IsAutoRunning = true
+                        		Navigator.AutorunState = 0
+                    		end
+                	end
 				if Navigator.OnStuckCall ~= nil then
 					Navigator.OnStuckCall()
 				end
