@@ -236,7 +236,7 @@ function RepairState:Run()
 	end
 
 	if self.state == 7 then -- 7 = state complete
-		if Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then
+		if Bot.Settings.WarehouseSettings.Enabled == true and Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then
 			Bot.WarehouseState.ManualForced = true
 			print("Forcing deposit after repair...")
 		end

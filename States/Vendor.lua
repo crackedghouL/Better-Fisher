@@ -280,7 +280,7 @@ function VendorState:Run()
 	end
 
 	if self.state == 6 then -- 6 = state complete
-		if Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then
+		if Bot.Settings.WarehouseSettings.Enabled == true and Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then
 			Bot.WarehouseState.ManualForced = true
 			print("Forcing deposit after vendor...")
 		end
