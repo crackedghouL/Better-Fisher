@@ -30,7 +30,6 @@ function TradeManagerState.new()
 	self.CallWhileMoving = nil
 
 	self.BargainState = 0
-	self.BargainCount = 0
 	self.BargainDice = 0 -- Last dice, 0=high 1=low
 
 	self.Forced = false
@@ -175,7 +174,6 @@ function TradeManagerState:Run()
 				if energy >= 5 then
 					BDOLua.Execute("click_TradeGameStart()")
 					BDOLua.Execute("messageBox_YesButtonUp()")
-					self.BargainCount = 0
 					if math.random(2) == 2 then
 						self.BargainDice = 0
 					else
@@ -206,7 +204,7 @@ function TradeManagerState:Run()
 					self.BargainState = 0
 					self.state = 4
 					self.CurrentSellList = self:GetItems()
-				elseif self.BargainCount >= 3 then
+				elseif tonumber(string.match (BDOLua.Execute("return UI.getChildControl(Panel_TradeGame, \"StaticText_RemainCount\"):GetText()"),"%d+")) <=0  then
 					if Bot.EnableDebug and Bot.EnableDebugTradeManagerState then
 						print("Bargain fail")
 					end
@@ -230,7 +228,6 @@ function TradeManagerState:Run()
 					end
 					self.SleepTimer = PyxTimer:New(2)
 					self.SleepTimer:Start()
-					self.BargainCount = self.BargainCount + 1
 				end
 			end
 		else
