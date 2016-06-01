@@ -12,7 +12,7 @@ MainWindow.ConfirmPopup = false
 -----------------------------------------------------------------------------
 
 function MainWindow.DrawMainWindow()
-	local _, shouldDisplay = ImGui.Begin(Bot.Version, true, ImVec2(260, 150), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
+	local _, shouldDisplay = ImGui.Begin(Bot.Version, true, ImVec2(265, 150), -1.0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize)
 
 	if shouldDisplay then
 		local selfPlayer = GetSelfPlayer()
@@ -40,21 +40,19 @@ function MainWindow.DrawMainWindow()
 						Bot.Stop()
 					end
 				end
-				if ImGui.MenuItem("Pause", "") then
+				if ImGui.MenuItem("Pause", "ALT+P") then
 					if Bot.Running then
-						if Bot.Paused then
+						if not Bot.Paused and Bot.PausedManual then
 							Bot.PausedManual = false
-							Bot.Paused = false
 						else
 							Bot.PausedManual = true
-							Bot.Paused = true
 						end
 					else
 						print("Start the Script first!")
 					end
 				end
 				ImGui.Separator()
-				if ImGui.MenuItem("Open Profile Editor", "ALT+P", ProfileEditor.Visible) then
+				if ImGui.MenuItem("Open Profile Editor", "ALT+E", ProfileEditor.Visible) then
 					if not ProfileEditor.Visible then
 						ProfileEditor.Visible = true
 					elseif ProfileEditor.Visible then
@@ -85,7 +83,7 @@ function MainWindow.DrawMainWindow()
 						LibConsumableWindow.Visible = false
 					end
 				end
-				if ImGui.MenuItem("Loot stats", "ALT+L",Stats.Visible) then
+				if ImGui.MenuItem("Stats", "ALT+L",Stats.Visible) then
 					if not Stats.Visible then
 						Stats.Visible = true
 					elseif Stats.Visible then
@@ -96,41 +94,49 @@ function MainWindow.DrawMainWindow()
 			end
 			if ImGui.BeginMenu("Force") then
 				if ImGui.MenuItem("Go to Warehouse", "ALT+W") then
-					if Bot.Running then
+					if Bot.Running and (not Bot.Paused or not Bot.PausedManual) then
 						Bot.WarehouseState.ManualForced = true
 						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
 							print("Go to Warehouse")
 						end
+					elseif not Bot.Paused and Bot.PausedManual then
+						print("Unpause the bot first!")
 					else
 						print("Start the Script first!")
 					end
 				end
 				if ImGui.MenuItem("Go to Trader", "ALT+T") then
-					if Bot.Running then
+					if Bot.Running and (not Bot.Paused or not Bot.PausedManual) then
 						Bot.TradeManagerState.ManualForced = true
 						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
 							print("Go to Trader")
 						end
+					elseif not Bot.Paused and Bot.PausedManual then
+						print("Unpause the bot first!")
 					else
 						print("Start the Script first!")
 					end
 				end
 				if ImGui.MenuItem("Go to Vendor", "ALT+V") then
-					if Bot.Running then
+					if Bot.Running and (not Bot.Paused or not Bot.PausedManual) then
 						Bot.VendorState.ManualForced = true
 						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
 							print("Go to Vendor")
 						end
+					elseif not Bot.Paused and Bot.PausedManual then
+						print("Unpause the bot first!")
 					else
 						print("Start the Script first!")
 					end
 				end
-				if ImGui.MenuItem("Go Repair", "ALT+G") then
-					if Bot.Running then
+				if ImGui.MenuItem("Go Repair", "ALT+R") then
+					if Bot.Running and (not Bot.Paused or not Bot.PausedManual) then
 						Bot.RepairState.ManualForced = true
 						if Bot.EnableDebug and Bot.EnableDebugMainWindow then
 							print("Go Repair")
 						end
+					elseif not Bot.Paused and Bot.PausedManual then
+						print("Unpause the bot first!")
 					else
 						print("Start the Script first!")
 					end
@@ -172,12 +178,12 @@ function MainWindow.DrawMainWindow()
 		ImGui.Text("State:")
 		ImGui.SameLine()
 		if not Bot.EnableDebug and not Bot.EnableDebugMainWindow then
-			if Bot.Running and Bot.FSM.CurrentState and not Bot.Paused then
-				ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Running") -- green
-			elseif (not Bot.WasRunning and Bot.Paused) or (Bot.Paused and Bot.PausedManual and Bot.LoopCounter > 0) then
-				ImGui.TextColored(ImVec4(1,0.8,0.2,1), "Paused") -- yellow
-			elseif selfPlayer.Inventory.FreeSlots == 0 then
-				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Inv. Full") -- red
+			if Bot.Running then
+				if (not Bot.WasRunning and Bot.Paused) or ((Bot.Paused or Bot.PausedManual) and Bot.LoopCounter > 0) then
+					ImGui.TextColored(ImVec4(1,0.8,0.2,1), "Paused") -- yellow
+				else
+					ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Running") -- green
+				end
 			else
 				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Stopped") -- red
 			end
@@ -189,9 +195,9 @@ function MainWindow.DrawMainWindow()
 
 		ImGui.Text("Inv. slots left:")
 		ImGui.SameLine()
-		if selfPlayer.Inventory.FreeSlots > 25 then
+		if selfPlayer.Inventory.FreeSlots > 20 then
 			ImGui.TextColored(ImVec4(0.2,1,0.2,1), selfPlayer.Inventory.FreeSlots) -- green
-		elseif selfPlayer.Inventory.FreeSlots >= 10 and selfPlayer.Inventory.FreeSlots <= 25 then
+		elseif selfPlayer.Inventory.FreeSlots >= 10 and selfPlayer.Inventory.FreeSlots <= 20 then
 			ImGui.TextColored(ImVec4(1,0.8,0.2,1), selfPlayer.Inventory.FreeSlots) -- yellow
 		elseif selfPlayer.Inventory.FreeSlots >= 5 and selfPlayer.Inventory.FreeSlots < 10 then
 			ImGui.TextColored(ImVec4(1,0.4,0.2,1), selfPlayer.Inventory.FreeSlots) -- orange
@@ -205,12 +211,12 @@ function MainWindow.DrawMainWindow()
 		ImGui.Separator()
 
 		ImGui.Columns(2)
-		if (not Bot.WasRunning and Bot.Paused) or (Bot.Paused and Bot.PausedManual and Bot.LoopCounter > 0) then
+		if (not Bot.WasRunning and Bot.Paused) or ((Bot.Paused or Bot.PausedManual) and Bot.LoopCounter > 0) then
 			ImGui.Text("Time:")
 			ImGui.SameLine()
 			ImGui.TextColored(ImVec4(1,0.8,0.2,1), string.format("%02.f:%02.f:%02.f", Bot.Hours, Bot.Minutes, Bot.Seconds)) -- yellow
 		else
-			ImGui.Text(string.format("Time: %02.f:%02.f:%02.f", Bot.Hours, Bot.Minutes, Bot.Seconds))
+			ImGui.Text(string.format("Time:  %02.f:%02.f:%02.f", Bot.Hours, Bot.Minutes, Bot.Seconds))
 		end
 		ImGui.NextColumn()
 		ImGui.Text("Loots: " .. string.format("%i", Bot.Stats.Loots))

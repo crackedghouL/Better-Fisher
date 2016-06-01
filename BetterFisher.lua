@@ -5,6 +5,7 @@ Bot.Version = "Better Fisher v0.9d DEV"
 
 Bot.Running = false
 Bot.Paused = false
+Bot.PausedManual = false
 Bot.PrintConsoleState = false
 Bot.EnableDebug = false
 Bot.EnableDebugMainWindow = false
@@ -211,6 +212,9 @@ end
 function Bot.Stop()
 	Navigation.MesherEnabled = false
 	Bot.Running = false
+	Bot.LoopCounter = 0
+	Bot.Paused = false
+	Bot.PausedManual = false
 	Bot.FSM:Reset()
 	Bot.WarehouseState:Reset()
 	Bot.VendorState:Reset()
@@ -227,15 +231,30 @@ function Bot.OnPulse()
 		if Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('S')) then
 			if Bot._startHotKeyPressed ~= true then
 				Bot._startHotKeyPressed = true
-				if Bot.Running then
+				if Bot.Running and (not Bot.Paused or not Bot.PausedManual) then
 					print("Stopping bot from hotkey")
 					Bot.Stop()
+				elseif Bot.Paused then
+					print("Bot remain paused, cause of some options enabled")
+				elseif Bot.PausedManual then
+					print("Unpause the bot first!")
 				else
 					print("Starting bot from hotkey")
 					Bot.Start()
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('P')) then
+			if Bot._pauseHotKeyPressed ~= true then
+				Bot._pauseHotKeyPressed = true
+				if Bot.Running and (not Bot.Paused and not Bot.PausedManual) then
+					print("Pausing bot from hotkey")
+					Bot.PausedManual = true
+				elseif not Bot.Paused and Bot.PausedManual then
+					print("Unpausing bot from hotkey")
+					Bot.PausedManual = false
+				end
+			end
+		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('E')) then
 			if Bot._profileHotKeyPressed ~= true then
 				Bot._profileHotKeyPressed = true
 				if not ProfileEditor.Visible then
@@ -283,11 +302,15 @@ function Bot.OnPulse()
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('W')) then
 			if Bot._warehouseHotKeyPressed ~= true then
 				Bot._warehouseHotKeyPressed = true
-				if Bot.Running then
+				if Bot.Running and (not Bot.Paused or not Bot.PausedManual) then
 					Bot.WarehouseState.ManualForced = true
 					if Bot.EnableDebug then
 						print("Go to Warehouse")
 					end
+				elseif Bot.Paused then
+					print("Bot remain paused, cause of some options enabled")
+				elseif Bot.PausedManual then
+					print("Unpause the bot first!")
 				else
 					print("Start the bot first!")
 				end
@@ -295,11 +318,15 @@ function Bot.OnPulse()
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('T')) then
 			if Bot._traderHotKeyPressed ~= true then
 				Bot._traderHotKeyPressed = true
-				if Bot.Running then
+				if Bot.Running and (not Bot.Paused or not Bot.PausedManual) then
 					Bot.TradeManagerState.ManualForced = true
 					if Bot.EnableDebug then
 						print("Go to Trader")
 					end
+				elseif Bot.Paused then
+					print("Bot remain paused, cause of some options enabled")
+				elseif Bot.PausedManual then
+					print("Unpause the bot first!")
 				else
 					print("Start the bot first!")
 				end
@@ -307,29 +334,38 @@ function Bot.OnPulse()
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('V')) then
 			if Bot._vendorHotKeyPressed ~= true then
 				Bot._vendorHotKeyPressed = true
-				if Bot.Running then
+				if Bot.Running and (not Bot.Paused or not Bot.PausedManual) then
 					Bot.VendorState.ManualForced = true
 					if Bot.EnableDebug then
 						print("Go to Vendor")
 					end
+				elseif Bot.Paused then
+					print("Bot remain paused, cause of some options enabled")
+				elseif Bot.PausedManual then
+					print("Unpause the bot first!")
 				else
 					print("Start the bot first!")
 				end
 			end
-		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('G')) then
+		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('R')) then
 			if Bot._repairHotKeyPressed ~= true then
 				Bot._repairHotKeyPressed = true
-				if Bot.Running then
+				if Bot.Running and (not Bot.Paused or not Bot.PausedManual) then
 					Bot.RepairState.ManualForced = true
 					if Bot.EnableDebug then
 						print("Go Repair")
 					end
+				elseif Bot.Paused then
+					print("Bot remain paused, cause of some options enabled")
+				elseif Bot.PausedManual then
+					print("Unpause the bot first!")
 				else
 					print("Start the bot first!")
 				end
 			end
 		else
 			Bot._startHotKeyPressed = false
+			Bot._pauseHotKeyPressed = false
 			Bot._profileHotKeyPressed = false
 			Bot._settingsHotKeyPressed = false
 			Bot._inventoryHotKeyPressed = false
@@ -342,7 +378,7 @@ function Bot.OnPulse()
 		end
 	end
 
-	if Bot.Paused and Bot.PausedManual then
+	if Bot.Paused or Bot.PausedManual then
 		Bot.LoopCounter = Bot.LoopCounter + 1
 	end
 

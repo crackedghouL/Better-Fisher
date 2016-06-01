@@ -33,11 +33,11 @@ function HookFishState:NeedToRun()
 		return false
 	end
 
-	if Bot.LastPauseTick ~= nil and Bot.Paused then
+	if Bot.LastPauseTick ~= nil and (Bot.Paused or Bot.PausedManual) then
 		return false
 	end
 
-	if Bot.Paused and Bot.PausedManual and Bot.LoopCounter > 0 then
+	if (Bot.Paused or Bot.PausedManual) and Bot.LoopCounter > 0 then
 		return false
 	end
 

@@ -47,11 +47,11 @@ function StartFishingState:NeedToRun()
 		return false
 	end
 
-	if Bot.LastPauseTick ~= nil and Bot.Paused then
+	if Bot.LastPauseTick ~= nil and (Bot.Paused or Bot.PausedManual) then
 		return false
 	end
 
-	if Bot.Paused and Bot.PausedManual and Bot.LoopCounter > 0 then
+	if (Bot.Paused or Bot.PausedManual) and Bot.LoopCounter > 0 then
 		return false
 	end
 
@@ -181,7 +181,7 @@ function StartFishingState:Run()
 			Bot.Stop()
 		end
 	else
-		if self.state == 0 and not Bot.Paused then
+		if self.state == 0 and (not Bot.Paused or not Bot.PausedManual) then
 			selfPlayer:SetRotation(ProfileEditor.CurrentProfile:GetFishSpotRotation())
 			if StartFishingState.GoodPosition then -- thanks to DogGoneFish and Parog
 				-- selfPlayer:SetActionState(ACTION_FLAG_MOVE_FORWARD, 100)
