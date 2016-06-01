@@ -34,11 +34,7 @@ end
 function LootState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 
-	if not selfPlayer then
-		return false
-	end
-
-	if not selfPlayer.IsAlive then
+	if not selfPlayer or not selfPlayer.IsAlive then
 		return false
 	end
 

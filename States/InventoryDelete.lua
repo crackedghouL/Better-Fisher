@@ -35,16 +35,12 @@ function InventoryDeleteState:NeedToRun()
 		return false
 	end
 
-	if not selfPlayer then
-		return false
-	end
-
-	if not selfPlayer.IsAlive then
+	if not selfPlayer or not selfPlayer.IsAlive then
 		return false
 	end
 
 	if table.length(self:GetItems()) > 0 then
-	   return true
+		return true
 	end
 
 	return false

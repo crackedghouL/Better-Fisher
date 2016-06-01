@@ -32,11 +32,7 @@ function EquipFloatState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_LEFT_HAND)
 
-	if not selfPlayer then
-		return false
-	end
-
-	if not selfPlayer.IsAlive then
+	if not selfPlayer or not selfPlayer.IsAlive then
 		return false
 	end
 

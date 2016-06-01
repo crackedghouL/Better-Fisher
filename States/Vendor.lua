@@ -50,11 +50,7 @@ end
 function VendorState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 
-	if not selfPlayer then
-		self.Forced = false
-	end
-
-	if not selfPlayer.IsAlive then
+	if not selfPlayer or not selfPlayer.IsAlive then
 		self.Forced = false
 	end
 
@@ -84,8 +80,6 @@ function VendorState:NeedToRun()
 		elseif not self.Settings.SellEnabled and not self.Settings.BuyEnabled then
 			self.Forced = false
 		end
-	elseif not self.Settings.Enabled then
-		self.Forced = false
 	end
 
 	if self.Forced or self.ManualForced then
@@ -271,7 +265,6 @@ function VendorState:Run()
 		if NpcShop.IsShopping then
 			NpcShop.Close()
 		end
-
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
 		Bot.SilverStats(false)
@@ -280,7 +273,7 @@ function VendorState:Run()
 	end
 
 	if self.state == 6 then -- 6 = state complete
-		if Bot.Settings.WarehouseSettings.Enabled == true and Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then
+		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then
 			Bot.WarehouseState.ManualForced = true
 			print("Forcing deposit after vendor...")
 		end

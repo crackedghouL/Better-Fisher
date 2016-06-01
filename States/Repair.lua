@@ -43,11 +43,7 @@ end
 function RepairState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 
-	if not selfPlayer then
-		self.Forced = false
-	end
-
-	if not selfPlayer.IsAlive then
+	if not selfPlayer or not selfPlayer.IsAlive then
 		self.Forced = false
 	end
 
@@ -67,29 +63,27 @@ function RepairState:NeedToRun()
 		self.Forced = false
 	end
 
-	if not selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND) then
-		for k,v in pairs(selfPlayer.Inventory.Items) do
-			if 	v.HasEndurance and v.EndurancePercent <= 0 and
-				(v.ItemEnchantStaticStatus.IsFishingRod and
-				(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
-			then
-				if self:HasNpc() and Navigator.CanMoveTo(self:GetPosition()) then
-					self.Forced = true
-				else
-					self.Forced = false
+	if self.Settings.Enabled then
+		if not selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND) then
+			for k,v in pairs(selfPlayer.Inventory.Items) do
+				if 	v.HasEndurance and v.EndurancePercent <= 0 and
+					(v.ItemEnchantStaticStatus.IsFishingRod and
+					(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
+				then
+					if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+						self.Forced = true
+					end
 				end
 			end
-		end
-	else
-		for k,v in pairs(selfPlayer.EquippedItems) do
-			if 	v.HasEndurance and v.EndurancePercent <= 0 and
-				(v.ItemEnchantStaticStatus.IsFishingRod and
-				(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
-			then
-				if self:HasNpc() and Navigator.CanMoveTo(self:GetPosition()) then
-					self.Forced = true
-				else
-					self.Forced = false
+		else
+			for k,v in pairs(selfPlayer.EquippedItems) do
+				if 	v.HasEndurance and v.EndurancePercent <= 0 and
+					(v.ItemEnchantStaticStatus.IsFishingRod and
+					(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
+				then
+					if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+						self.Forced = true
+					end
 				end
 			end
 		end
@@ -236,7 +230,7 @@ function RepairState:Run()
 	end
 
 	if self.state == 7 then -- 7 = state complete
-		if Bot.Settings.WarehouseSettings.Enabled == true and Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then
+		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then
 			Bot.WarehouseState.ManualForced = true
 			print("Forcing deposit after repair...")
 		end

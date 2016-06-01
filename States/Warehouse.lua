@@ -49,11 +49,7 @@ end
 function WarehouseState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 
-	if not selfPlayer then
-		self.Forced = false
-	end
-
-	if not selfPlayer.IsAlive then
+	if not selfPlayer or not selfPlayer.IsAlive then
 		self.Forced = false
 	end
 
@@ -75,8 +71,6 @@ function WarehouseState:NeedToRun()
 				self.Forced = true
 			end
 		end
-	elseif not self.Settings.Enabled then
-		self.Forced = false
 	end
 
 	if self.Forced or self.ManualForced then

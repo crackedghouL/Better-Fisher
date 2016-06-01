@@ -151,6 +151,7 @@ function MainWindow.DrawMainWindow()
 					print("***** Made with love by spearmint <3 ****")
 					print("***** Thanks to: gklt, Akafist, tyty123 *****")
 					print("*** pat, Pookie, borek24 and MrUnreal. ***")
+					print("** Edan, Triplany and all the community **")
 					print("*" .. motto[math.random(#motto)] .. "*")
 					print("*******************************************")
 				end

@@ -42,11 +42,7 @@ end
 function TradeManagerState:NeedToRun()
 	local selfPlayer = GetSelfPlayer()
 
-	if not selfPlayer then
-		self.Forced = false
-	end
-
-	if not selfPlayer.IsAlive then
+	if not selfPlayer or not selfPlayer.IsAlive then
 		self.Forced = false
 	end
 
@@ -64,10 +60,10 @@ function TradeManagerState:NeedToRun()
 
 	if self.Settings.Enabled then
 		if selfPlayer.Inventory.FreeSlots <= 3 and table.length(self:GetItems()) > 0 and not Looting.IsLooting then
-			self.Forced = true
+			if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+				self.Forced = true
+			end
 		end
-	elseif not self.Settings.Enabled then
-		self.Forced = false
 	end
 
 	if self.Forced or self.ManualForced then
@@ -204,7 +200,7 @@ function TradeManagerState:Run()
 					self.BargainState = 0
 					self.state = 4
 					self.CurrentSellList = self:GetItems()
-				elseif tonumber(string.match (BDOLua.Execute("return UI.getChildControl(Panel_TradeGame, \"StaticText_RemainCount\"):GetText()"),"%d+")) <=0  then
+				elseif tonumber(string.match (BDOLua.Execute("return UI.getChildControl(Panel_TradeGame, \"StaticText_RemainCount\"):GetText()"),"%d+")) <= 0 then
 					if Bot.EnableDebug and Bot.EnableDebugTradeManagerState then
 						print("Bargain fail")
 					end
