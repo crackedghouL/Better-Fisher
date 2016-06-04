@@ -1,4 +1,4 @@
-WarehouseState = { }
+WarehouseState = {}
 WarehouseState.__index = WarehouseState
 WarehouseState.Name = "Warehouse"
 
@@ -22,144 +22,103 @@ function WarehouseState.new()
 		DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR,
 		DepositMoney = false,
 		MoneyToKeep = 10000,
-		IgnoreItemsNamed = { },
+		IgnoreItemsNamed = {},
 		SecondsBetweenTries = 300
 	}
-
-	self.State = 0
-	self.Forced = false
-	self.ManualForced = false
-
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
-
 	self.DepositList = nil
-	self.CurrentDepositList = { }
+	self.CurrentDepositList = {}
 	self.DepositedMoney = false
-
+	self.DepositItems = false
 	self.ItemCheckFunction = nil
-
 	self.CallWhenCompleted = nil
 	self.CallWhileMoving = nil
-
+	self.ManualForced = false
+	self.state = 0
 	return self
 end
 
 function WarehouseState:NeedToRun()
-	local selfPlayer = GetSelfPlayer()
+	if Bot.CheckIfLoggedIn() then
+		local selfPlayer = GetSelfPlayer()
 
-	if not selfPlayer then
-		return false
-	end
-
-	if not selfPlayer.IsAlive then
-		return false
-	end
-
-	if not self:HasNpc() then
-		self.Forced = false
-		return false
-	end
-
-	if Bot.Settings.EnableWarehouse == false then
-		self.Forced = false
-		return false
-	end
-
-	if not self:HasNpc() and Bot.Settings.InvFullStop == true then
-		self.Forced = false
-		return false
-	end
-
-	if self.Forced == true and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.Forced = false
-		return false
-	elseif self.Forced == true then
-		return true
-	end
-
-	if self.ManualForced == true and not Navigator.CanMoveTo(self:GetPosition()) then
-		self.ManualForced = false
-		self.Forced = false
-		return false
-	elseif self.ManualForced == true then
-		return true
-	end
-
-	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
-		return false
-	end
-
-	if self.Forced and selfPlayer.WeightPercent >= 95 then
-		if Navigator.CanMoveTo(self:GetPosition())	then
-			self.Forced = true
-			return true
-		else
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Deposit money! Can not find path to NPC: " .. self.Settings.NpcName)
+		if not Bot.CheckIfLoggedIn() or not selfPlayer.IsAlive then
 			return false
 		end
-	end
 
-	if self.Forced and table.length(self:GetItems()) > 0 and (selfPlayer.Inventory.FreeSlots <= 3 or selfPlayer.WeightPercent >= 95) then
-		if Navigator.CanMoveTo(self:GetPosition()) then
-			self.Forced = true
-			return true
-		else
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Need to Deposit items! Can not find path to NPC: " .. self.Settings.NpcName)
+		if not self:HasNpc() or (not self:HasNpc() and Bot.Settings.InvFullStop) then
 			return false
 		end
-	end
 
-	return false
+		if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+			return false
+		end
+
+		if self.ManualForced and Navigator.CanMoveTo(self:GetPosition()) then
+			return true
+		end
+
+		if self.Settings.Enabled then
+			if table.length(self:GetItems()) > 0 and (selfPlayer.Inventory.FreeSlots <= 3 or selfPlayer.WeightPercent >= 95) then
+				if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+					return true
+				end
+			end
+		end
+
+		return false
+	else
+		return false
+	end
 end
 
 function WarehouseState:Reset()
-	self.State = 0
-	self.Forced = false
-	self.ManualForced = false
-	self.DepositedMoney = false
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
+	self.ManualForced = false
+	self.DepositedMoney = false
+	self.DepositItems = false
+	self.state = 0
 end
 
 function WarehouseState:Exit()
-	if self.State > 1 then
-		if Dialog.IsTalking then
-			Dialog.ClickExit()
-		end
+	if Dialog.IsTalking then
+		Dialog.ClickExit()
+	end
 
-		self.State = 0
+	if self.state > 1 then
 		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastUseTimer:Start()
 		self.SleepTimer = nil
-		self.Forced = false
 		self.ManualForced = false
 		self.DepositedMoney = false
+		self.DepositItems = false
+		self.state = 0
 	end
 end
 
 function WarehouseState:Run()
+	local npcs = GetNpcs()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
-	local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
-	StartFishingState.good_position = false
 
-	if equippedItem then
+	if Bot.CheckIfRodIsEquipped() then
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
-	if vendorPosition.Distance3DFromMe > 300 then
+	if vendorPosition.Distance3DFromMe > math.random(180,220) then
 		if self.CallWhileMoving then
 			self.CallWhileMoving(self)
 		end
 
 		Navigator.MoveTo(vendorPosition, nil, Bot.Settings.PlayerRun)
-		if self.State > 1 then
+		if self.state > 1 then
 			self:Exit()
 			return
 		end
 
-		self.State = 1
+		self.state = 1
 		return
 	end
 
@@ -169,9 +128,8 @@ function WarehouseState:Run()
 		return
 	end
 
-	local npcs = GetNpcs()
 	if table.length(npcs) < 1 then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Could not find any Warehouse NPC's")
+		print("Could not find any Warehouse NPC's")
 		self:Exit()
 		return
 	end
@@ -179,34 +137,35 @@ function WarehouseState:Run()
 	table.sort(npcs, function(a,b) return a.Position:GetDistance3D(vendorPosition) < b.Position:GetDistance3D(vendorPosition) end)
 	local npc = npcs[1]
 
-	if self.State == 1 then
+	if self.state == 1 then -- 1 = open npc dialog
 		npc:InteractNpc()
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
-		self.State = 2
+		self.state = 2
 		return
 	end
 
-	if self.State == 2 then
+	if self.state == 2 then -- 2 = create deposit list
 		if not Dialog.IsTalking then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] " .. self.Settings.NpcName " dialog didn't open")
+			print(self.Settings.NpcName " dialog didn't open")
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
 			return
 		end
-
 		BDOLua.Execute("Warehouse_OpenPanelFromDialog()")
-		self.SleepTimer = PyxTimer:New(5)
+		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
-		self.State = 3
-		self.CurrentDepositList = self:GetItems()
-		if Bot.EnableDebug then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Deposit list done")
+		if self.Settings.DepositItems or (not self.Settings.DepositItems and self.ManualForced) then
+			if Bot.EnableDebug and Bot.EnableDebugWarehouseState then
+				print("Deposit list done")
+			end
+			self.CurrentDepositList = self:GetItems()
 		end
+		self.state = 3
 		return
 	end
 
-	if self.State == 3 then
+	if self.state == 3 then -- 3 = deposit money
 		if not self.DepositedMoney and (self.Settings.DepositMoney or self.ManualForced) then
 			local toDeposit = selfPlayer.Inventory.Money - self.Settings.MoneyToKeep
 			if toDeposit > 0 then
@@ -215,51 +174,52 @@ function WarehouseState:Run()
 				self.SleepTimer = PyxTimer:New(3)
 				self.SleepTimer:Start()
 			end
-
 			self.DepositedMoney = true
-			self.State = 4
+			self.state = 4
 			return
 		end
 	end
 
-	if self.State == 4 then
+	if self.state == 4 then -- 4 = deposit items
 		if table.length(self.CurrentDepositList) < 1 then
-			if self.DepositedMoney and (self.Settings.DepositItems or self.ManualForced) then
-				if self.CallWhenCompleted then
-					self.CallWhenCompleted(self)
-				end
-			end
-
-			Bot.Stats.SilverGained = Bot.Stats.SilverGained + 1
+			Bot.Stats.SilverGained = Bot.Stats.SilverGained - 1
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
-			self:Exit()
+			Bot.SilverStats(true)
+			self.DepositItems = true
+			Bot.SilverStats()
+			self.state = 5
 			return
 		end
 
 		local item = self.CurrentDepositList[1]
 		local itemPtr = selfPlayer.Inventory:GetItemByName(item.name)
 		if itemPtr ~= nil then
-			if Bot.EnableDebug then
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Index: #" .. itemPtr.InventoryIndex .. " Deposited: " .. itemPtr.ItemEnchantStaticStatus.Name)
-			else
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Deposited: " .. itemPtr.ItemEnchantStaticStatus.Name)
-			end
-
+			print("Deposited: " .. itemPtr.ItemEnchantStaticStatus.Name)
 			itemPtr:PushToWarehouse(npc)
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
 		end
-
 		table.remove(self.CurrentDepositList, 1)
 		return
 	end
 
+	if self.state == 5 then -- 5 = state complete
+		if  Bot.Settings.RepairSettings.Enabled == true and Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then
+			Bot.RepairState.ManualForced = true
+			print("Forcing repair after warehouse...")
+		end
+		if self.CallWhenCompleted then
+			self.CallWhenCompleted(self)
+		end
+	end
+
 	self:Exit()
+	return false
 end
 
 function WarehouseState:GetItems()
-	local items = { }
+	local items = {}
 	local selfPlayer = GetSelfPlayer()
 
 	if selfPlayer then

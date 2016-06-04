@@ -1,11 +1,11 @@
-IdleState = { }
+IdleState = {}
 IdleState.__index = IdleState
 IdleState.Name = "Idle"
 
 setmetatable(IdleState, {
 	__call = function (cls, ...)
-    	return cls.new(...)
-    end,
+		return cls.new(...)
+	end,
 })
 
 function IdleState.new()
@@ -14,7 +14,7 @@ function IdleState.new()
 end
 
 function IdleState:NeedToRun()
-    return true
+	return true
 end
 
 function IdleState:Run()

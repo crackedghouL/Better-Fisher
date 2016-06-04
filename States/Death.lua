@@ -1,4 +1,4 @@
-DeathState = { }
+DeathState = {}
 DeathState.__index = DeathState
 DeathState.Name = "Death"
 
@@ -14,61 +14,78 @@ setmetatable(DeathState, {
 
 function DeathState.new()
 	local self = setmetatable({}, DeathState)
-	self.LastUseTimer = nil
+	self.Settings = {
+		EnableDeathDelay = false,
+		DelaySeconds = 200,
+		ReviveMethod = DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED
+	}
+	self.SleepTimer = nil
 	self.CallWhenCompleted = nil
-	self.Settings = { ReviveMethod = DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED }
-	self.WasDead = false
-	self.DeathCount = 0
+	self.state = 0
 	return self
 end
 
 function DeathState:NeedToRun()
-	local selfPlayer = GetSelfPlayer()
-
-	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
-		return false
-	end
-
-	if not selfPlayer then
-		return false
-	end
-
-	if not selfPlayer.IsAlive then
+	if Bot.CheckIfLoggedIn() and not GetSelfPlayer().IsAlive then
 		return true
 	end
 
-	self.WasDead = false
 	return false
 end
 
 function DeathState:Run()
 	local selfPlayer = GetSelfPlayer()
 
-	self.LastUseTimer = PyxTimer:New(1)
-	self.LastUseTimer:Start()
-
-	if self.WasDead == false then
-		self.WasDead = true
-		self.DeathCount = self.DeathCount + 1
-	end
-
-	if self.Settings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_NODE then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] I'm dead, attempt to revive at nearest node ...");
-		selfPlayer:ReviveAtNode()
-	elseif self.Settings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE then
-		print("[" .. os.date(Bot.UsedTimezone) .. "] I'm dead, attempt to revive at nearest village ...");
-		selfPlayer:ReviveAtVillage()
+	if self.Settings.EnableDeathDelay and self.SleepTimer == nil then
+		self.state = 0
 	else
-		print("[" .. os.date(Bot.UsedTimezone) .. "] Death have state: " .. self.Settings.ReviveMethod)
+		self.state = 1
 	end
 
-	if self.CallWhenCompleted then
-		self.CallWhenCompleted(self)
+	if self.SleepTimer ~= nil and self.SleepTimer:IsRunning() and not self.SleepTimer:Expired() then
+		return
+	end
+
+	if self.state == 0 then
+		self.SleepTimer = PyxTimer:New(self.Settings.DelaySeconds)
+		self.SleepTimer:Start()
+		self.state = 1
+		return
+	end
+
+	if self.state == 1 then
+		if Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED then
+			Bot.Stop()
+		elseif self.Settings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_NODE then
+			print("Trying to revive at nearest node...");
+			selfPlayer:ReviveAtNode()
+		elseif self.Settings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE then
+			print("Trying to revive at nearest village...");
+			selfPlayer:ReviveAtVillage()
+		end
+
+		self.state = 2
+		return
+	end
+
+	if self.state == 2 then
+		if self.CallWhenCompleted then
+			self.CallWhenCompleted(self)
+		end
+	end
+
+	self:Exit()
+	return false
+end
+
+function DeathState:Exit()
+	if self.state > 1 then
+		self.SleepTimer = nil
+		self.state = 0
 	end
 end
 
 function DeathState:Reset()
-	self.LastUseTimer = nil
-	self.WasDead = false
-	self.DeathCount = 0
+	self.SleepTimer = nil
+	self.state = 0
 end

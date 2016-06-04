@@ -2,7 +2,7 @@
 -- Variables
 ---------------------------------------------
 
-Stats = { }
+Stats = {}
 Stats.Visible = false
 
 SilverInitial = GetSelfPlayer().Inventory.Money
@@ -14,20 +14,7 @@ SilverGained = 0
 
 function Stats.DrawStats()
 	if Stats.Visible then
-		_, Stats.Visible = ImGui.Begin("Loot Stats", Stats.Visible, ImVec2(350, 220), -1.0)
-
-		if h == nil then
-			h = 0
-			m = 0
-			s = 0
-		end
-
-		if Bot.Running then
-			t = math.ceil((Bot.Stats.TotalSession + Pyx.System.TickCount - Bot.Stats.SessionStart) / 1000)
-			s = t % 60
-			m = math.floor(t / 60) % 60
-			h = math.floor(t / (60 * 60))
-		end
+		_, Stats.Visible = ImGui.Begin("Stats", Stats.Visible, ImVec2(350, 260), -1.0, ImGuiWindowFlags_NoResize)
 
 		if Bot.Stats.Loots > 0 then
 			statsWhites = string.format("%i - %.02f%%%%", Bot.Stats.LootQuality[0] or 0, (Bot.Stats.LootQuality[0] or 0) / Bot.Stats.Loots * 100)
@@ -39,6 +26,7 @@ function Stats.DrawStats()
 			statsTrashes = string.format("%i - %.02f%%%%", Bot.Stats.Trashes, Bot.Stats.Trashes / Bot.Stats.Loots * 100)
 			statsKeys = string.format("%i - %.02f%%%%", Bot.Stats.Keys, Bot.Stats.Keys / Bot.Stats.Loots * 100)
 			statsShards = string.format("%i - %.02f%%%%", Bot.Stats.Shards, Bot.Stats.Shards / Bot.Stats.Loots * 100)
+			statsEggs = string.format("%i - %.02f%%%%", Bot.Stats.Eggs, Bot.Stats.Eggs / Bot.Stats.Loots * 100)
 		else
 			statsWhites = "0 - 0.00%%"
 			statsGreens = "0 - 0.00%%"
@@ -49,20 +37,21 @@ function Stats.DrawStats()
 			statsTrashes = "0 - 0.00%%"
 			statsKeys = "0 - 0.00%%"
 			statsShards = "0 - 0.00%%"
+			statsEggs = "0 - 0.00%%"
 		end
 
 		ImGui.Columns(3)
-		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", h, m, s))
+		ImGui.Text("Time " .. string.format("%02.f:%02.f:%02.f", Bot.Hours, Bot.Minutes, Bot.Seconds))
 		ImGui.NextColumn()
 		ImGui.Text("Loots: " .. string.format("%i", Bot.Stats.Loots))
 		ImGui.NextColumn()
-		ImGui.Text("Avg.: " .. Bot.Stats.AverageLootTime .. "s")
+		ImGui.Text("Avg: " .. Bot.Stats.AverageLootTime .. "s")
 
 		ImGui.Columns(1)
 		ImGui.Separator()
 
 		ImGui.Columns(1)
-		ImGui.Text("Silver Gained: " .. Bot.comma_value(Bot.Stats.SilverGained))
+		ImGui.Text("Silver Gained: " .. Bot.FormatMoney(Bot.Stats.SilverGained))
 
 		ImGui.Columns(1)
 		ImGui.Separator()
@@ -75,57 +64,65 @@ function Stats.DrawStats()
 		ImGui.Columns(1)
 		ImGui.Separator()
 
-		if Bot.Settings.LootSettings.LootKeys == true or Bot.Settings.LootSettings.LootShards == true then
+		ImGui.Columns(2)
+		if Bot.Settings.LootSettings.LootKeys then
+			ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Keys: " .. statsKeys)
+		else
+			ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Keys: " .. statsKeys)
+		end
+		ImGui.NextColumn()
+		if Bot.Settings.LootSettings.LootShards then
+			ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Shards: " .. statsShards)
+		else
+			ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Shards: " .. statsShards)
+		end
+
+		ImGui.Columns(1)
+		ImGui.Separator()
+
+		ImGui.Columns(1)
+		if ImGui.CollapsingHeader("Fish quality", "id_gui_loot_quality", true, false) then
 			ImGui.Columns(2)
-			if Bot.Settings.LootSettings.LootKeys == true then
-				ImGui.Text("Keys: " .. statsKeys)
+			if Bot.Settings.LootSettings.LootWhite then
+				ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Whites: " .. statsWhites)
+			else
+				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Whites: " .. statsWhites)
 			end
 			ImGui.NextColumn()
-			if Bot.Settings.LootSettings.LootShards == true then
-				ImGui.Text("Shards: " .. statsShards)
+			if Bot.Settings.LootSettings.LootGreen then
+				ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Greens: " .. statsGreens)
+			else
+				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Greens: " .. statsGreens)
 			end
 
 			ImGui.Columns(1)
 			ImGui.Separator()
-		end
 
-		ImGui.Columns(1)
-		if ImGui.CollapsingHeader("Fish quality", "id_gui_loot_quality", true, false) then
-			if Bot.Settings.LootSettings.LootWhite == true or Bot.Settings.LootSettings.LootGreen == true then
-				ImGui.Columns(2)
-				if Bot.Settings.LootSettings.LootWhite == true then
-					ImGui.Text("Whites: " .. statsWhites)
-				end
-				ImGui.NextColumn()
-				if Bot.Settings.LootSettings.LootGreen == true then
-					ImGui.Text("Greens: " .. statsGreens)
-				end
-
-				ImGui.Columns(1)
-				ImGui.Separator()
+			ImGui.Columns(2)
+			if Bot.Settings.LootSettings.LootBlue then
+				ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Blues: " .. statsBlues)
+			else
+				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Blues: " .. statsBlues)
+			end
+			ImGui.NextColumn()
+			if Bot.Settings.LootSettings.LootGold then
+				ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Golds: " .. statsGolds)
+			else
+				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Golds: " .. statsGolds)
 			end
 
-			if Bot.Settings.LootSettings.LootBlue == true or Bot.Settings.LootSettings.LootGold == true then
-				ImGui.Columns(2)
-				if Bot.Settings.LootSettings.LootBlue == true then
-					ImGui.Text("Blues: " .. statsBlues)
-				end
-				ImGui.NextColumn()
-				if Bot.Settings.LootSettings.LootGold == true then
-					ImGui.Text("Golds: " .. statsGolds)
-				end
+			ImGui.Columns(1)
+			ImGui.Separator()
 
-				ImGui.Columns(1)
-				ImGui.Separator()
+			ImGui.Columns(1)
+			if Bot.Settings.LootSettings.LootOrange then
+				ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Oranges: " .. statsOranges)
+			else
+				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Oranges: " .. statsOranges)
 			end
 
-			if Bot.Settings.LootSettings.LootOrange == true then
-				ImGui.Columns(1)
-				ImGui.Text("Oranges: " .. statsOranges)
-
-				ImGui.Columns(1)
-				ImGui.Separator()
-			end
+			ImGui.Columns(1)
+			ImGui.Separator()
 		end
 
 		ImGui.Columns(1)

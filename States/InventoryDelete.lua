@@ -1,4 +1,4 @@
-InventoryDeleteState = { }
+InventoryDeleteState = {}
 InventoryDeleteState.__index = InventoryDeleteState
 InventoryDeleteState.Name = "Inventory Delete"
 
@@ -9,79 +9,61 @@ setmetatable(InventoryDeleteState, {
 })
 
 function InventoryDeleteState.new()
-	local self = setmetatable( { }, InventoryDeleteState)
-	self.State = 0
+	local self = setmetatable({}, InventoryDeleteState)
+	self.state = 0
 	self.Settings = {
 		DeleteItems = {},
 		DeleteDepletedItems = {},
 		SecondsBetweenTries = 60
 	}
-
-	self.Forced = false
 	self.SleepTimer = nil
-
 	self.CallWhenCompleted = nil
 	self.ItemCheckFunction = nil
-
-	self.ItemList = {}
-
 	return self
 end
 
 function InventoryDeleteState:NeedToRun()
-	local selfPlayer = GetSelfPlayer()
+	if Bot.CheckIfLoggedIn() then
+		if not GetSelfPlayer().IsAlive then
+			return false
+		end
 
-	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+		if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+			return false
+		end
+
+		if table.length(self:GetItems()) > 0 then
+			return true
+		end
+
+		return false
+	else
 		return false
 	end
-
-	if not selfPlayer then
-		return false
-	end
-
-	if not selfPlayer.IsAlive then
-		return false
-	end
-
-	if table.length(self:GetItems()) > 0 then
-	   return true
-	end
-
-	return false
 end
 
 function InventoryDeleteState:Reset()
-	self.State = 0
 	self.LastUseTimer = nil
-	self.Forced = false
-	self.ItemList = {}
-end
-
-function InventoryDeleteState:Exit()
-	if self.State > 1 then
-		self.State = 0
-		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
-		self.LastUseTimer:Start()
-		self.Forced = false
-		self.ItemList = {}
-	end
+	self.CallWhenCompleted = nil
+	self.ItemCheckFunction = nil
 end
 
 function InventoryDeleteState:Run()
 	local selfPlayer = GetSelfPlayer()
 
+	self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
+	self.LastUseTimer:Start()
+
 	for k,v in pairs(self:GetItems()) do
-		if Bot.EnableDebug then
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Deleting: "..v.item.ItemEnchantStaticStatus.Name)
+		if Bot.EnableDebug and Bot.EnableDebugInventoryDeleteState then
+			print("Deleting: "..v.item.ItemEnchantStaticStatus.Name)
 		end
 		selfPlayer.Inventory:DeleteItem(v.slot)
 	end
-
-	self:Exit()
 end
 
 function InventoryDeleteState:GetItems()
-	local items = { }
+	local items = {}
 	local selfPlayer = GetSelfPlayer()
 
 	if selfPlayer then

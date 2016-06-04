@@ -2,18 +2,18 @@
 -- Variables
 -----------------------------------------------------------------------------
 
-BotSettings = { }
+BotSettings = {}
 BotSettings.Visible = false
 
 BotSettings.InventoryComboSelectedIndex = 0
 BotSettings.InventorySelectedIndex = 0
-BotSettings.InventoryName = { }
+BotSettings.InventoryName = {}
 
 BotSettings.WarehouseComboSelectedIndex = 0
 BotSettings.WarehouseSelectedIndex = 0
-BotSettings.WarehouseName = { }
+BotSettings.WarehouseName = {}
 
-BotSettings.BaitComboBoxItems = { }
+BotSettings.BaitComboBoxItems = {}
 BotSettings.BaitComboBoxSelected = 0
 
 -----------------------------------------------------------------------------
@@ -23,20 +23,17 @@ BotSettings.BaitComboBoxSelected = 0
 function BotSettings.DrawBotSettings()
 	local valueChanged = false
 
-	if BotSettings.Visible == true then
-		_, BotSettings.Visible = ImGui.Begin("Bot Settings", BotSettings.Visible, ImVec2(350, 400), -1.0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)
-
-		BotSettings.UpdateInventoryList()
-		BotSettings.UpdateBaitComboBox()
+	if BotSettings.Visible then
+		_, BotSettings.Visible = ImGui.Begin("Settings", BotSettings.Visible, ImVec2(350, 400), -1.0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)
 
 		if ImGui.Button("Save settings", ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
 			Bot.SaveSettings()
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Settings saved")
+			print("Settings saved")
 		end
 		ImGui.SameLine()
 		if ImGui.Button("Load settings", ImVec2(ImGui.GetContentRegionAvailWidth(), 20)) then
 			Bot.LoadSettings()
-			print("[" .. os.date(Bot.UsedTimezone) .. "] Settings loaded")
+			print("Settings loaded")
 		end
 
 		ImGui.Spacing()
@@ -49,11 +46,19 @@ function BotSettings.DrawBotSettings()
 		if ImGui.RadioButton("Boat settings", Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_BOAT_FISHING) then
 			Bot.Settings.StartFishingSettings.FishingMethod = StartFishingState.SETTINGS_ON_BOAT_FISHING
 		end
-		ImGui.Columns(1)
 
+		ImGui.Columns(1)
 		ImGui.Spacing()
 
 		if ImGui.CollapsingHeader("Fishing options", "if_gui_fishing_option", true, false) then
+			BotSettings.UpdateBaitComboBox()
+
+			if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_BOAT_FISHING then
+				_, Bot.Settings.InvFullStop = ImGui.Checkbox("##id_guid_fishing_option_invfullstop", Bot.Settings.InvFullStop)
+				ImGui.SameLine()
+				ImGui.Text("Stop fishing when the inventory is full")
+			end
+
 			if not table.find(BotSettings.BaitComboBoxItems, Bot.Settings.ConsumablesSettings.Consumables[1].Name) then
 				table.insert(BotSettings.BaitComboBoxItems, Bot.Settings.ConsumablesSettings.Consumables[1].Name)
 			end
@@ -63,7 +68,7 @@ function BotSettings.DrawBotSettings()
 			valueChanged, BotSettings.BaitComboBoxSelected = ImGui.Combo("##id_guid_fisher_option_bait_to_use", table.findIndex(BotSettings.BaitComboBoxItems, Bot.Settings.ConsumablesSettings.Consumables[1].Name), BotSettings.BaitComboBoxItems)
 			if valueChanged then
 				Bot.Settings.ConsumablesSettings.Consumables[1].Name = BotSettings.BaitComboBoxItems[BotSettings.BaitComboBoxSelected]
-				print("[" .. os.date(Bot.UsedTimezone) .. "] Bait selected: " .. Bot.Settings.ConsumablesSettings.Consumables[1].Name)
+				print("Bait selected: " .. Bot.Settings.ConsumablesSettings.Consumables[1].Name)
 			end
 
 			ImGui.Text("Mins Lasts for")
@@ -79,16 +84,16 @@ function BotSettings.DrawBotSettings()
 			ImGui.TextColored(ImVec4(1,1,1,1), "Loot White Fish")
 			_, Bot.Settings.LootSettings.LootGreen = ImGui.Checkbox("##id_guid_fisher_option_loot_green", Bot.Settings.LootSettings.LootGreen)
 			ImGui.SameLine()
-			ImGui.TextColored(ImVec4(0.20,1,0.20,1), "Loot Green Fish")
+			ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Loot Green Fish")
 			_, Bot.Settings.LootSettings.LootBlue = ImGui.Checkbox("##id_guid_fisher_option_loot_blue", Bot.Settings.LootSettings.LootBlue)
 			ImGui.SameLine()
-			ImGui.TextColored(ImVec4(0.40,0.60,1,1), "Loot Blue Fish")
+			ImGui.TextColored(ImVec4(0.4,0.6,1,1), "Loot Blue Fish")
 			_, Bot.Settings.LootSettings.LootGold = ImGui.Checkbox("##id_guid_fisher_option_loot_gold", Bot.Settings.LootSettings.LootGold)
 			ImGui.SameLine()
-			ImGui.TextColored(ImVec4(1,0.80,0.20,1), "Loot Gold Fish")
+			ImGui.TextColored(ImVec4(1,0.8,0.2,1), "Loot Gold Fish")
 			_, Bot.Settings.LootSettings.LootOrange = ImGui.Checkbox("##id_guid_fisher_option_loot_orange", Bot.Settings.LootSettings.LootOrange)
 			ImGui.SameLine()
-			ImGui.TextColored(ImVec4(1,0.40,0.20,1), "Loot Orange Fish")
+			ImGui.TextColored(ImVec4(1,0.4,0.2,1), "Loot Orange Fish")
 			_, Bot.Settings.LootSettings.LootShards = ImGui.Checkbox("##id_guid_fisher_option_loot_shard", Bot.Settings.LootSettings.LootShards)
 			ImGui.SameLine()
 			ImGui.Text("Loot Shards")
@@ -103,6 +108,8 @@ function BotSettings.DrawBotSettings()
 
 		if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_NORMAL_FISHING then
 			if ImGui.CollapsingHeader("NPCs options", "id_gui_npc_option", true, false) then
+				BotSettings.UpdateInventoryList()
+
 				ImGui.Columns(2)
 				_, Bot.Settings.TradeManagerSettings.Enabled = ImGui.Checkbox("##id_gui_npc_option_enable_trader", Bot.Settings.TradeManagerSettings.Enabled)
 				ImGui.SameLine()
@@ -121,11 +128,8 @@ function BotSettings.DrawBotSettings()
 
 				ImGui.Separator()
 
-				if Bot.Settings.TradeManagerSettings.Enabled == true then
+				if Bot.Settings.TradeManagerSettings.Enabled then
 					if ImGui.TreeNode("Trade Manager") then
-						_, Bot.Settings.TradeManagerSettings.TradeManagerOnInventoryFull = ImGui.Checkbox("##id_guid_trademanager_full_inventory", Bot.Settings.TradeManagerSettings.TradeManagerOnInventoryFull)
-						ImGui.SameLine()
-						ImGui.Text("Sell at Trader when inventory is full")
 						_, Bot.Settings.TradeManagerSettings.DoBargainGame = ImGui.Checkbox("##id_guid_trademanager_minigame", Bot.Settings.TradeManagerSettings.DoBargainGame)
 						ImGui.SameLine()
 						ImGui.Text("Play bargain minigame")
@@ -133,7 +137,7 @@ function BotSettings.DrawBotSettings()
 					end
 				end
 
-				if Bot.Settings.WarehouseSettings.Enabled == true then
+				if Bot.Settings.WarehouseSettings.Enabled then
 					if ImGui.TreeNode("Warehouse") then
 						if ImGui.RadioButton("Deposit after Vendor##id_guid_warehouse_after_vendor", Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR) then
 							Bot.Settings.WarehouseSettings.DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR
@@ -184,12 +188,12 @@ function BotSettings.DrawBotSettings()
 					end
 				end
 
-				if Bot.Settings.VendorSettings.Enabled == true then
+				if Bot.Settings.VendorSettings.Enabled then
 					if ImGui.TreeNode("Vendor") then
 						ImGui.Separator()
 						_, Bot.Settings.VendorSettings.BuyEnabled = ImGui.Checkbox("Enable Buying", Bot.Settings.VendorSettings.BuyEnabled)
 						ImGui.Separator()
-						if Bot.Settings.VendorSettings.BuyEnabled == true then
+						if Bot.Settings.VendorSettings.BuyEnabled then
 							ImGui.Text("Select item")
 							ImGui.SameLine()
 							valueChanged, BotSettings.InventoryComboSelectedIndex = ImGui.Combo("##id_guid_vendor_buy_combo_select", BotSettings.InventoryComboSelectedIndex, BotSettings.InventoryName)
@@ -203,7 +207,7 @@ function BotSettings.DrawBotSettings()
 									end
 								end
 
-								if found == false then
+								if not found then
 									table.insert(Bot.VendorState.Settings.BuyItems, { Name = inventoryName, BuyAt = 0, BuyMax = 1 })
 								end
 
@@ -270,7 +274,7 @@ function BotSettings.DrawBotSettings()
 						ImGui.Separator()
 						_, Bot.Settings.VendorSettings.SellEnabled = ImGui.Checkbox("Enable Selling", Bot.Settings.VendorSettings.SellEnabled)
 						ImGui.Separator()
-						if Bot.Settings.VendorSettings.SellEnabled == true then
+						if Bot.Settings.VendorSettings.SellEnabled then
 							_, Bot.Settings.VendorSettings.VendorOnInventoryFull = ImGui.Checkbox("##id_guid_vendor_sell_full_inventory", Bot.Settings.VendorSettings.VendorOnInventoryFull)
 							ImGui.SameLine()
 							ImGui.Text("Go to Vendor when inventory is full")
@@ -285,11 +289,11 @@ function BotSettings.DrawBotSettings()
 							ImGui.SameLine()
 							_, Bot.Settings.VendorSettings.VendorGreen = ImGui.Checkbox("##id_guid_vendor_sell_green", Bot.Settings.VendorSettings.VendorGreen)
 							ImGui.SameLine()
-							ImGui.TextColored(ImVec4(0.20,1,0.20,1), "Sell green")
+							ImGui.TextColored(ImVec4(0.2,1,0.2,1), "Sell green")
 							ImGui.SameLine()
 							_, Bot.Settings.VendorSettings.VendorBlue = ImGui.Checkbox("##id_guid_vendor_sell_blue", Bot.Settings.VendorSettings.VendorBlue)
 							ImGui.SameLine()
-							ImGui.TextColored(ImVec4(0.40,0.60,1,1), "Sell blue")
+							ImGui.TextColored(ImVec4(0.4,0.6,1,1), "Sell blue")
 
 							ImGui.Spacing()
 
@@ -316,7 +320,7 @@ function BotSettings.DrawBotSettings()
 					end
 				end
 
-				if Bot.Settings.RepairSettings.Enabled == true then
+				if Bot.Settings.RepairSettings.Enabled then
 					if ImGui.TreeNode("Repair") then
 						if ImGui.RadioButton("Repair after Warehouse##id_guid_repair_after_warehouse", Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE) then
 							Bot.Settings.RepairSettings.RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE
@@ -357,77 +361,27 @@ function BotSettings.DrawBotSettings()
 		end
 
 		if ImGui.CollapsingHeader("Death action", "id_gui_death_action", true, false) then
-			if ImGui.RadioButton("Stop bot##death_action_stop_bot", Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED) then
+			if ImGui.RadioButton("Stop bot##id_guid_death_action_stop_bot", Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED) then
 				Bot.Settings.DeathSettings.ReviveMethod = DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED
 			end
-			if ImGui.RadioButton("Revive at nearest node##death_action_revive_node", Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_NODE) then
+			if ImGui.RadioButton("Revive at nearest node##id_guid_death_action_revive_node", Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_NODE) then
 				Bot.Settings.DeathSettings.ReviveMethod = DeathState.SETTINGS_ON_DEATH_REVIVE_NODE
 			end
-			if ImGui.RadioButton("Revive at nearest village##death_action_revive_village", Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE) then
+			if ImGui.RadioButton("Revive at nearest village##id_guid_death_action_revive_village", Bot.Settings.DeathSettings.ReviveMethod == DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE) then
 				Bot.Settings.DeathSettings.ReviveMethod = DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE
 			end
+			_, Bot.Settings.DeathSettings.EnableDeathDelay =  ImGui.Checkbox("##id_guid_death_action_dealy_after_death", Bot.Settings.DeathSettings.EnableDeathDelay)
+			ImGui.SameLine()
+			ImGui.Text("Enable delay before come back to spot")
+			_, Bot.Settings.DeathSettings.DelaySeconds = ImGui.SliderInt("Delay on Seconds##id_guid_death_action_delay_seconds", Bot.Settings.DeathSettings.DelaySeconds , 5, 500)
 		end
 
 		if ImGui.CollapsingHeader("Anti-PK", "id_gui_antipk_option", true, false) then
-			_, Bot.Settings.AutoEscape =  ImGui.Checkbox("##id_gui_antipk_escape", Bot.Settings.AutoEscape)
+			_, Bot.Settings.AutoEscape =  ImGui.Checkbox("##id_guid_antipk_autoescape", Bot.Settings.AutoEscape)
 			ImGui.SameLine()
 			ImGui.Text("Enable /Escape")
-
-			valueChanged, Bot.Settings.HealthPercent = ImGui.SliderInt("Health percent##id_gui_antipk_escapeSlider", Bot.Settings.HealthPercent, 1, 95)
-		end
-
-		if ImGui.CollapsingHeader("Advanced options", "id_gui_adv_option", true, false) then
-			if ImGui.TreeNode("Be very careful with options below") then
-				if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_NORMAL_FISHING then
-					_, Bot.Settings.PlayerRun = ImGui.Checkbox("##id_guid_adv_option_fish_alone_boat_sprint", Bot.Settings.PlayerRun)
-					ImGui.SameLine()
-					ImGui.Text("Sprint when moving instead of walking")
-				end
-				_, Bot.Settings.HookFishHandleGameSettings.UseOldAnimations = ImGui.Checkbox("##id_guid_adv_option_old_animations", Bot.Settings.HookFishHandleGameSettings.UseOldAnimations)
-				ImGui.SameLine()
-				ImGui.Text("Use old animations when fishing")
-				if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_BOAT_FISHING then
-					_, Bot.Settings.InvFullStop = ImGui.Checkbox("##id_guid_adv_option_invfullstop", Bot.Settings.InvFullStop)
-					ImGui.SameLine()
-					ImGui.Text("Stop fishing when the inventory is full")
-				end
-				_, Bot.Settings.HookFishHandleGameSettings.NoDelay = ImGui.Checkbox("##id_guid_adv_option_nodelay", Bot.Settings.HookFishHandleGameSettings.NoDelay)
-				ImGui.SameLine()
-				ImGui.TextColored(ImVec4(1,0,0,1), "Disable delay when fish bite")
-				_, Bot.Settings.StartFishingSettings.MaxEnergyCheat = ImGui.Checkbox("##id_guid_adv_option_hook_fast_game", Bot.Settings.StartFishingSettings.MaxEnergyCheat)
-				ImGui.SameLine()
-				ImGui.TextColored(ImVec4(1,0,0,1), "Max Energy Cast (uses no energy)")
-				_, Bot.Settings.StopWhenPeopleNearby = ImGui.Checkbox("##id_guid_adv_option_stop_bot_when_someone_nearby", Bot.Settings.StopWhenPeopleNearby)
-				ImGui.SameLine()
-				ImGui.TextColored(ImVec4(1,0,0,1), "Stop bot when someone is nearby")
-				ImGui.TreePop()
-			end
-
-			if ImGui.TreeNode("Debug") then
-				_, Bot.Settings.PrintConsoleState = ImGui.Checkbox("##id_guid_adv_option_printconsolestate", Bot.Settings.PrintConsoleState)
-				ImGui.SameLine()
-				ImGui.Text("Print bot state on console")
-				_, Bot.EnableDebug = ImGui.Checkbox("##id_guid_adv_option_debug_enable", Bot.EnableDebug)
-				ImGui.SameLine()
-				ImGui.Text("Enable Debug")
-
-				if Bot.EnableDebug then
-					if ImGui.TreeNode("Debug") then
-						_, Bot.EnableDebugMainWindow = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_mainwindow", Bot.EnableDebugMainWindow)
-						ImGui.SameLine()
-						ImGui.Text("Enable Main Window Debug")
-
-						_, Bot.EnableDebugRadar = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_radar", Bot.EnableDebugRadar)
-						ImGui.SameLine()
-						ImGui.Text("Enable Radar Debug")
-
-						_, Bot.EnableDebugInventory = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_inventory", Bot.EnableDebugInventory)
-						ImGui.SameLine()
-						ImGui.Text("Enable Inventory Debug")
-					end
-				end
-				ImGui.TreePop()
-			end
+			_, Bot.Settings.HealthPercent = ImGui.SliderInt("Health percent##id_guid_antipk_health_percent", Bot.Settings.HealthPercent, 1, 95)
+			_, Bot.Settings.MinPeopleBeforeAutoEscape = ImGui.SliderInt("Minimun people for Auto Escape##id_guid_antipk_min_people_before_autoescape", Bot.Settings.MinPeopleBeforeAutoEscape, 0, 10)
 		end
 		ImGui.End()
 	end
