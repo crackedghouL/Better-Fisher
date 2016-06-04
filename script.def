@@ -1,5 +1,5 @@
 [script]
-name=[Bot] Better Fisher v0.9d DEV
+name=[Bot] Better Fisher v0.9e DEV
 type=script
 
 [files]
@@ -7,6 +7,7 @@ file=Data/Profile.lua
 file=Data/Settings.lua
 file=Gui/MainWindow.lua
 file=Gui/ProfileEditor.lua
+file=Gui/AdvancedSettings.lua
 file=Gui/BotSettings.lua
 file=Gui/Stats.lua
 file=Gui/InventoryList.lua

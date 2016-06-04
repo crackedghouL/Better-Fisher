@@ -20,20 +20,18 @@ function HookFishHandleGameState.new()
 	return self
 end
 
-function HookFishHandleGameState:Reset()
-	self.LastGameTick = 0
-	self.RandomWaitTime = 0
-	self.state = 0
-end
-
 function HookFishHandleGameState:NeedToRun()
-	local selfPlayer = GetSelfPlayer()
+	if Bot.CheckIfLoggedIn() then
+		local selfPlayer = GetSelfPlayer()
 
-	if not selfPlayer or not selfPlayer.IsAlive then
+		if not selfPlayer.IsAlive then
+			return false
+		end
+
+		return selfPlayer.CurrentActionName == "FISHING_HOOK_START" or selfPlayer.CurrentActionName == "FISHING_HOOK_ING_HARDER"
+	else
 		return false
 	end
-
-	return selfPlayer.CurrentActionName == "FISHING_HOOK_START" or selfPlayer.CurrentActionName == "FISHING_HOOK_ING_HARDER"
 end
 
 function HookFishHandleGameState:Run()
@@ -43,7 +41,10 @@ function HookFishHandleGameState:Run()
 		self.LastGameTick = Pyx.Win32.GetTickCount()
 		self.RandomWaitTime = math.random(500,1200)
 		self.state = 1
-	elseif self.state == 1 and Pyx.Win32.GetTickCount() - self.LastGameTick > self.RandomWaitTime then -- Time spacebar minigame
+		return
+	end
+
+	if self.state == 1 and Pyx.Win32.GetTickCount() - self.LastGameTick > self.RandomWaitTime then -- Time spacebar minigame
 		if self.Settings.NoDelay or self.Settings.AlwaysPerfect or math.random(10) == 10 then -- Make perfects from options or 10% chance
 			if Bot.EnableDebug and Bot.EnableDebugHookHandleGameState then
 				print("Perfect timing!")
@@ -60,7 +61,10 @@ function HookFishHandleGameState:Run()
 			self.state = 2
 		end
 		self.LastGameTick = Pyx.Win32.GetTickCount()
-	elseif self.state == 2 and Pyx.Win32.GetTickCount() - self.LastGameTick > self.RandomWaitTime then -- Letters minigame
+		return
+	end
+
+	if self.state == 2 and Pyx.Win32.GetTickCount() - self.LastGameTick > self.RandomWaitTime then -- Letters minigame
 		BDOLua.Execute("getSelfPlayer():get():SetMiniGameResult(2)")
 		self.LastGameTick = Pyx.Win32.GetTickCount()
 		self.state = 0

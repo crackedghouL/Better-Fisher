@@ -24,7 +24,7 @@ function BotSettings.DrawBotSettings()
 	local valueChanged = false
 
 	if BotSettings.Visible then
-		_, BotSettings.Visible = ImGui.Begin("Bot Settings", BotSettings.Visible, ImVec2(350, 400), -1.0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)
+		_, BotSettings.Visible = ImGui.Begin("Settings", BotSettings.Visible, ImVec2(350, 400), -1.0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)
 
 		if ImGui.Button("Save settings", ImVec2(ImGui.GetContentRegionAvailWidth() / 2, 20)) then
 			Bot.SaveSettings()
@@ -52,6 +52,12 @@ function BotSettings.DrawBotSettings()
 
 		if ImGui.CollapsingHeader("Fishing options", "if_gui_fishing_option", true, false) then
 			BotSettings.UpdateBaitComboBox()
+
+			if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_BOAT_FISHING then
+				_, Bot.Settings.InvFullStop = ImGui.Checkbox("##id_guid_fishing_option_invfullstop", Bot.Settings.InvFullStop)
+				ImGui.SameLine()
+				ImGui.Text("Stop fishing when the inventory is full")
+			end
 
 			if not table.find(BotSettings.BaitComboBoxItems, Bot.Settings.ConsumablesSettings.Consumables[1].Name) then
 				table.insert(BotSettings.BaitComboBoxItems, Bot.Settings.ConsumablesSettings.Consumables[1].Name)
@@ -376,115 +382,6 @@ function BotSettings.DrawBotSettings()
 			ImGui.Text("Enable /Escape")
 			_, Bot.Settings.HealthPercent = ImGui.SliderInt("Health percent##id_guid_antipk_health_percent", Bot.Settings.HealthPercent, 1, 95)
 			_, Bot.Settings.MinPeopleBeforeAutoEscape = ImGui.SliderInt("Minimun people for Auto Escape##id_guid_antipk_min_people_before_autoescape", Bot.Settings.MinPeopleBeforeAutoEscape, 0, 10)
-		end
-
-		if ImGui.CollapsingHeader("Advanced options", "id_gui_adv_option", true, false) then
-			if ImGui.TreeNode("Be very careful with options below") then
-				if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_NORMAL_FISHING then
-					_, Bot.Settings.PlayerRun = ImGui.Checkbox("##id_guid_adv_option_fish_alone_boat_sprint", Bot.Settings.PlayerRun)
-					ImGui.SameLine()
-					ImGui.Text("Sprint when moving instead of walking")
-				end
-				if Bot.Settings.StartFishingSettings.FishingMethod == StartFishingState.SETTINGS_ON_BOAT_FISHING then
-					_, Bot.Settings.InvFullStop = ImGui.Checkbox("##id_guid_adv_option_invfullstop", Bot.Settings.InvFullStop)
-					ImGui.SameLine()
-					ImGui.Text("Stop fishing when the inventory is full")
-				end
-				_, Bot.Settings.UseAutorun = ImGui.Checkbox("##id_guid_adv_option_fish_alone_boat_use_autorun", Bot.Settings.UseAutorun)
-				ImGui.SameLine()
-				ImGui.Text("Use autorun to a certain distance of destination")
-				_, Bot.Settings.UseAutorunDistance = ImGui.SliderInt("Distance##id_guid_adv_option_use_autorun_until_distance", Bot.Settings.UseAutorunDistance, 550, 4000)
-				_, Bot.Settings.FishingSpotRadius = ImGui.SliderInt("Fish Spot Radius##id_guid_adv_option_fishing_spot_radius", Bot.Settings.FishingSpotRadius, 100, 1000)
-				_, Bot.Settings.HookFishHandleGameSettings.NoDelay = ImGui.Checkbox("##id_guid_adv_option_nodelay", Bot.Settings.HookFishHandleGameSettings.NoDelay)
-				ImGui.SameLine()
-				ImGui.TextColored(ImVec4(1,0,0,1), "Disable delay when fish bite")
-				_, Bot.Settings.StartFishingSettings.UseMaxEnergy = ImGui.Checkbox("##id_guid_adv_option_hook_fast_game", Bot.Settings.StartFishingSettings.UseMaxEnergy)
-				ImGui.SameLine()
-				ImGui.TextColored(ImVec4(1,0,0,1), "Max Energy Cast (uses no energy)")
-				_, Bot.Settings.StopWhenPeopleNearby = ImGui.Checkbox("##id_guid_adv_option_stop_bot_when_someone_nearby", Bot.Settings.StopWhenPeopleNearby)
-				ImGui.SameLine()
-				ImGui.TextColored(ImVec4(1,0,0,1), "Stop bot when someone is nearby")
-				if Bot.Settings.StopWhenPeopleNearby then
-					_, Bot.Settings.StopWhenPeopleNearbyDistance = ImGui.SliderInt("Distance##id_guid_adv_option_stop_bot_when_someone_nearby_distance", Bot.Settings.StopWhenPeopleNearbyDistance, 0, 10000)
-				end
-				_, Bot.Settings.PauseWhenPeopleNearby = ImGui.Checkbox("##id_guid_adv_option_pause_bot_when_someone_nearby", Bot.Settings.PauseWhenPeopleNearby)
-				ImGui.SameLine()
-				ImGui.TextColored(ImVec4(1,0,0,1), "Enable pause when someone is nearby")
-				if Bot.Settings.PauseWhenPeopleNearby then
-					_, Bot.Settings.PauseWhenPeopleNearbySeconds = ImGui.SliderInt("Seconds##id_guid_adv_option_stop_bot_when_someone_nearby_seconds", Bot.Settings.PauseWhenPeopleNearbySeconds, 30, 3600)
-				end
-				ImGui.TreePop()
-			end
-
-			if ImGui.TreeNode("Debug") then
-				_, Bot.Settings.PrintConsoleState = ImGui.Checkbox("##id_guid_adv_option_printconsolestate", Bot.Settings.PrintConsoleState)
-				ImGui.SameLine()
-				ImGui.Text("Print bot state on console")
-				_, Bot.EnableDebug = ImGui.Checkbox("##id_guid_adv_option_debug_enable", Bot.EnableDebug)
-				ImGui.SameLine()
-				ImGui.Text("Enable Debug")
-
-				if Bot.EnableDebug then
-					if ImGui.TreeNode("Debug") then
-						_, Bot.EnableDebugMainWindow = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_mainwindow", Bot.EnableDebugMainWindow)
-						ImGui.SameLine()
-						ImGui.Text("Enable Main Window Debug")
-
-						_, Bot.EnableDebugInventory = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_inventory", Bot.EnableDebugInventory)
-						ImGui.SameLine()
-						ImGui.Text("Enable Inventory Debug")
-
-						_, Bot.EnableDebugDeathState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_deathstate", Bot.EnableDebugDeathState)
-						ImGui.SameLine()
-						ImGui.Text("Enable DeathState Debug")
-
-						_, Bot.EnableDebugEquipFishignRodState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_equipfishingrodstate", Bot.EnableDebugEquipFishignRodState)
-						ImGui.SameLine()
-						ImGui.Text("Enable EquipFishignRodState Debug")
-
-						_, Bot.EnableDebugEquipFloatState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_equipfloatstate", Bot.EnableDebugEquipFloatState)
-						ImGui.SameLine()
-						ImGui.Text("Enable EquipFloatState Debug")
-
-						_, Bot.EnableDebugHookFishState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_hookfishstate", Bot.EnableDebugHookFishState)
-						ImGui.SameLine()
-						ImGui.Text("Enable HookFishState Debug")
-
-						_, Bot.EnableDebugHookHandleGameState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_hookhandlegamestate", Bot.EnableDebugHookHandleGameState)
-						ImGui.SameLine()
-						ImGui.Text("Enable HookHandleGameState Debug")
-
-						_, Bot.EnableDebugInventoryDeleteState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_inventorydeletestate", Bot.EnableDebugInventoryDeleteState)
-						ImGui.SameLine()
-						ImGui.Text("Enable InventoryDeleteState Debug")
-
-						_, Bot.EnableDebugLootState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_lootstate", Bot.EnableDebugLootState)
-						ImGui.SameLine()
-						ImGui.Text("Enable LootState Debug")
-
-						_, Bot.EnableDebugRepairState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_repairstate", Bot.EnableDebugRepairState)
-						ImGui.SameLine()
-						ImGui.Text("Enable RepairState Debug")
-
-						_, Bot.EnableDebugStartFishingState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_startfishingstate", Bot.EnableDebugStartFishingState)
-						ImGui.SameLine()
-						ImGui.Text("Enable StartFishingState Debug")
-
-						_, Bot.EnableDebugTradeManagerState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_trademanagerstate", Bot.EnableDebugTradeManagerState)
-						ImGui.SameLine()
-						ImGui.Text("Enable TradeManagerState Debug")
-
-						_, Bot.EnableDebugVendorState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_vendorstate", Bot.EnableDebugVendorState)
-						ImGui.SameLine()
-						ImGui.Text("Enable VendorState Debug")
-
-						_, Bot.EnableDebugWarehouseState = ImGui.Checkbox("##id_guid_adv_option_debug_options_enable_warehousestate", Bot.EnableDebugWarehouseState)
-						ImGui.SameLine()
-						ImGui.Text("Enable WarehouseState Debug")
-					end
-				end
-				ImGui.TreePop()
-			end
 		end
 		ImGui.End()
 	end

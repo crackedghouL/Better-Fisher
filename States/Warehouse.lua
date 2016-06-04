@@ -25,67 +25,57 @@ function WarehouseState.new()
 		IgnoreItemsNamed = {},
 		SecondsBetweenTries = 300
 	}
-
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
-
 	self.DepositList = nil
 	self.CurrentDepositList = {}
 	self.DepositedMoney = false
 	self.DepositItems = false
-
 	self.ItemCheckFunction = nil
-
 	self.CallWhenCompleted = nil
 	self.CallWhileMoving = nil
-
-	self.Forced = false
 	self.ManualForced = false
 	self.state = 0
-
 	return self
 end
 
 function WarehouseState:NeedToRun()
-	local selfPlayer = GetSelfPlayer()
+	if Bot.CheckIfLoggedIn() then
+		local selfPlayer = GetSelfPlayer()
 
-	if not selfPlayer or not selfPlayer.IsAlive then
-		self.Forced = false
-	end
+		if not Bot.CheckIfLoggedIn() or not selfPlayer.IsAlive then
+			return false
+		end
 
-	if not self:HasNpc() or (not self:HasNpc() and Bot.Settings.InvFullStop) then
-		self.Forced = false
-	end
+		if not self:HasNpc() or (not self:HasNpc() and Bot.Settings.InvFullStop) then
+			return false
+		end
 
-	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
-		self.Forced = false
-	end
+		if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+			return false
+		end
 
-	if not Navigator.CanMoveTo(self:GetPosition()) then
-		self.Forced = false
-	end
+		if self.ManualForced and Navigator.CanMoveTo(self:GetPosition()) then
+			return true
+		end
 
-	if self.Settings.Enabled then
-		if table.length(self:GetItems()) > 0 and (selfPlayer.Inventory.FreeSlots <= 3 or selfPlayer.WeightPercent >= 95) then
-			if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
-				self.Forced = true
+		if self.Settings.Enabled then
+			if table.length(self:GetItems()) > 0 and (selfPlayer.Inventory.FreeSlots <= 3 or selfPlayer.WeightPercent >= 95) then
+				if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+					return true
+				end
 			end
 		end
-	end
 
-	if self.Forced or self.ManualForced then
-		return true
-	elseif not self.Forced or not self.ManualForced then
+		return false
+	else
 		return false
 	end
-
-	return false
 end
 
 function WarehouseState:Reset()
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
-	self.Forced = false
 	self.ManualForced = false
 	self.DepositedMoney = false
 	self.DepositItems = false
@@ -101,7 +91,6 @@ function WarehouseState:Exit()
 		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastUseTimer:Start()
 		self.SleepTimer = nil
-		self.Forced = false
 		self.ManualForced = false
 		self.DepositedMoney = false
 		self.DepositItems = false
@@ -118,7 +107,7 @@ function WarehouseState:Run()
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
-	if vendorPosition.Distance3DFromMe > 300 then
+	if vendorPosition.Distance3DFromMe > math.random(180,220) then
 		if self.CallWhileMoving then
 			self.CallWhileMoving(self)
 		end

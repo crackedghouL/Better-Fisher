@@ -178,13 +178,19 @@ Fixed vendor don't buying items
 Fixed for facing wrong when fishing
 Minor fixes
 
-[0.XX BETA]
-PyX2 compatible [done]
-Removed Radar [done]
-Removed old fishing animations [done]
-Added new option, safer distance before stop the script [done]
-Added new option, minimum peoples around before call Escape [done]
-Added new option, wait x seconds before respawn [done]
-Added new option, pause the bot for X seconds if someone is nearby [done]
-Polished the code [done]
-Fixed some bugs [done]
+PyX2 compatible
+Channel Switcher compatible
+Removed Radar
+Removed Old Fishing Animations
+Added new feature, Pause
+Added new window, Advanced Settings
+Added new option, safer distance before stop the script
+Added new option, minimum peoples around before call Escape
+Added new option, wait x seconds before respawn
+Added new option, pause the bot for X seconds if someone is nearby
+Added new navigation system (is based of default one), for this thanks gklt
+Moved some settings from Bot Settings to Advanced Settings
+Renamed Loot Stats to Stats
+Renamed Bot Settings to Settings
+Polished the code, more easy to read and more easy to understand
+Fixed some bugs

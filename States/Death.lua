@@ -21,26 +21,13 @@ function DeathState.new()
 	}
 	self.SleepTimer = nil
 	self.CallWhenCompleted = nil
-	self.Forced = false
 	self.state = 0
 	return self
 end
 
 function DeathState:NeedToRun()
-	local selfPlayer = GetSelfPlayer()
-
-	if not selfPlayer then
-		self.Forced = false
-	end
-
-	if not selfPlayer.IsAlive then
-		self.Forced = true
-	end
-
-	if self.Forced then
+	if Bot.CheckIfLoggedIn() and not GetSelfPlayer().IsAlive then
 		return true
-	elseif not self.Forced then
-		return false
 	end
 
 	return false
@@ -88,16 +75,17 @@ function DeathState:Run()
 	end
 
 	self:Exit()
+	return false
 end
 
 function DeathState:Exit()
-	self.SleepTimer = nil
-	self.Forced = false
-	self.state = 0
+	if self.state > 1 then
+		self.SleepTimer = nil
+		self.state = 0
+	end
 end
 
 function DeathState:Reset()
 	self.SleepTimer = nil
-	self.Forced = false
 	self.state = 0
 end

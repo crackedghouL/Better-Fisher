@@ -26,69 +26,64 @@ function VendorState.new()
 		BuyItems = {},
 		SecondsBetweenTries = 300
 	}
-	-- Buy Items Format {Name, BuyAt, BuyMax} BuyAt level we should buyat or below, BuyMax Max to have in Inventory so if is 100 and we have 20 bot will buy 80
+	-- Buy Items Format {Name, BuyAt, BuyMax}:
+	-- Name is the local name of the item, is based on the language of the client
+	-- BuyAt level we should buyat or below
+	-- BuyMax Max to have in Inventory so if is 100 and we have 20 bot will buy 80
 
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
-
 	self.DepositList = nil
 	self.CurrentSellList = {}
 	self.CurrentBuyList = {}
-
 	self.ItemCheckFunction = nil
-
 	self.CallWhenCompleted = nil
 	self.CallWhileMoving = nil
-
-	self.Forced = false
 	self.ManualForced = false
 	self.state = 0
-
 	return self
 end
 
 function VendorState:NeedToRun()
-	local selfPlayer = GetSelfPlayer()
+	if Bot.CheckIfLoggedIn() then
+		local selfPlayer = GetSelfPlayer()
 
-	if not selfPlayer or not selfPlayer.IsAlive then
-		self.Forced = false
-	end
-
-	if not self:HasNpc() or (not self:HasNpc() and Bot.Settings.InvFullStop) then
-		self.Forced = false
-	end
-
-	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
-		self.Forced = false
-	end
-
-	if not Navigator.CanMoveTo(self:GetPosition()) then
-		self.Forced = false
-	end
-
-	if self.Settings.Enabled then
-		if self.Settings.SellEnabled then
-			if table.length(self:GetSellItems()) > 0 then
-				if (self.Settings.VendorOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3) or (self.Settings.VendorOnWeight and selfPlayer.WeightPercent >= 95) then
-					self.Forced = true
-				end
-			end
-		elseif self.Settings.BuyEnabled then
-			if self.Settings.BuyItems and table.length(self:GetBuyItems(false)) > 0 then
-				self.Forced = true
-			end
-		elseif not self.Settings.SellEnabled and not self.Settings.BuyEnabled then
-			self.Forced = false
+		if not Bot.CheckIfLoggedIn() or not selfPlayer.IsAlive then
+			return false
 		end
-	end
 
-	if self.Forced or self.ManualForced then
-		return true
-	elseif not self.Forced or not self.ManualForced then
+		if not self:HasNpc() or (not self:HasNpc() and Bot.Settings.InvFullStop) then
+			return false
+		end
+
+		if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+			return false
+		end
+
+		if self.ManualForced and Navigator.CanMoveTo(self:GetPosition()) then
+			return true
+		end
+
+		if self.Settings.Enabled then
+			if self.Settings.SellEnabled then
+				if table.length(self:GetSellItems()) > 0 then
+					if (self.Settings.VendorOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3) or (self.Settings.VendorOnWeight and selfPlayer.WeightPercent >= 95) then
+						return true
+					end
+				end
+			elseif self.Settings.BuyEnabled then
+				if self.Settings.BuyItems and table.length(self:GetBuyItems(false)) > 0 then
+					return true
+				end
+			elseif not self.Settings.SellEnabled and not self.Settings.BuyEnabled then
+				return false
+			end
+		end
+
+		return false
+	else
 		return false
 	end
-
-	return false
 end
 
 function VendorState:HasNpc()
@@ -102,7 +97,6 @@ end
 function VendorState:Reset()
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
-	self.Forced = false
 	self.ManualForced = false
 	self.state = 0
 end
@@ -116,7 +110,6 @@ function VendorState:Exit()
 		self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastUseTimer:Start()
 		self.SleepTimer = nil
-		self.Forced = false
 		self.ManualForced = false
 		self.state = 0
 	end
@@ -131,7 +124,7 @@ function VendorState:Run()
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
-	if vendorPosition.Distance3DFromMe > 300 then
+	if vendorPosition.Distance3DFromMe > math.random(180,220) then
 		if self.CallWhileMoving then
 			self.CallWhileMoving(self)
 		end

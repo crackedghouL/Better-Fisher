@@ -40,45 +40,42 @@ function TradeManagerState.new()
 end
 
 function TradeManagerState:NeedToRun()
-	local selfPlayer = GetSelfPlayer()
+	if Bot.CheckIfLoggedIn() then
+		local selfPlayer = GetSelfPlayer()
 
-	if not selfPlayer or not selfPlayer.IsAlive then
-		self.Forced = false
-	end
+		if not selfPlayer.IsAlive then
+			return false
+		end
 
-	if not self:HasNpc() or (not self:HasNpc() and Bot.Settings.InvFullStop) then
-		self.Forced = false
-	end
+		if not self:HasNpc() or (not self:HasNpc() and Bot.Settings.InvFullStop) then
+			return false
+		end
 
-	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
-		self.Forced = false
-	end
+		if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+			return false
+		end
 
-	if not Navigator.CanMoveTo(self:GetPosition()) then
-		self.Forced = false
-	end
+		if self.ManualForced and Navigator.CanMoveTo(self:GetPosition()) then
+			return true
+		end
 
-	if self.Settings.Enabled then
-		if selfPlayer.Inventory.FreeSlots <= 3 and table.length(self:GetItems()) > 0 and not Looting.IsLooting then
-			if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
-				self.Forced = true
+		if self.Settings.Enabled then
+			if selfPlayer.Inventory.FreeSlots <= 3 and table.length(self:GetItems()) > 0 and not Looting.IsLooting then
+				if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+					return true
+				end
 			end
 		end
-	end
 
-	if self.Forced or self.ManualForced then
-		return true
-	elseif not self.Forced or not self.ManualForced then
+		return false
+	else
 		return false
 	end
-
-	return false
 end
 
 function TradeManagerState:Reset()
 	self.LastTradeUseTimer = nil
 	self.SleepTimer = nil
-	self.Forced = false
 	self.ManualForced = false
 	self.state = 0
 end
@@ -96,7 +93,6 @@ function TradeManagerState:Exit()
 		self.LastTradeUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
 		self.LastTradeUseTimer:Start()
 		self.SleepTimer = nil
-		self.Forced = false
 		self.ManualForced = false
 		self.state = 0
 	end
@@ -111,17 +107,15 @@ function TradeManagerState:Run()
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
-	if vendorPosition.Distance3DFromMe > 300 then
+	if vendorPosition.Distance3DFromMe > math.random(180,220) then
 		if self.CallWhileMoving then
 			self.CallWhileMoving(self)
 		end
-
 		Navigator.MoveTo(vendorPosition, nil, Bot.Settings.PlayerRun)
 		if self.state > 1 then
 			self:Exit()
 			return
 		end
-
 		self.state = 1
 		return
 	end

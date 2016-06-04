@@ -20,29 +20,26 @@ function LootState.new()
 		LootKeys = false,
 		LootEggs = false
 	}
-
-	self.LastHookFishTickCount = 0
 	self.state = 0
 	return self
 end
 
-function LootState:Reset()
-	self.LastHookFishTickCount = 0
-	self.state = 0
-end
-
 function LootState:NeedToRun()
-	local selfPlayer = GetSelfPlayer()
+	if Bot.CheckIfLoggedIn() then
+		local selfPlayer = GetSelfPlayer()
 
-	if not selfPlayer or not selfPlayer.IsAlive then
+		if not selfPlayer.IsAlive then
+			return false
+		end
+
+		if not Bot.Settings.InvFullStop and selfPlayer.Inventory.FreeSlots <= 3 then
+			return false
+		end
+
+		return Looting.IsLooting and selfPlayer.CurrentActionName == "WAIT"
+	else
 		return false
 	end
-
-	if not Bot.Settings.InvFullStop and selfPlayer.Inventory.FreeSlots <= 3 then
-		return false
-	end
-
-	return Looting.IsLooting and selfPlayer.CurrentActionName == "WAIT"
 end
 
 function LootState:Run()
@@ -50,14 +47,14 @@ function LootState:Run()
 	local x = tostring(numLoots)
 	local FishGameTime = 0
 	Bot.Stats.Loots = Bot.Stats.Loots + 1
-	self.state = 0 -- 0 = nothing
+	self.state = 0
 
 	if Bot.EnableDebug and Bot.EnableDebugLootState then
 		print("Item to loot: " .. numLoots)
 	end
 
 	-- if numLoots ~= 0 then
-		for i = 0, numLoots -1, x do -- for i = 0, numLoots -1 do
+		for i = 0, numLoots -1, x do
 			local lootItem = Looting.GetItemByIndex(i)
 			local lootItemName = lootItem.ItemEnchantStaticStatus.Name
 			local lootItemType = nil
@@ -113,14 +110,12 @@ function LootState:Run()
 				if lootItem.ItemEnchantStaticStatus.Classify == 16 and lootItem.ItemEnchantStaticStatus.IsTradeAble then
 					lootItemType = "Fish"
 					self.state = 3
-				--elseif lootItem.ItemEnchantStaticStatus.Type == 2 and lootItem.ItemEnchantStaticStatus.Classify == 0 then
 				elseif 	lootItem.ItemEnchantStaticStatus.ItemId == 40218 or -- ancient relic crystal shard
 						lootItem.ItemEnchantStaticStatus.ItemId == 4997 or  -- hard black crystal shard
 						lootItem.ItemEnchantStaticStatus.ItemId == 4998     -- sharp black crystal shard
 				then
 					lootItemType = "Shard"
 					self.state = 4
-				--elseif lootItem.ItemEnchantStaticStatus.Type == 0 and lootItem.ItemEnchantStaticStatus.Classify == 0 then
 				elseif 	lootItem.ItemEnchantStaticStatus.ItemId == 44165 or -- silver key
 						lootItem.ItemEnchantStaticStatus.ItemId == 44166 or -- bronze key
 						lootItem.ItemEnchantStaticStatus.ItemId == 44164    -- gold key

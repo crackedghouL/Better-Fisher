@@ -16,51 +16,43 @@ function InventoryDeleteState.new()
 		DeleteDepletedItems = {},
 		SecondsBetweenTries = 60
 	}
-
-	self.Forced = false
 	self.SleepTimer = nil
-
 	self.CallWhenCompleted = nil
 	self.ItemCheckFunction = nil
-
-	self.ItemList = {}
-
 	return self
 end
 
 function InventoryDeleteState:NeedToRun()
-	local selfPlayer = GetSelfPlayer()
+	if Bot.CheckIfLoggedIn() then
+		if not GetSelfPlayer().IsAlive then
+			return false
+		end
 
-	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+		if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+			return false
+		end
+
+		if table.length(self:GetItems()) > 0 then
+			return true
+		end
+
+		return false
+	else
 		return false
 	end
-
-	if not selfPlayer or not selfPlayer.IsAlive then
-		return false
-	end
-
-	if table.length(self:GetItems()) > 0 then
-		return true
-	end
-
-	return false
 end
 
 function InventoryDeleteState:Reset()
 	self.LastUseTimer = nil
-	self.Forced = false
-	self.ItemList = {}
-end
-
-function InventoryDeleteState:Exit()
-	self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
-	self.LastUseTimer:Start()
-	self.Forced = false
-	self.ItemList = {}
+	self.CallWhenCompleted = nil
+	self.ItemCheckFunction = nil
 end
 
 function InventoryDeleteState:Run()
 	local selfPlayer = GetSelfPlayer()
+
+	self.LastUseTimer = PyxTimer:New(self.Settings.SecondsBetweenTries)
+	self.LastUseTimer:Start()
 
 	for k,v in pairs(self:GetItems()) do
 		if Bot.EnableDebug and Bot.EnableDebugInventoryDeleteState then
@@ -68,8 +60,6 @@ function InventoryDeleteState:Run()
 		end
 		selfPlayer.Inventory:DeleteItem(v.slot)
 	end
-
-	self:Exit()
 end
 
 function InventoryDeleteState:GetItems()

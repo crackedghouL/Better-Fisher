@@ -20,82 +20,73 @@ function RepairState.new()
 		RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE,
 		SecondsBetweenTries = 300
 	}
-
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
-
 	self.CallWhenCompleted = nil
 	self.CallWhileMoving = nil
-
 	self.RepairList = {}
 	self.ItemCheckFunction = nil
-
-    self.RepairEquipped = true
-    self.RepairInventory = true
-
-	self.Forced = false
+	self.RepairEquipped = true
+	self.RepairInventory = true
 	self.ManualForced = false
 	self.state = 0
-
 	return self
 end
 
 function RepairState:NeedToRun()
-	local selfPlayer = GetSelfPlayer()
+	if Bot.CheckIfLoggedIn() then
+		local selfPlayer = GetSelfPlayer()
 
-	if not selfPlayer or not selfPlayer.IsAlive then
-		self.Forced = false
-	end
+		if not selfPlayer.IsAlive then
+			return false
+		end
 
-	if not self:HasNpc() or (not self:HasNpc() and Bot.Settings.InvFullStop) then
-		self.Forced = false
-	end
+		if not self:HasNpc() or (not self:HasNpc() and Bot.Settings.InvFullStop) then
+			return false
+		end
 
-	if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
-		self.Forced = false
-	end
+		if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
+			return false
+		end
 
-	if not self.Settings.Enabled then
-		self.Forced = false
-	end
+		if self.ManualForced and Navigator.CanMoveTo(self:GetPosition()) then
+			return true
+		end
 
-	if not Navigator.CanMoveTo(self:GetPosition()) then
-		self.Forced = false
-	end
+		if not self.Settings.Enabled then
+			return false
+		end
 
-	if self.Settings.Enabled then
-		if not selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND) then
-			for k,v in pairs(selfPlayer.Inventory.Items) do
-				if 	v.HasEndurance and v.EndurancePercent <= 0 and
-					(v.ItemEnchantStaticStatus.IsFishingRod and
-					(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
-				then
-					if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
-						self.Forced = true
+		if self.Settings.Enabled then
+			if not selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND) then
+				for k,v in pairs(selfPlayer.Inventory.Items) do
+					if 	v.HasEndurance and v.EndurancePercent <= 0 and
+						(v.ItemEnchantStaticStatus.IsFishingRod and
+						(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
+					then
+						if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+							return true
+						end
 					end
 				end
-			end
-		else
-			for k,v in pairs(selfPlayer.EquippedItems) do
-				if 	v.HasEndurance and v.EndurancePercent <= 0 and
-					(v.ItemEnchantStaticStatus.IsFishingRod and
-					(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
-				then
-					if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
-						self.Forced = true
+			else
+				for k,v in pairs(selfPlayer.EquippedItems) do
+					if 	v.HasEndurance and v.EndurancePercent <= 0 and
+						(v.ItemEnchantStaticStatus.IsFishingRod and
+						(v.ItemEnchantStaticStatus.ItemId ~= 16141 and v.ItemEnchantStaticStatus.ItemId ~= 16147 and v.ItemEnchantStaticStatus.ItemId ~= 16151))
+					then
+						if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+							return true
+						end
 					end
 				end
 			end
 		end
-	end
 
-	if self.Forced or self.ManualForced then
-		return true
+		return false
 	else
 		return false
 	end
-
-	return false
 end
 
 function RepairState:HasNpc()
@@ -109,8 +100,12 @@ end
 function RepairState:Reset()
 	self.LastUseTimer = nil
 	self.SleepTimer = nil
+	self.CallWhenCompleted = nil
+	self.CallWhileMoving = nil
 	self.RepairList = {}
-	self.Forced = false
+	self.ItemCheckFunction = nil
+	self.RepairEquipped = true
+	self.RepairInventory = true
 	self.ManualForced = false
 	self.state = 0
 end
@@ -125,7 +120,6 @@ function RepairState:Exit()
 		self.LastUseTimer:Start()
 		self.SleepTimer = nil
 		self.RepairList = {}
-		self.Forced = false
 		self.ManualForced = false
 		self.state = 0
 	end
@@ -136,11 +130,11 @@ function RepairState:Run()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
 
-	if Bot.CheckIfRodIsEquipped() then
+	if Bot.CheckIfRodIsEquipped() or not selfPlayer.IsAlive then
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
-	if vendorPosition.Distance3DFromMe > 300 then
+	if vendorPosition.Distance3DFromMe > math.random(180,220) then
 		if self.CallWhileMoving then
 			self.CallWhileMoving(self)
 		end
@@ -244,34 +238,34 @@ function RepairState:Run()
 end
 
 function RepairState:GetItems()
-    local items = {}
-    local selfPlayer = GetSelfPlayer()
+	local items = {}
+	local selfPlayer = GetSelfPlayer()
 
-    if selfPlayer then
-        for k,v in pairs(selfPlayer.EquippedItems) do
-            if self.ItemCheckFunction then
-                if self.ItemCheckFunction(v) then
-                    table.insert(items, {item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
-                end
-            else
-                if v.HasEndurance and v.EndurancePercent < 100 then
-                    table.insert(items, {item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
-                end
-            end
-        end
+	if selfPlayer then
+		for k,v in pairs(selfPlayer.EquippedItems) do
+			if self.ItemCheckFunction then
+				if self.ItemCheckFunction(v) then
+					table.insert(items, {item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
+				end
+			else
+				if v.HasEndurance and v.EndurancePercent < 100 then
+					table.insert(items, {item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
+				end
+			end
+		end
 
-        for k,v in pairs(selfPlayer.Inventory.Items) do
-            if self.ItemCheckFunction then
-                if self.ItemCheckFunction(v) then
-                    table.insert(items, {item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
-                end
-            else
-                if v.HasEndurance and v.EndurancePercent < 100 then
-                    table.insert(items, {item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
-                end
-            end
-        end
-    end
+		for k,v in pairs(selfPlayer.Inventory.Items) do
+			if self.ItemCheckFunction then
+				if self.ItemCheckFunction(v) then
+					table.insert(items, {item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
+				end
+			else
+				if v.HasEndurance and v.EndurancePercent < 100 then
+					table.insert(items, {item = v, slot = v.InventoryIndex, name = v.ItemEnchantStaticStatus.Name, count = v.Count})
+				end
+			end
+		end
+	end
 
-    return items
+	return items
 end

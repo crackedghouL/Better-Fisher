@@ -1,7 +1,7 @@
 Bot = { }
 Bot.Settings = Settings()
 
-Bot.Version = "Better Fisher v0.9d DEV"
+Bot.Version = "Better Fisher v0.9e DEV"
 
 Bot.Running = false
 Bot.Paused = false
@@ -216,6 +216,12 @@ function Bot.Stop()
 	Bot.Paused = false
 	Bot.PausedManual = false
 	Bot.FSM:Reset()
+	Bot.InventoryDeleteState:Reset()
+	Bot.EquipFishingRodState:Reset()
+	Bot.EquipFloatState:Reset()
+	Bot.UnequipFishingRodState:Reset()
+	Bot.UnequipFloatState:Reset()
+	Bot.RepairState:Reset()
 	Bot.WarehouseState:Reset()
 	Bot.VendorState:Reset()
 	Bot.TradeManagerState:Reset()
@@ -270,6 +276,15 @@ function Bot.OnPulse()
 					BotSettings.Visible = true
 				elseif BotSettings.Visible then
 					BotSettings.Visible = false
+				end
+			end
+		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('D')) then
+			if Bot._advancedsettingsHotKeyPressed ~= true then
+				Bot._advancedsettingsHotKeyPressed = true
+				if not AdvancedSettings.Visible then
+					AdvancedSettings.Visible = true
+				elseif AdvancedSettings.Visible then
+					AdvancedSettings.Visible = false
 				end
 			end
 		elseif Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('B')) then
@@ -368,6 +383,7 @@ function Bot.OnPulse()
 			Bot._pauseHotKeyPressed = false
 			Bot._profileHotKeyPressed = false
 			Bot._settingsHotKeyPressed = false
+			Bot._advancedsettingsHotKeyPressed = false
 			Bot._inventoryHotKeyPressed = false
 			Bot._consumableHotKeyPressed = false
 			Bot._statsHotKeyPressed = false
@@ -484,6 +500,7 @@ function Bot.LoadSettings()
 	Bot.Settings.LibConsumablesSettings = LibConsumables.Settings
 	Bot.Settings.InventoryDeleteSettings = Bot.InventoryDeleteState.Settings
 	Bot.Settings.StartFishingSettings = Bot.StartFishingState.Settings
+	Bot.Settings.HookFishStateSettings = Bot.HookFishState.Settings
 	Bot.Settings.HookFishHandleGameSettings = Bot.HookFishHandleGameState.Settings
 	Bot.Settings.LootSettings = Bot.LootState.Settings
 
@@ -548,14 +565,22 @@ function Bot.StateComplete(state)
 	end
 end
 
+function Bot.CheckIfLoggedIn()
+	if GetSelfPlayer() then
+		return true
+	end
+
+	return false
+end
+
 function Bot.CheckForNearbyPeople()
-	if Bot.FSM.CurrentState == Bot.StartFishingState or Bot.WasRunning then
+	if Bot.WasRunning or Bot.FSM.CurrentState == Bot.StartFishingState then
 		local players = GetCharacters()
 		local count = 0
 		local safeDistance = Bot.Settings.StopWhenPeopleNearbyDistance
 
 		for k,v in pairs(players, function(t,a,b) return t[a].Position.Distance3DFromMe < t[b].Position.Distance3DFromMe end) do
-			if math.floor(v.Position.Distance3DFromMe) <= safeDistance then -- not string.match(me.Key, v.Key)
+			if (v.IsPlayer and v.Name ~= GetSelfPlayer().Name) and math.floor(v.Position.Distance3DFromMe) <= safeDistance then -- not string.match(me.Key, v.Key)
 				count = count + 1
 			end
 		end

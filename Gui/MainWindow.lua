@@ -17,10 +17,6 @@ function MainWindow.DrawMainWindow()
 	if shouldDisplay then
 		local selfPlayer = GetSelfPlayer()
 
-		if not selfPlayer then
-			return
-		end
-
 		if Bot.Hours == nil then
 			Bot.Hours = 0
 			Bot.Minutes = 0
@@ -59,11 +55,18 @@ function MainWindow.DrawMainWindow()
 						ProfileEditor.Visible = false
 					end
 				end
-				if ImGui.MenuItem("Open Bot Settings", "ALT+O", BotSettings.Visible) then
+				if ImGui.MenuItem("Open Settings", "ALT+O", BotSettings.Visible) then
 					if not BotSettings.Visible then
 						BotSettings.Visible = true
 					elseif BotSettings.Visible then
 						BotSettings.Visible = false
+					end
+				end
+				if ImGui.MenuItem("Open Advanced Settings", "ALT+D", AdvancedSettings.Visible) then
+					if not AdvancedSettings.Visible then
+						AdvancedSettings.Visible = true
+					elseif AdvancedSettings.Visible then
+						AdvancedSettings.Visible = false
 					end
 				end
 				ImGui.EndMenu()
@@ -188,23 +191,31 @@ function MainWindow.DrawMainWindow()
 				ImGui.TextColored(ImVec4(1,0.2,0.2,1), "Stopped") -- red
 			end
 		else
-			ImGui.Text(selfPlayer.CurrentActionName)
+			if Bot.CheckIfLoggedIn() then
+				ImGui.Text(selfPlayer.CurrentActionName)
+			else
+				ImGui.Text("N/A")
+			end
 		end
 
 		ImGui.NextColumn()
 
 		ImGui.Text("Inv. slots left:")
 		ImGui.SameLine()
-		if selfPlayer.Inventory.FreeSlots > 20 then
-			ImGui.TextColored(ImVec4(0.2,1,0.2,1), selfPlayer.Inventory.FreeSlots) -- green
-		elseif selfPlayer.Inventory.FreeSlots >= 10 and selfPlayer.Inventory.FreeSlots <= 20 then
-			ImGui.TextColored(ImVec4(1,0.8,0.2,1), selfPlayer.Inventory.FreeSlots) -- yellow
-		elseif selfPlayer.Inventory.FreeSlots >= 5 and selfPlayer.Inventory.FreeSlots < 10 then
-			ImGui.TextColored(ImVec4(1,0.4,0.2,1), selfPlayer.Inventory.FreeSlots) -- orange
-		elseif selfPlayer.Inventory.FreeSlots ~= 0 and selfPlayer.Inventory.FreeSlots < 5 then
-			ImGui.TextColored(ImVec4(1,0.2,0.2,1), selfPlayer.Inventory.FreeSlots) -- red
+		if Bot.CheckIfLoggedIn() then
+			if selfPlayer.Inventory.FreeSlots > 20 then
+				ImGui.TextColored(ImVec4(0.2,1,0.2,1), selfPlayer.Inventory.FreeSlots) -- green
+			elseif selfPlayer.Inventory.FreeSlots >= 10 and selfPlayer.Inventory.FreeSlots <= 20 then
+				ImGui.TextColored(ImVec4(1,0.8,0.2,1), selfPlayer.Inventory.FreeSlots) -- yellow
+			elseif selfPlayer.Inventory.FreeSlots >= 5 and selfPlayer.Inventory.FreeSlots < 10 then
+				ImGui.TextColored(ImVec4(1,0.4,0.2,1), selfPlayer.Inventory.FreeSlots) -- orange
+			elseif selfPlayer.Inventory.FreeSlots ~= 0 and selfPlayer.Inventory.FreeSlots < 5 then
+				ImGui.TextColored(ImVec4(1,0.2,0.2,1), selfPlayer.Inventory.FreeSlots) -- red
+			else
+				ImGui.Text(selfPlayer.Inventory.FreeSlots)
+			end
 		else
-			ImGui.Text(selfPlayer.Inventory.FreeSlots)
+			ImGui.Text("N/A")
 		end
 
 		ImGui.Columns(1)
