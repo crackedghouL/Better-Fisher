@@ -33,7 +33,7 @@ function AdvancedSettings.DrawAdvancedSettings()
 				ImGui.Text("Enable wait random seconds")
 				if Bot.Settings.HookFishStateSettings.UseRandomSeconds then
 					ImGui.Text("When fish hook, the bot wait random seconds from " .. Bot.Settings.HookFishStateSettings.HookMinSeconds .. " and " .. Bot.Settings.HookFishStateSettings.HookMaxSeconds)
-					_, Bot.Settings.HookFishStateSettings.HookMinSeconds = ImGui.SliderInt("Min seconds##id_guid_delays_option_min_seconds", Bot.Settings.HookFishStateSettings.HookMinSeconds, 5, Bot.Settings.HookFishStateSettings.HookMaxSeconds)
+					_, Bot.Settings.HookFishStateSettings.HookMinSeconds = ImGui.SliderInt("Min seconds##id_guid_delays_option_min_seconds", Bot.Settings.HookFishStateSettings.HookMinSeconds, 1, Bot.Settings.HookFishStateSettings.HookMaxSeconds)
 					_, Bot.Settings.HookFishStateSettings.HookMaxSeconds = ImGui.SliderInt("Max seconds##id_guid_delays_option_max_seconds", Bot.Settings.HookFishStateSettings.HookMaxSeconds, Bot.Settings.HookFishStateSettings.HookMinSeconds, 170)
 				end
 				ImGui.TreePop()

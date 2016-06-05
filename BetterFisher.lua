@@ -1,7 +1,7 @@
 Bot = { }
 Bot.Settings = Settings()
 
-Bot.Version = "Better Fisher v0.9e BETA"
+Bot.Version = "Better Fisher v0.9f DEV"
 
 Bot.Running = false
 Bot.Paused = false
