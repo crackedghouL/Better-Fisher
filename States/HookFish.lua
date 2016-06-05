@@ -60,7 +60,7 @@ function HookFishState:Run()
 			realMinSeconds = self.Settings.HookMinSeconds * 1000
 			realMaxSeconds = self.Settings.HookMaxSeconds * 1000
 			self.LastWaitToHookTick = Pyx.Win32.GetTickCount()
-			self.WaitToHook = math.random(self.Settings.HookMinSeconds, self.Settings.HookMaxSeconds)
+			self.WaitToHook = math.random(realMinSeconds, realMaxSeconds)
 			self.state = 1
 		else
 			self.state = 2
