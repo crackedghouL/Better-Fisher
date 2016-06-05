@@ -130,7 +130,7 @@ function RepairState:Run()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
 
-	if Bot.CheckIfRodIsEquipped() or not selfPlayer.IsAlive then
+	if Bot.CheckIfRodIsEquipped() then
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 

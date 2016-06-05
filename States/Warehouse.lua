@@ -43,7 +43,7 @@ function WarehouseState:NeedToRun()
 	if Bot.CheckIfLoggedIn() then
 		local selfPlayer = GetSelfPlayer()
 
-		if not Bot.CheckIfLoggedIn() or not selfPlayer.IsAlive then
+		if not selfPlayer.IsAlive then
 			return false
 		end
 
@@ -55,7 +55,7 @@ function WarehouseState:NeedToRun()
 			return false
 		end
 
-		if self.ManualForced and Navigator.CanMoveTo(self:GetPosition()) then
+		if self.ManualForced and (Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun) then
 			return true
 		end
 
@@ -205,7 +205,7 @@ function WarehouseState:Run()
 	end
 
 	if self.state == 5 then -- 5 = state complete
-		if  Bot.Settings.RepairSettings.Enabled == true and Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then
+		if Bot.Settings.RepairSettings.Enabled and Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then
 			Bot.RepairState.ManualForced = true
 			print("Forcing repair after warehouse...")
 		end

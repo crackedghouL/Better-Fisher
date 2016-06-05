@@ -246,7 +246,11 @@ function LootState:Run()
 			end
 
 			if self.state == 9 then -- 9 = don't loot the item
-				print("Not looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ")")
+				if lootItemType == "Trash" then
+					print("Not looted: " .. lootItemName .. " [" .. lootItemType .. "]")
+				else
+					print("Not looted: " .. lootItemName .. " [" .. lootItemType .. "] (" .. lootItemQuality .. ")")
+				end
 			end
 		end
 	--end
