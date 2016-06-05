@@ -195,3 +195,6 @@ Renamed Loot Stats to Stats
 Renamed Bot Settings to Settings
 Polished the code, more easy to read and more easy to understand
 Fixed some bugs
+
+[0.XX]
+Fixed seconds not getting calculated when delay option is active
