@@ -196,5 +196,5 @@ Renamed Bot Settings to Settings
 Polished the code, more easy to read and more easy to understand
 Fixed some bugs
 
-[0.XX]
+[0.9f BETA]
 Fixed seconds not getting calculated when delay option is active
