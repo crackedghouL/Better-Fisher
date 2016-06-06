@@ -148,6 +148,7 @@ function BotSettings.DrawBotSettings()
 						if ImGui.RadioButton("Deposit after Repair##id_guid_warehouse_repair_after_trader", Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR) then
 							Bot.Settings.WarehouseSettings.DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR
 						end
+						_, Bot.Settings.RepairSettings.UseWarehouseMoney = ImGui.Checkbox("Use Warehouse Money", Bot.Settings.RepairSettings.UseWarehouseMoney)
 
 						_, Bot.Settings.WarehouseSettings.DepositMoney = ImGui.Checkbox("##id_guid_warehouse_deposit_money", Bot.Settings.WarehouseSettings.DepositMoney)
 						ImGui.SameLine()
