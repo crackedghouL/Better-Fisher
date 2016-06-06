@@ -195,6 +195,7 @@ function RepairState:Run()
 
 	if self.state == 4 then -- 4 = repair all equipped items
 		self.state = 5
+		BDOLua.Execute("allClearMessageData()")
 		if self.RepairEquipped then
 			if self.Settings.UseWarehouseMoney and tonumber(BDOLua.Execute("return Int64toInt32(warehouse_moneyFromNpcShop_s64())")) > 100 then
 				BDOLua.Execute("MessageBoxRepairAllEquippedItem()")
@@ -211,6 +212,7 @@ function RepairState:Run()
 
 	if self.state == 5 then -- 6 = repair all items in the inventory
 		self.state = 6
+		BDOLua.Execute("allClearMessageData()")
 		if self.RepairInventory then
 			if self.Settings.UseWarehouseMoney and tonumber(BDOLua.Execute("return Int64toInt32(warehouse_moneyFromNpcShop_s64())")) > 100 then 
 				BDOLua.Execute("MessageBoxRepairAllInvenItem()")
