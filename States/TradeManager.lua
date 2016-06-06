@@ -19,23 +19,16 @@ function TradeManagerState.new()
 		IgnoreItemsNamed = { },
 		SecondsBetweenTries = 300
 	}
-
 	self.LastTradeUseTimer = nil
 	self.SleepTimer = nil
-
 	self.CurrentSellList = {}
 	self.ItemCheckFunction = nil
-
 	self.CallWhenCompleted = nil
 	self.CallWhileMoving = nil
-
 	self.BargainState = 0
 	self.BargainDice = 0 -- Last dice, 0=high 1=low
-
-	self.Forced = false
 	self.ManualForced = false
 	self.state = 0
-
 	return self
 end
 
@@ -55,7 +48,7 @@ function TradeManagerState:NeedToRun()
 			return false
 		end
 
-		if self.ManualForced and Navigator.CanMoveTo(self:GetPosition()) then
+		if self.ManualForced and (Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun) then
 			return true
 		end
 
@@ -107,7 +100,7 @@ function TradeManagerState:Run()
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
-	if vendorPosition.Distance3DFromMe > math.random(180,220) then
+	if vendorPosition.Distance3DFromMe > math.random(200,220) then
 		if self.CallWhileMoving then
 			self.CallWhileMoving(self)
 		end

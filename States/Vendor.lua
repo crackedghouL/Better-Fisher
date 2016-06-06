@@ -48,7 +48,7 @@ function VendorState:NeedToRun()
 	if Bot.CheckIfLoggedIn() then
 		local selfPlayer = GetSelfPlayer()
 
-		if not Bot.CheckIfLoggedIn() or not selfPlayer.IsAlive then
+		if not selfPlayer.IsAlive then
 			return false
 		end
 
@@ -60,7 +60,7 @@ function VendorState:NeedToRun()
 			return false
 		end
 
-		if self.ManualForced and Navigator.CanMoveTo(self:GetPosition()) then
+		if self.ManualForced and (Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun) then
 			return true
 		end
 
@@ -68,15 +68,17 @@ function VendorState:NeedToRun()
 			if self.Settings.SellEnabled then
 				if table.length(self:GetSellItems()) > 0 then
 					if (self.Settings.VendorOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3) or (self.Settings.VendorOnWeight and selfPlayer.WeightPercent >= 95) then
-						return true
+						if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+							return true
+						end
 					end
 				end
 			elseif self.Settings.BuyEnabled then
 				if self.Settings.BuyItems and table.length(self:GetBuyItems(false)) > 0 then
-					return true
+					if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+						return true
+					end
 				end
-			elseif not self.Settings.SellEnabled and not self.Settings.BuyEnabled then
-				return false
 			end
 		end
 
@@ -124,7 +126,7 @@ function VendorState:Run()
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
-	if vendorPosition.Distance3DFromMe > math.random(180,220) then
+	if vendorPosition.Distance3DFromMe > math.random(200,220) then
 		if self.CallWhileMoving then
 			self.CallWhileMoving(self)
 		end
@@ -175,21 +177,21 @@ function VendorState:Run()
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
 				print("Buy/Sell list done")
 			end
-			self.state = 3
 			self.CurrentSellList = self:GetSellItems()
 			self.CurrentBuyList = self:GetBuyItems(true)
+			self.state = 3
 		elseif self.Settings.SellEnabled == true then
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
 				print("Sell list done")
 			end
-			self.state = 3
 			self.CurrentSellList = self:GetSellItems()
+			self.state = 3
 		elseif self.Settings.BuyEnabled == true then
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
 				print("Buy list done")
 			end
-			self.state = 4
 			self.CurrentBuyList = self:GetBuyItems(true)
+			self.state = 4
 		else
 			self.state = 5
 		end

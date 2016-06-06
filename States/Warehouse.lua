@@ -107,7 +107,7 @@ function WarehouseState:Run()
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
-	if vendorPosition.Distance3DFromMe > math.random(180,220) then
+	if vendorPosition.Distance3DFromMe > math.random(200,220) then
 		if self.CallWhileMoving then
 			self.CallWhileMoving(self)
 		end
@@ -187,7 +187,6 @@ function WarehouseState:Run()
 			self.SleepTimer:Start()
 			Bot.SilverStats(true)
 			self.DepositItems = true
-			Bot.SilverStats()
 			self.state = 5
 			return
 		end
