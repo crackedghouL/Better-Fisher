@@ -196,7 +196,7 @@ function RepairState:Run()
 	if self.state == 4 then -- 4 = repair all equipped items
 		self.state = 5
 		if self.RepairEquipped then
-			if self.Settings.useWarehouseMoney then
+			if self.Settings.UseWarehouseMoney then
 				BDOLua.Execute("MessageBoxRepairAllEquippedItem()")
 				BDOLua.Execute("repair_AllItem(CppEnums.ItemWhereType.eWarehouse)")
 				BDOLua.Execute("allClearMessageData()")
@@ -212,7 +212,7 @@ function RepairState:Run()
 	if self.state == 5 then -- 6 = repair all items in the inventory
 		self.state = 6
 		if self.RepairInventory then
-			if self.Settings.useWarehouseMoney then 
+			if self.Settings.UseWarehouseMoney then 
 				BDOLua.Execute("MessageBoxRepairAllInvenItem()")
 				BDOLua.Execute("repair_AllItem(CppEnums.ItemWhereType.eWarehouse)")
 				BDOLua.Execute("allClearMessageData()")
