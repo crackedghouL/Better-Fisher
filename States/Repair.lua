@@ -15,6 +15,7 @@ function RepairState.new()
 	local self = setmetatable({}, RepairState)
 	self.Settings = {
 		Enabled = true,
+		UseWarehouseMoney = true,
 		NpcName = nil,
 		NpcPosition = { X = 0, Y = 0, Z = 0 },
 		RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE,
@@ -195,7 +196,13 @@ function RepairState:Run()
 	if self.state == 4 then -- 4 = repair all equipped items
 		self.state = 5
 		if self.RepairEquipped then
-			selfPlayer:RepairAllEquippedItems(npc)
+			if self.Settings.useWarehouseMoney then
+				BDOLua.Execute("MessageBoxRepairAllEquippedItem()")
+				BDOLua.Execute("repair_AllItem(CppEnums.ItemWhereType.eWarehouse)")
+				BDOLua.Execute("allClearMessageData()")
+					else
+ 					selfPlayer:RepairAllEquippedItems(npc)
+ 				end
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
 		end
@@ -205,6 +212,13 @@ function RepairState:Run()
 	if self.state == 5 then -- 6 = repair all items in the inventory
 		self.state = 6
 		if self.RepairInventory then
+			if self.Settings.useWarehouseMoney then 
+				BDOLua.Execute("MessageBoxRepairAllInvenItem()")
+				BDOLua.Execute("repair_AllItem(CppEnums.ItemWhereType.eWarehouse)")
+				BDOLua.Execute("allClearMessageData()")
+					else
+					selfPlayer:RepairAllInventoryItems(npc)
+			end
 			selfPlayer:RepairAllInventoryItems(npc)
 			self.SleepTimer = PyxTimer:New(3)
 			self.SleepTimer:Start()
