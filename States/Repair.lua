@@ -15,7 +15,7 @@ function RepairState.new()
 	local self = setmetatable({}, RepairState)
 	self.Settings = {
 		Enabled = true,
-		UseWarehouseMoney = true,
+		UseWarehouseMoney = false,
 		NpcName = nil,
 		NpcPosition = { X = 0, Y = 0, Z = 0 },
 		RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE,
