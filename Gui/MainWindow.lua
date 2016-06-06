@@ -158,14 +158,14 @@ function MainWindow.DrawMainWindow()
 					}
 					print("*******************************************")
 					print("***** Made with love by spearmint <3 ****")
-					print("***** Thanks to: gklt, Akafist, tyty123 *****")
-					print("*** pat, Pookie, borek24 and MrUnreal. ***")
-					print("** Edan, Triplany and all the community **")
+					print("*** Thanks: gklt, Akafist, tyty123, naski ***")
+					print("** pat, Pookie, borek24, MrUnreal, Edan **")
+					print("***** Triplany and all the community *****")
 					print("*" .. motto[math.random(#motto)] .. "*")
 					print("*******************************************")
 				end
 				if ImGui.MenuItem("Check for update", "") then
-					if string.find(tostring(Bot.Version), "DEV") then
+					if Bot.IsDev then
 						os.execute("start https://github.com/miracle091/Better-Fisher/tree/develop")
 					else
 						os.execute("start https://github.com/miracle091/Better-Fisher/releases")

@@ -1,7 +1,9 @@
 Bot = { }
 Bot.Settings = Settings()
 
-Bot.Version = "Better Fisher v0.9f BETA"
+Bot.IsDev = true
+Bot.IsBeta = false
+Bot.Version = ""
 
 Bot.Running = false
 Bot.Paused = false
@@ -60,6 +62,17 @@ Bot.VendorState = VendorState()
 Bot.RepairState = RepairState()
 Bot.UnequipFishingRodState = UnequipFishingRodState()
 Bot.UnequipFloatState = UnequipFloatState()
+
+function Bot.ScriptVersion()
+	local version = "Better Fisher v0.9g"
+	if Bot.IsDev then
+		Bot.Version = version .. " DEV"
+	elseif Bot.IsBeta then
+		Bot.Version = version .. " BETA"
+	else
+		Bot.Version = version
+	end
+end
 
 function Bot.FormatMoney(amount) -- used the example from here: http://lua-users.org/wiki/FormattingNumbers
 	local formatted = amount
@@ -232,6 +245,7 @@ end
 
 function Bot.OnPulse()
 	local selfPlayer = GetSelfPlayer()
+	Bot.ScriptVersion()
 
 	if Pyx.Input.IsGameForeground() then
 		if Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('S')) then
