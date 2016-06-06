@@ -239,6 +239,7 @@ function Bot.OnPulse()
 				Bot._startHotKeyPressed = true
 				if Bot.Running and (not Bot.Paused or not Bot.PausedManual) then
 					print("Stopping bot from hotkey")
+					BDOLua.Execute("FGlobal_WorldBossShow('BetterFisher STOPPED')")
 					Bot.Stop()
 				elseif Bot.Paused then
 					print("Bot remain paused, cause of some options enabled")
@@ -246,6 +247,7 @@ function Bot.OnPulse()
 					print("Unpause the bot first!")
 				else
 					print("Starting bot from hotkey")
+					BDOLua.Execute("FGlobal_WorldBossShow('BetterFisher STARTED')")
 					Bot.Start()
 				end
 			end
@@ -254,9 +256,11 @@ function Bot.OnPulse()
 				Bot._pauseHotKeyPressed = true
 				if Bot.Running and (not Bot.Paused and not Bot.PausedManual) then
 					print("Pausing bot from hotkey")
+					BDOLua.Execute("FGlobal_WorldBossShow('BetterFisher Paused')")
 					Bot.PausedManual = true
 				elseif not Bot.Paused and Bot.PausedManual then
 					print("Unpausing bot from hotkey")
+					BDOLua.Execute("FGlobal_WorldBossShow('BetterFisher Resumed')")
 					Bot.PausedManual = false
 				end
 			end
