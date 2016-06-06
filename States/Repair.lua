@@ -136,14 +136,16 @@ function RepairState:Run()
 	postProcessMessageData()
 	]]
 	local equippedwarehouse = [[
+	UI.getChildControl( Panel_Equipment, \"RadioButton_Icon_Money2\"):SetCheck(true)
+	UI.getChildControl(Panel_Equipment,\"RadioButton_Icon_Money\"):SetCheck(false)
 	MessageBoxRepairAllEquippedItem()
-	repair_AllItem(CppEnums.ItemWhereType.eWarehouse)
-	MessageBox_Empty_function()
+	Repair_AllItem_MessageBox_Confirm
 	]]
 	local invenwarehouse = [[
+	UI.getChildControl( Panel_Equipment, \"RadioButton_Icon_Money2\"):SetCheck(true)
+	UI.getChildControl(Panel_Equipment,\"RadioButton_Icon_Money\"):SetCheck(false)
 	MessageBoxRepairAllInvenItem()
-	repair_AllItem(CppEnums.ItemWhereType.eWarehouse)
-	MessageBox_Empty_function()
+	Repair_AllItem_MessageBox_Confirm
 	]]
 
 	if Bot.CheckIfRodIsEquipped() then
