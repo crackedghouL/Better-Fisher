@@ -318,7 +318,9 @@ function Navigator.OnPulse()
 		then
 			if (Navigator.LastStuckCheckPosition.Distance2DFromMe < 35) then
 				print("I'm stuck, jump forward !")
-				if Navigator.StuckCount < 20 then
+				local rnd1 = math.random(1, 2)
+				
+				if Navigator.StuckCount < 20 and rnd1 == 1 then 
 					Keybindings.HoldByActionId(KEYBINDING_ACTION_JUMP, 500)
 					--[[
 					if selfPlayer.IsBattleMode == false and selfPlayer.IsSwimming == false then
@@ -330,6 +332,23 @@ function Navigator.OnPulse()
 					end
 					--]]
 				end
+				if rnd1 == 2 then
+				    if Bot.Settings.UseAutorun and not Navigator.AutorunFinish then
+						print("Autorun should be active but isn't. Activating Autorun")
+							local code = string.format([[
+							ToClient_DeleteNaviGuideByGroup(0)
+							local target = float3(%f, %f, %f)
+							local repairNaviKey = ToClient_WorldMapNaviStart( target, NavigationGuideParam(), true, true )
+							local selfPlayer = getSelfPlayer():get()
+							selfPlayer:setNavigationMovePath(key)
+							selfPlayer:checkNaviPathUI(key)
+							]], Navigator.Destination.X, Navigator.Destination.Y, Navigator.Destination.Z)
+						BDOLua.Execute(code)
+						Navigator.IsAutoRunning = true
+						Navigator.AutorunState = 0
+					end
+				end
+				
 				Navigator.StuckCount = Navigator.StuckCount + 1
 				if Navigator.StuckCount == 3 then
 					print("Still stuck. Lets try to re-generate path")
