@@ -130,6 +130,21 @@ function RepairState:Run()
 	local npcs = GetNpcs()
 	local selfPlayer = GetSelfPlayer()
 	local vendorPosition = self:GetPosition()
+	local flushdialog = [[
+	MessageBox_Empty_function()
+	allClearMessageData()
+	postProcessMessageData()
+	]]
+	local equippedwarehouse = [[
+	MessageBoxRepairAllEquippedItem()
+	repair_AllItem(CppEnums.ItemWhereType.eWarehouse)
+	MessageBox_Empty_function()
+	]]
+	local invenwarehouse = [[
+	MessageBoxRepairAllInvenItem()
+	repair_AllItem(CppEnums.ItemWhereType.eWarehouse)
+	MessageBox_Empty_function()
+	]]
 
 	if Bot.CheckIfRodIsEquipped() then
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
@@ -175,6 +190,7 @@ function RepairState:Run()
 
 	if self.state == 2 then -- 2 = open repair panel
 		self.state = 3
+		BDOLua.Execute(flushdialog)
 		BDOLua.Execute("Repair_OpenPanel(true)")
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
@@ -195,12 +211,11 @@ function RepairState:Run()
 
 	if self.state == 4 then -- 4 = repair all equipped items
 		self.state = 5
-		BDOLua.Execute("allClearMessageData()")
+		BDOLua.Execute(flushdialog)
 		if self.RepairEquipped then
 			if self.Settings.UseWarehouseMoney and tonumber(BDOLua.Execute("return Int64toInt32(warehouse_moneyFromNpcShop_s64())")) > 100 then
-				BDOLua.Execute("MessageBoxRepairAllEquippedItem()")
-				BDOLua.Execute("repair_AllItem(CppEnums.ItemWhereType.eWarehouse)")
-				BDOLua.Execute("allClearMessageData()")
+				BDOLua.Execute(equippedwarehouse)
+				BDOLua.Execute(flushdialog)
 					else
  					selfPlayer:RepairAllEquippedItems(npc)
  				end
@@ -212,12 +227,11 @@ function RepairState:Run()
 
 	if self.state == 5 then -- 6 = repair all items in the inventory
 		self.state = 6
-		BDOLua.Execute("allClearMessageData()")
+		BDOLua.Execute(flushdialog)
 		if self.RepairInventory then
 			if self.Settings.UseWarehouseMoney and tonumber(BDOLua.Execute("return Int64toInt32(warehouse_moneyFromNpcShop_s64())")) > 100 then 
-				BDOLua.Execute("MessageBoxRepairAllInvenItem()")
-				BDOLua.Execute("repair_AllItem(CppEnums.ItemWhereType.eWarehouse)")
-				BDOLua.Execute("allClearMessageData()")
+				BDOLua.Execute(invenwarehouse)
+				BDOLua.Execute(flushdialog)
 					else
 					selfPlayer:RepairAllInventoryItems(npc)
 			end
@@ -232,6 +246,7 @@ function RepairState:Run()
 		if Bot.EnableDebug and Bot.EnableDebugRepairState then
 			print("Repair done")
 		end
+		BDOLua.Execute(flushdialog)
 		BDOLua.Execute("Repair_OpenPanel(false)\r\nFixEquip_Close()")
 		self.SleepTimer = PyxTimer:New(3)
 		self.SleepTimer:Start()
