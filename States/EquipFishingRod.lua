@@ -103,9 +103,9 @@ function EquipFishingRodState:NeedToRun()
 			return true
 		else
 			if not equippedItem.ItemEnchantStaticStatus.IsFishingRod then
-				if 	not string.find(tostring(v.ItemEnchantStaticStatus.Name), "Fishing Rod") or   -- english client
-					not string.find(tostring(v.ItemEnchantStaticStatus.Name), "Canne à pêche") or -- french client
-					not string.find(tostring(v.ItemEnchantStaticStatus.Name), "Angelrute")		  -- deutsch client
+				if 	not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Fishing Rod") or   -- english client
+					not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Canne à pêche") or -- french client
+					not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Angelrute")		  -- deutsch client
 				then
 					return true
 				end

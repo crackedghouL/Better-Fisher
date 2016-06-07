@@ -134,17 +134,20 @@ function Bot.Start()
 
 		Bot.WarehouseState.Settings.NpcName = currentProfile.WarehouseNpcName
 		Bot.WarehouseState.Settings.NpcPosition = currentProfile.WarehouseNpcPosition
+		Bot.WarehouseState.Settings.NpcSize = currentProfile.WarehouseNpcSize
 		Bot.WarehouseState.CallWhenCompleted = Bot.StateComplete
 		Bot.WarehouseState.CallWhileMoving = Bot.StateMoving
 		Bot.WarehouseState.ItemCheckFunction = Bot.CustomWarehouseCheck
 
 		Bot.VendorState.Settings.NpcName = currentProfile.VendorNpcName
 		Bot.VendorState.Settings.NpcPosition = currentProfile.VendorNpcPosition
+		Bot.VendorState.Settings.NpcSize = currentProfile.VendorNpcSize
 		Bot.VendorState.CallWhenCompleted = Bot.StateComplete
 		Bot.VendorState.CallWhileMoving = Bot.StateMoving
 
 		Bot.TradeManagerState.Settings.NpcName = currentProfile.TradeManagerNpcName
 		Bot.TradeManagerState.Settings.NpcPosition = currentProfile.TradeManagerNpcPosition
+		Bot.TradeManagerState.Settings.NpcSize = currentProfile.TradeManagerNpcSize
 		Bot.TradeManagerState.CallWhenCompleted = Bot.StateComplete
 		Bot.TradeManagerState.CallWhileMoving = Bot.StateMoving
 
@@ -161,6 +164,7 @@ function Bot.Start()
 		Bot.RepairState.ItemCheckFunction = Bot.RepairCheck
 		Bot.RepairState.Settings.NpcName = currentProfile.RepairNpcName
 		Bot.RepairState.Settings.NpcPosition = currentProfile.RepairNpcPosition
+		Bot.RepairState.Settings.NpcSize = currentProfile.RepairNpcSize
 
 		if Bot.MeshDisabled ~= true then
 			ProfileEditor.Visible = false
