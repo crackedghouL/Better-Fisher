@@ -3,7 +3,7 @@ LootState.__index = LootState
 LootState.Name = "Loot"
 
 setmetatable(LootState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })

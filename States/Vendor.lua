@@ -48,7 +48,7 @@ function VendorState:NeedToRun()
 	if Bot.CheckIfLoggedIn() then
 		local selfPlayer = GetSelfPlayer()
 
-		if not Bot.CheckIfLoggedIn() or not selfPlayer.IsAlive then
+		if not selfPlayer.IsAlive then
 			return false
 		end
 
@@ -60,23 +60,25 @@ function VendorState:NeedToRun()
 			return false
 		end
 
-		if self.ManualForced and Navigator.CanMoveTo(self:GetPosition()) then
+		if self.ManualForced and (Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun) then
 			return true
 		end
 
 		if self.Settings.Enabled then
 			if self.Settings.SellEnabled then
-				if table.length(self:GetSellItems()) > 0 then
+				if table.length(self:GetSellItems(false)) > 0 then
 					if (self.Settings.VendorOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3) or (self.Settings.VendorOnWeight and selfPlayer.WeightPercent >= 95) then
-						return true
+						if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+							return true
+						end
 					end
 				end
 			elseif self.Settings.BuyEnabled then
 				if self.Settings.BuyItems and table.length(self:GetBuyItems(false)) > 0 then
-					return true
+					if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
+						return true
+					end
 				end
-			elseif not self.Settings.SellEnabled and not self.Settings.BuyEnabled then
-				return false
 			end
 		end
 
@@ -124,7 +126,7 @@ function VendorState:Run()
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
-	if vendorPosition.Distance3DFromMe > math.random(180,220) then
+	if vendorPosition.Distance3DFromMe > math.random(200,220) then
 		if self.CallWhileMoving then
 			self.CallWhileMoving(self)
 		end
@@ -156,7 +158,7 @@ function VendorState:Run()
 
 	if self.state == 1 then -- 1 = open npc dialog
 		npc:InteractNpc()
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
 		self.state = 2
 		return
@@ -169,27 +171,27 @@ function VendorState:Run()
 			return
 		end
 		BDOLua.Execute("npcShop_requestList()")
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
 		if self.Settings.BuyEnabled and self.Settings.SellEnabled then
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
 				print("Buy/Sell list done")
 			end
-			self.state = 3
 			self.CurrentSellList = self:GetSellItems()
 			self.CurrentBuyList = self:GetBuyItems(true)
+			self.state = 3
 		elseif self.Settings.SellEnabled == true then
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
 				print("Sell list done")
 			end
-			self.state = 3
 			self.CurrentSellList = self:GetSellItems()
+			self.state = 3
 		elseif self.Settings.BuyEnabled == true then
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
 				print("Buy list done")
 			end
-			self.state = 4
 			self.CurrentBuyList = self:GetBuyItems(true)
+			self.state = 4
 		else
 			self.state = 5
 		end
@@ -243,7 +245,7 @@ function VendorState:Run()
 			for cnt = 1, item.countNeeded do
 				itemPtr:Buy(1)
 			end
-			self.SleepTimer = PyxTimer:New(3)
+			self.SleepTimer = PyxTimer:New(2)
 			self.SleepTimer:Start()
 		else
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
@@ -258,18 +260,18 @@ function VendorState:Run()
 		if NpcShop.IsShopping then
 			NpcShop.Close()
 		end
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
 		Bot.SilverStats(false)
+		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then
+			Bot.WarehouseState.ManualForced = true
+			print("Forcing deposit after vendor...")
+		end
 		self.state = 6
 		return
 	end
 
 	if self.state == 6 then -- 6 = state complete
-		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then
-			Bot.WarehouseState.ManualForced = true
-			print("Forcing deposit after vendor...")
-		end
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end

@@ -19,23 +19,16 @@ function TradeManagerState.new()
 		IgnoreItemsNamed = { },
 		SecondsBetweenTries = 300
 	}
-
 	self.LastTradeUseTimer = nil
 	self.SleepTimer = nil
-
 	self.CurrentSellList = {}
 	self.ItemCheckFunction = nil
-
 	self.CallWhenCompleted = nil
 	self.CallWhileMoving = nil
-
 	self.BargainState = 0
 	self.BargainDice = 0 -- Last dice, 0=high 1=low
-
-	self.Forced = false
 	self.ManualForced = false
 	self.state = 0
-
 	return self
 end
 
@@ -55,7 +48,7 @@ function TradeManagerState:NeedToRun()
 			return false
 		end
 
-		if self.ManualForced and Navigator.CanMoveTo(self:GetPosition()) then
+		if self.ManualForced and (Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun) then
 			return true
 		end
 
@@ -107,7 +100,7 @@ function TradeManagerState:Run()
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
-	if vendorPosition.Distance3DFromMe > math.random(180,220) then
+	if vendorPosition.Distance3DFromMe > math.random(200,220) then
 		if self.CallWhileMoving then
 			self.CallWhileMoving(self)
 		end
@@ -137,7 +130,7 @@ function TradeManagerState:Run()
 
 	if self.state == 1 then -- 1 = open npc dialog
 		npc:InteractNpc()
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
 		self.state = 2
 		return
@@ -150,10 +143,10 @@ function TradeManagerState:Run()
 			return
 		end
 		BDOLua.Execute("npcShop_requestList()")
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
-		self.state = 3
 		self.CurrentSellList = self:GetItems()
+		self.state = 3
 		return
 	end
 
@@ -235,7 +228,7 @@ function TradeManagerState:Run()
 			return
 		end
 		TradeMarket.SellAll() -- Currently only Sell All is supported
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
 		self.state = 5
 		return
@@ -246,21 +239,20 @@ function TradeManagerState:Run()
 			TradeMarket.Close()
 		end
 		Bot.SilverStats(false)
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
+		if Bot.Settings.RepairSettings.Enabled and Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then
+			Bot.RepairState.ManualForced = true
+			print("Forcing repair after trader...")
+		elseif Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then
+			Bot.WarehouseState.ManualForced = true
+			print("Forcing deposit after trader...")
+		end
 		self.state = 6
 		return
 	end
 
 	if self.state == 6 then -- 6 = state complete
-		if  Bot.Settings.RepairSettings.Enabled == true and Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER then
-			Bot.RepairState.ManualForced = true
-			print("Forcing repair after trader...")
-		end
-		if Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then
-			Bot.WarehouseState.ManualForced = true
-			print("Forcing deposit after trader...")
-		end
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end

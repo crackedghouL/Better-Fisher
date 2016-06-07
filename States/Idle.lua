@@ -3,7 +3,7 @@ IdleState.__index = IdleState
 IdleState.Name = "Idle"
 
 setmetatable(IdleState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })

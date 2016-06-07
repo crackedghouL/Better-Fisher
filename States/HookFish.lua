@@ -5,7 +5,7 @@ HookFishState.Name = "Hook fish"
 HookFishState.fishBite = true
 
 setmetatable(HookFishState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })
@@ -42,7 +42,7 @@ function HookFishState:NeedToRun()
 			return false
 		end
 
-		if Pyx.Win32.GetTickCount() - self.LastHookFishTickCount < 4000 then
+		if Pyx.Win32.GetTickCount() - self.LastHookFishTickCount < Bot.WaitTimeForStates then
 			return false
 		end
 

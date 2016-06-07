@@ -7,7 +7,7 @@ DeathState.SETTINGS_ON_DEATH_REVIVE_NODE = 1
 DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE = 2
 
 setmetatable(DeathState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })

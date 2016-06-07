@@ -8,7 +8,7 @@ StartFishingState.SETTINGS_ON_BOAT_FISHING = 1
 StartFishingState.GoodPosition = false
 
 setmetatable(StartFishingState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })
@@ -56,7 +56,7 @@ function StartFishingState:NeedToRun()
 			return false
 		end
 
-		if Pyx.Win32.GetTickCount() - self.LastStartFishTickcount < 4000 then
+		if Pyx.Win32.GetTickCount() - self.LastStartFishTickcount < Bot.WaitTimeForStates then
 			return false
 		end
 

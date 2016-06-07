@@ -3,7 +3,7 @@ HookFishHandleGameState.__index = HookFishHandleGameState
 HookFishHandleGameState.Name = "Hook game"
 
 setmetatable(HookFishHandleGameState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })
@@ -39,7 +39,7 @@ function HookFishHandleGameState:Run()
 
 	if self.state == 0 and selfPlayer.CurrentActionName == "FISHING_HOOK_START" then -- Wait before starting first minigame
 		self.LastGameTick = Pyx.Win32.GetTickCount()
-		self.RandomWaitTime = math.random(500,1200)
+		self.RandomWaitTime = math.random(500,1000)
 		self.state = 1
 		return
 	end

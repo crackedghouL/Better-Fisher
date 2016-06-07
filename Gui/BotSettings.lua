@@ -148,7 +148,6 @@ function BotSettings.DrawBotSettings()
 						if ImGui.RadioButton("Deposit after Repair##id_guid_warehouse_repair_after_trader", Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR) then
 							Bot.Settings.WarehouseSettings.DepositMethod = WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR
 						end
-						_, Bot.Settings.RepairSettings.UseWarehouseMoney = ImGui.Checkbox("Use Warehouse Money", Bot.Settings.RepairSettings.UseWarehouseMoney)
 
 						_, Bot.Settings.WarehouseSettings.DepositMoney = ImGui.Checkbox("##id_guid_warehouse_deposit_money", Bot.Settings.WarehouseSettings.DepositMoney)
 						ImGui.SameLine()
@@ -323,6 +322,7 @@ function BotSettings.DrawBotSettings()
 
 				if Bot.Settings.RepairSettings.Enabled then
 					if ImGui.TreeNode("Repair") then
+						_, Bot.Settings.RepairSettings.UseWarehouseMoney = ImGui.Checkbox("Use Warehouse Money", Bot.Settings.RepairSettings.UseWarehouseMoney)
 						if ImGui.RadioButton("Repair after Warehouse##id_guid_repair_after_warehouse", Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE) then
 							Bot.Settings.RepairSettings.RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE
 						end

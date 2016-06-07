@@ -3,7 +3,7 @@ BuildNavigationState.__index = BuildNavigationState
 BuildNavigationState.Name = "Build Navigation"
 
 setmetatable(BuildNavigationState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })

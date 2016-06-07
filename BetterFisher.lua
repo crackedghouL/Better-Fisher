@@ -1,7 +1,11 @@
 Bot = { }
 Bot.Settings = Settings()
 
-Bot.Version = "Better Fisher v0.9f BETA"
+Bot.IsDev = true
+Bot.IsBeta = false
+Bot.Version = ""
+
+Bot.WaitTimeForStates = 4000
 
 Bot.Running = false
 Bot.Paused = false
@@ -61,6 +65,17 @@ Bot.RepairState = RepairState()
 Bot.UnequipFishingRodState = UnequipFishingRodState()
 Bot.UnequipFloatState = UnequipFloatState()
 
+function Bot.ScriptVersion()
+	local version = "Better Fisher v0.9g"
+	if Bot.IsDev then
+		Bot.Version = version .. " DEV"
+	elseif Bot.IsBeta then
+		Bot.Version = version .. " BETA"
+	else
+		Bot.Version = version
+	end
+end
+
 function Bot.FormatMoney(amount) -- used the example from here: http://lua-users.org/wiki/FormattingNumbers
 	local formatted = amount
 	while true do
@@ -108,14 +123,11 @@ function Bot.Start()
 		Bot.Stats.SessionStart = Pyx.Win32.GetTickCount()
 		Bot.SaveSettings()
 
-		Bot.TradeManagerState.Forced = false
-		Bot.TradeManagerState.ManualForced = false
-		Bot.VendorState.Forced = false
-		Bot.VendorState.ManualForced = false
-		Bot.WarehouseState.Forced = false
-		Bot.WarehouseState.ManualForced = false
-		Bot.RepairState.Forced = false
-		Bot.RepairState.ManualForced = false
+		Bot.DeathState:Reset()
+		Bot.TradeManagerState:Reset()
+		Bot.RepairState:Reset()
+		Bot.VendorState:Reset()
+		Bot.WarehouseState:Reset()
 
 		Navigator.MeshConnects = ProfileEditor.CurrentProfile.MeshConnects
 		Navigator.ApproachDistance = 80
@@ -232,6 +244,7 @@ end
 
 function Bot.OnPulse()
 	local selfPlayer = GetSelfPlayer()
+	Bot.ScriptVersion()
 
 	if Pyx.Input.IsGameForeground() then
 		if Pyx.Input.IsKeyDown(0x12) and Pyx.Input.IsKeyDown(string.byte('S')) then
@@ -239,6 +252,7 @@ function Bot.OnPulse()
 				Bot._startHotKeyPressed = true
 				if Bot.Running and (not Bot.Paused or not Bot.PausedManual) then
 					print("Stopping bot from hotkey")
+					BDOLua.Execute("FGlobal_WorldBossShow('BetterFisher STOPPED')")
 					Bot.Stop()
 				elseif Bot.Paused then
 					print("Bot remain paused, cause of some options enabled")
@@ -246,6 +260,7 @@ function Bot.OnPulse()
 					print("Unpause the bot first!")
 				else
 					print("Starting bot from hotkey")
+					BDOLua.Execute("FGlobal_WorldBossShow('BetterFisher STARTED')")
 					Bot.Start()
 				end
 			end
@@ -254,9 +269,11 @@ function Bot.OnPulse()
 				Bot._pauseHotKeyPressed = true
 				if Bot.Running and (not Bot.Paused and not Bot.PausedManual) then
 					print("Pausing bot from hotkey")
+					BDOLua.Execute("FGlobal_WorldBossShow('BetterFisher Paused')")
 					Bot.PausedManual = true
 				elseif not Bot.Paused and Bot.PausedManual then
 					print("Unpausing bot from hotkey")
+					BDOLua.Execute("FGlobal_WorldBossShow('BetterFisher Resumed')")
 					Bot.PausedManual = false
 				end
 			end
@@ -414,6 +431,7 @@ function Bot.OnPulse()
 		local currentExp = tonumber(BDOLua.Execute("return tostring(getSelfPlayer():get():getCurrLifeExperiencePoint(1))"))
 		local demandExp = tonumber(BDOLua.Execute("return tostring(getSelfPlayer():get():getDemandLifeExperiencePoint(1))"))
 
+		-- Thanks to AncientRanger for this smart method :)
 		if rawLevel <= 10 then -- 1 to 10 = Beginner
 			Bot.FishingLevel = "Beginner " .. rawLevel
 		elseif rawLevel >= 11 and rawLevel <= 20 then -- 11 to 20 = Apprentice
@@ -522,42 +540,11 @@ function Bot.StateMoving(state)
 end
 
 function Bot.StateComplete(state)
-	if Bot.Settings.WarehouseSettings.Enabled then
-		if state == Bot.TradeManagerState then
-			if Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_TRADER then -- DepositMethod = 1
-				Bot.WarehouseState.Forced = true
-			end
-		elseif state == Bot.VendorState then
-			if Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then -- DepositMethod = 0
-				Bot.WarehouseState.Forced = true
-			end
-		elseif state == Bot.RepairState then
-			if Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then -- DepositMethod = 2
-				Bot.WarehouseState.Forced = true
-			end
-		end
-	elseif Bot.Settings.RepairSettings.Enabled then
-		if state == Bot.WarehouseState then
-			if 	Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE or	-- RepairMethod = 0
-				Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_TRADER			-- RepairMethod = 1
-			then
-				Bot.RepairState.Forced = true
-			end
-		end
-	elseif state == Bot.DeathState then
-		if 	Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_ONLY_CALL_WHEN_COMPLETED or -- DeathState = 0
-			Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_REVIVE_NODE or				-- DeathState = 1
-			Bot.Settings.DeathSettings.ReviveMethod == Bot.DeathState.SETTINGS_ON_DEATH_REVIVE_VILLAGE				-- DeathState = 2
-		then
-			Bot.DeathState.Forced = true
-		else
-			if not Bot.Settings.InvFullStop then
-				Bot.TradeManagerState:Reset()
-				Bot.WarehouseState:Reset()
-				Bot.VendorState:Reset()
-				Bot.RepairState:Reset()
-			end
-		end
+	if not Bot.Settings.InvFullStop then
+		Bot.TradeManagerState:Reset()
+		Bot.WarehouseState:Reset()
+		Bot.VendorState:Reset()
+		Bot.RepairState:Reset()
 	end
 
 	if Bot.EnableDebug then
