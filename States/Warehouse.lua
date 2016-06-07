@@ -148,12 +148,12 @@ function WarehouseState:Run()
 	if self.state == 2 then -- 2 = create deposit list
 		if not Dialog.IsTalking then
 			print(self.Settings.NpcName " dialog didn't open")
-			self.SleepTimer = PyxTimer:New(3)
+			self.SleepTimer = PyxTimer:New(2)
 			self.SleepTimer:Start()
 			return
 		end
 		BDOLua.Execute("Warehouse_OpenPanelFromDialog()")
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
 		if self.Settings.DepositItems or (not self.Settings.DepositItems and self.ManualForced) then
 			if Bot.EnableDebug and Bot.EnableDebugWarehouseState then
@@ -171,7 +171,7 @@ function WarehouseState:Run()
 			if toDeposit > 0 then
 				selfPlayer:WarehousePushMoney(npc, toDeposit)
 				self.DepositedMoney = true
-				self.SleepTimer = PyxTimer:New(3)
+				self.SleepTimer = PyxTimer:New(2)
 				self.SleepTimer:Start()
 			end
 			self.DepositedMoney = true
@@ -183,10 +183,14 @@ function WarehouseState:Run()
 	if self.state == 4 then -- 4 = deposit items
 		if table.length(self.CurrentDepositList) < 1 then
 			Bot.Stats.SilverGained = Bot.Stats.SilverGained - 1
-			self.SleepTimer = PyxTimer:New(3)
+			self.SleepTimer = PyxTimer:New(2)
 			self.SleepTimer:Start()
 			Bot.SilverStats(true)
 			self.DepositItems = true
+			if Bot.Settings.RepairSettings.Enabled and Bot.Settings.RepairSettings.RepairMethod == Bot.RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then
+				Bot.RepairState.ManualForced = true
+				print("Forcing repair after warehouse...")
+			end
 			self.state = 5
 			return
 		end
@@ -204,10 +208,6 @@ function WarehouseState:Run()
 	end
 
 	if self.state == 5 then -- 5 = state complete
-		if Bot.Settings.RepairSettings.Enabled and Bot.Settings.RepairSettings.RepairMethod == RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE then
-			Bot.RepairState.ManualForced = true
-			print("Forcing repair after warehouse...")
-		end
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end

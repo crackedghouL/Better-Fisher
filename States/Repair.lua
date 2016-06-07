@@ -173,7 +173,7 @@ function RepairState:Run()
 
 	if self.state == 1 then -- 1 = open npc dialog
 		npc:InteractNpc()
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
 		self.state = 2
 		return
@@ -181,9 +181,8 @@ function RepairState:Run()
 
 	if self.state == 2 then -- 2 = open repair panel
 		BDOLua.Execute(flushdialog)
-		-- BDOLua.Execute("Repair_OpenPanel(true)") -- this doesn't update Warehouse Money, ever.
 		BDOLua.Execute("HandleClickedFuncButton(getDialogButtonIndexByType(CppEnums.ContentsType.Contents_Repair))")
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
 		self.state = 3
 		return
@@ -195,7 +194,7 @@ function RepairState:Run()
 			self:Exit()
 			return
 		end
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
 		self.state = 4
 		return
@@ -268,17 +267,17 @@ function RepairState:Run()
 			print("Repair done")
 		end
 		BDOLua.Execute("Repair_OpenPanel(false)\r\nFixEquip_Close()")
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
+		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then
+			Bot.WarehouseState.ManualForced = true
+			print("Forcing deposit after repair...")
+		end
 		self.state = 7
 		return
 	end
 
 	if self.state == 7 then -- 7 = state complete
-		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_REPAIR then
-			Bot.WarehouseState.ManualForced = true
-			print("Forcing deposit after repair...")
-		end
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end

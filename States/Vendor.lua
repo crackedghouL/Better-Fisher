@@ -66,7 +66,7 @@ function VendorState:NeedToRun()
 
 		if self.Settings.Enabled then
 			if self.Settings.SellEnabled then
-				if table.length(self:GetSellItems()) > 0 then
+				if table.length(self:GetSellItems(false)) > 0 then
 					if (self.Settings.VendorOnInventoryFull and selfPlayer.Inventory.FreeSlots <= 3) or (self.Settings.VendorOnWeight and selfPlayer.WeightPercent >= 95) then
 						if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
 							return true
@@ -158,7 +158,7 @@ function VendorState:Run()
 
 	if self.state == 1 then -- 1 = open npc dialog
 		npc:InteractNpc()
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
 		self.state = 2
 		return
@@ -171,7 +171,7 @@ function VendorState:Run()
 			return
 		end
 		BDOLua.Execute("npcShop_requestList()")
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
 		if self.Settings.BuyEnabled and self.Settings.SellEnabled then
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
@@ -245,7 +245,7 @@ function VendorState:Run()
 			for cnt = 1, item.countNeeded do
 				itemPtr:Buy(1)
 			end
-			self.SleepTimer = PyxTimer:New(3)
+			self.SleepTimer = PyxTimer:New(2)
 			self.SleepTimer:Start()
 		else
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
@@ -260,18 +260,18 @@ function VendorState:Run()
 		if NpcShop.IsShopping then
 			NpcShop.Close()
 		end
-		self.SleepTimer = PyxTimer:New(3)
+		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
 		Bot.SilverStats(false)
+		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then
+			Bot.WarehouseState.ManualForced = true
+			print("Forcing deposit after vendor...")
+		end
 		self.state = 6
 		return
 	end
 
 	if self.state == 6 then -- 6 = state complete
-		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then
-			Bot.WarehouseState.ManualForced = true
-			print("Forcing deposit after vendor...")
-		end
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end

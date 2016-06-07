@@ -56,7 +56,7 @@ function StartFishingState:NeedToRun()
 			return false
 		end
 
-		if Pyx.Win32.GetTickCount() - self.LastStartFishTickcount < 4000 then
+		if Pyx.Win32.GetTickCount() - self.LastStartFishTickcount < Bot.WaitTimeForStates then
 			return false
 		end
 

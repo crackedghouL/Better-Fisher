@@ -12,23 +12,19 @@ function EquipFloatState.new()
 	local self = setmetatable({}, EquipFloatState)
 	self.LastEquipTickCount = 0
 	self.ItemToEquip = nil
-	self.EquipState = 0
-	self.EquippedState = 0
+	self.state = 0
 	return self
 end
 
 function EquipFloatState:Reset()
 	self.LastEquipTickCount = 0
 	self.ItemToEquip = nil
-	self.EquipState = 0
-	self.EquippedState = 0
+	self.state = 0
 end
 
 function EquipFloatState:Exit()
-	if self.EquipState > 1 and self.EquipState > 1 then
-		self.LastEquipTickCount = 0
-		self.EquipState = 0
-		self.EquippedState = 0
+	if self.state > 1 then
+		self.state = 0
 	end
 end
 
@@ -41,7 +37,11 @@ function EquipFloatState:NeedToRun()
 			return false
 		end
 
-		if Pyx.Win32.GetTickCount() - self.LastEquipTickCount < 4000 then
+		if selfPlayer.CurrentActionName ~= "WAIT" then
+			return false
+		end
+
+		if Pyx.Win32.GetTickCount() - self.LastEquipTickCount < Bot.WaitTimeForStates then
 			return false
 		end
 
@@ -54,35 +54,19 @@ function EquipFloatState:NeedToRun()
 				if Bot.EnableDebug and Bot.EnableDebugEquipFloatState then
 					print(v.ItemEnchantStaticStatus.Name .. " which have durability found")
 				end
-				self.EquipState = 1
+				self.state = 1
 			end
 
-			if self.EquipState == 1 then -- 1 = item have endurance
+			if self.state == 1 then -- 1 = item have endurance
 				if v.Endurance > 0 then
 					if Bot.EnableDebug and Bot.EnableDebugEquipFloatState then
-						print(v.ItemEnchantStaticStatus.Name .. " have more than 0 durability left")
+						print(v.ItemEnchantStaticStatus.Name .. " have " .. v.Endurance .. " durability left")
 					end
-					self.EquipState = 2
+					self.state = 2
 				end
 			end
 
-			if self.EquipState == 2 then -- 2 = this is for enhanced float
-				if string.find(tostring(v.ItemEnchantStaticStatus.Name), "Float") then
-					if Bot.EnableDebug and Bot.EnableDebugEquipFloatState then
-						print("The item have in the a '+' in the name, so is a enhanced float")
-						print("Equipped: " .. v.ItemEnchantStaticStatus.Name)
-					end
-					self.ItemToEquip = v
-					break
-				else
-					if Bot.EnableDebug and Bot.EnableDebugEquipFloatState then
-						print("Maybe " .. v.ItemEnchantStaticStatus.Name .. " is a know float?")
-					end
-					self.EquipState = 3
-				end
-			end
-
-			if self.EquipState == 3 then -- 3 = fallback for know Float using ids, just in case all the step don't work
+			if self.state == 2 then -- 2 = fallback for know Floats using ids, just in case all the step don't work
 				if 	v.ItemEnchantStaticStatus.ItemId == 16167 or  -- Ash Tree Float
 					v.ItemEnchantStaticStatus.ItemId == 81703 or  -- Ash Tree Float +1
 					v.ItemEnchantStaticStatus.ItemId == 147239 or -- Ash Tree Float +2
@@ -96,17 +80,17 @@ function EquipFloatState:NeedToRun()
 					v.ItemEnchantStaticStatus.ItemId == 278312 or -- Maple Float +4
 					v.ItemEnchantStaticStatus.ItemId == 343848 or -- Maple Float +5
 					v.ItemEnchantStaticStatus.ItemId == 16169 or  -- Cedar Float
-																-- Cedar Float +1
-																-- Cedar Float +2
-																-- Cedar Float +3
-																-- Cedar Float +4
-																-- Cedar Float +5
+																  -- Cedar Float +1
+																  -- Cedar Float +2
+																  -- Cedar Float +3
+																  -- Cedar Float +4
+																  -- Cedar Float +5
 					v.ItemEnchantStaticStatus.ItemId == 16170	  -- Palm Tree Float
-																-- Palm Tree Float +1
-																-- Palm Tree Float +2
-																-- Palm Tree Float +3
-																-- Palm Tree Float +4
-																-- Palm Tree Float +5
+																  -- Palm Tree Float +1
+																  -- Palm Tree Float +2
+																  -- Palm Tree Float +3
+																  -- Palm Tree Float +4
+																  -- Palm Tree Float +5
 				then
 					if Bot.EnableDebug and Bot.EnableDebugEquipFloatState then
 						print("Equipped: " .. v.ItemEnchantStaticStatus.Name)
@@ -124,31 +108,10 @@ function EquipFloatState:NeedToRun()
 		if not equippedItem then
 			return true
 		else
-			self.EquippedState = 1
-		end
-
-		if self.EquippedState == 1 then -- 1 = search for 'Float' string
-			if not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Float") then
-				self.EquippedState = 2
-			end
-		end
-
-		if self.EquippedState == 2 then -- 2 = fallback to know float using ids
-			if 	not equippedItem.ItemEnchantStaticStatus.ItemId == 16167 or		-- Ash Tree Float
-				not equippedItem.ItemEnchantStaticStatus.ItemId == 81703 or		-- Ash Tree Float +1
-				not equippedItem.ItemEnchantStaticStatus.ItemId == 147239 or	-- Ash Tree Float +2
-				not equippedItem.ItemEnchantStaticStatus.ItemId == 212775 or	-- Ash Tree Float +3
-				not equippedItem.ItemEnchantStaticStatus.ItemId == 278311 or	-- Ash Tree Float +4
-				not equippedItem.ItemEnchantStaticStatus.ItemId == 343847 or	-- Ash Tree Float +5
-				not equippedItem.ItemEnchantStaticStatus.ItemId == 16168 or		-- Maple Float
-				not equippedItem.ItemEnchantStaticStatus.ItemId == 81704 or		-- Maple Float +1
-				not equippedItem.ItemEnchantStaticStatus.ItemId == 147240 or	-- Maple Float +2
-				not equippedItem.ItemEnchantStaticStatus.ItemId == 212776 or	-- Maple Float +3
-				not equippedItem.ItemEnchantStaticStatus.ItemId == 278312 or	-- Maple Float +4
-				not equippedItem.ItemEnchantStaticStatus.ItemId == 343848		-- Maple Float +5
+			if 	not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Float") or	-- english client
+				not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "flottant") or -- french client
+				not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "holzfloß") 	-- deutsch client
 			then
-				return false
-			else
 				return true
 			end
 		end
@@ -161,7 +124,6 @@ function EquipFloatState:NeedToRun()
 end
 
 function EquipFloatState:Run()
-	local selfPlayer = GetSelfPlayer()
 	self.ItemToEquip:UseItem()
 	self.LastEquipTickCount = Pyx.Win32.GetTickCount()
 end

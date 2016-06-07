@@ -20,6 +20,12 @@ function UnequipFloatState:Reset()
 	self.state = 0
 end
 
+function UnequipFloatState:Exit()
+	if self.state > 1 then
+		self.state = 0
+	end
+end
+
 function UnequipFloatState:NeedToRun()
 	if Bot.CheckIfLoggedIn() then
 		local selfPlayer = GetSelfPlayer()
@@ -29,7 +35,7 @@ function UnequipFloatState:NeedToRun()
 			return false
 		end
 
-		if Pyx.Win32.GetTickCount() - self.LastUnequipTickcount < 4000 then
+		if Pyx.Win32.GetTickCount() - self.LastUnequipTickcount < Bot.WaitTimeForStates then
 			return false
 		end
 
@@ -40,7 +46,10 @@ function UnequipFloatState:NeedToRun()
 		end
 
 		if self.state == 1 then -- 1 = search for 'float' string
-			if not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Float") then
+			if 	not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "Float") or	-- english client
+				not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "flottant") or -- french client
+				not string.find(tostring(equippedItem.ItemEnchantStaticStatus.Name), "holzfloß") 	-- deutsch client
+			then
 				self.state = 2
 			end
 		end
@@ -59,17 +68,17 @@ function UnequipFloatState:NeedToRun()
 				not equippedItem.ItemEnchantStaticStatus.ItemId == 278312 or -- Maple Float +4
 				not equippedItem.ItemEnchantStaticStatus.ItemId == 343848 or -- Maple Float +5
 				not equippedItem.ItemEnchantStaticStatus.ItemId == 16169 or	 -- Cedar Float
-																			-- Cedar Float +1
-																			-- Cedar Float +2
-																			-- Cedar Float +3
-																			-- Cedar Float +4
-																			-- Cedar Float +5
+																			 -- Cedar Float +1
+																			 -- Cedar Float +2
+																			 -- Cedar Float +3
+																			 -- Cedar Float +4
+																			 -- Cedar Float +5
 				not equippedItem.ItemEnchantStaticStatus.ItemId == 16170	 -- Palm Tree Float
-																			-- Palm Tree Float +1
-																			-- Palm Tree Float +2
-																			-- Palm Tree Float +3
-																			-- Palm Tree Float +4
-																			-- Palm Tree Float +5
+																			 -- Palm Tree Float +1
+																			 -- Palm Tree Float +2
+																			 -- Palm Tree Float +3
+																			 -- Palm Tree Float +4
+																			 -- Palm Tree Float +5
 			then
 				return true
 			else
