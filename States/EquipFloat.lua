@@ -3,7 +3,7 @@ EquipFloatState.__index = EquipFloatState
 EquipFloatState.Name = "Equip Float"
 
 setmetatable(EquipFloatState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })

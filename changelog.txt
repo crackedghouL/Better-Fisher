@@ -198,3 +198,5 @@ Fixed some bugs
 
 [0.9f BETA]
 Fixed seconds not getting calculated when delay option is active
+
+[0.XX]

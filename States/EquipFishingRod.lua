@@ -3,7 +3,7 @@ EquipFishingRodState.__index = EquipFishingRodState
 EquipFishingRodState.Name = "Equip fishing rod"
 
 setmetatable(EquipFishingRodState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })

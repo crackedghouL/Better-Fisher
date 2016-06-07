@@ -3,7 +3,7 @@ UnequipFloatState.__index = UnequipFloatState
 UnequipFloatState.Name = "Unequip float"
 
 setmetatable(UnequipFloatState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })

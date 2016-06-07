@@ -5,7 +5,7 @@ HookFishState.Name = "Hook fish"
 HookFishState.fishBite = true
 
 setmetatable(HookFishState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })

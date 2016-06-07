@@ -3,7 +3,7 @@ HookFishHandleGameState.__index = HookFishHandleGameState
 HookFishHandleGameState.Name = "Hook game"
 
 setmetatable(HookFishHandleGameState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })

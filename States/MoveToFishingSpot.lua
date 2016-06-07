@@ -3,7 +3,7 @@ MoveToFishingSpotState.__index = MoveToFishingSpotState
 MoveToFishingSpotState.Name = "Move to fish spot"
 
 setmetatable(MoveToFishingSpotState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })

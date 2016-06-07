@@ -8,7 +8,7 @@ StartFishingState.SETTINGS_ON_BOAT_FISHING = 1
 StartFishingState.GoodPosition = false
 
 setmetatable(StartFishingState, {
-	__call = function (cls, ...)
+	__call = function(cls, ...)
 		return cls.new(...)
 	end,
 })
