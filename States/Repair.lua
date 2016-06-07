@@ -17,6 +17,7 @@ function RepairState.new()
 		Enabled = true,
 		NpcName = nil,
 		NpcPosition = { X = 0, Y = 0, Z = 0 },
+		NpcSize = 0,
 		RepairMethod = RepairState.SETTINGS_ON_REPAIR_AFTER_WAREHOUSE,
 		UseWarehouseMoney = false,
 		SecondsBetweenTries = 300
@@ -142,8 +143,7 @@ function RepairState:Run()
 	if Bot.CheckIfRodIsEquipped() then
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
-
-	if vendorPosition.Distance3DFromMe > math.random(200,220) then
+	if vendorPosition.Distance3DFromMe > (200 + self.Settings.NpcSize) then
 		if self.CallWhileMoving then
 			self.CallWhileMoving(self)
 		end

@@ -14,6 +14,7 @@ function VendorState.new()
 		Enabled = true,
 		NpcName = "",
 		NpcPosition = { X = 0, Y = 0, Z = 0 },
+		NpcSize = 0,
 		VendorOnInventoryFull = false,
 		VendorOnWeight = false,
 		VendorWhite = false,
@@ -126,7 +127,7 @@ function VendorState:Run()
 		selfPlayer:UnequipItem(INVENTORY_SLOT_RIGHT_HAND)
 	end
 
-	if vendorPosition.Distance3DFromMe > math.random(200,220) then
+	if vendorPosition.Distance3DFromMe > (200 + self.Settings.NpcSize) then
 		if self.CallWhileMoving then
 			self.CallWhileMoving(self)
 		end
