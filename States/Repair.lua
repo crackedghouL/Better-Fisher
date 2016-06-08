@@ -234,7 +234,6 @@ function RepairState:Run()
 		if self.RepairInventory then
 			if self.Settings.UseWarehouseMoney and tonumber(BDOLua.Execute("return Int64toInt32(warehouse_moneyFromNpcShop_s64())")) > 100 then
 				BDOLua.Execute(invenwarehouse)
-				BDOLua.Execute(flushdialog)
 			else
 				selfPlayer:RepairAllInventoryItems(npc)
 			end
