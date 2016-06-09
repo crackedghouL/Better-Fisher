@@ -200,3 +200,5 @@ Fixed some bugs
 Fixed seconds not getting calculated when delay option is active
 
 [0.XX]
+Removed most of the old code, now is more clean
+Added new option, % of perfect Hooks

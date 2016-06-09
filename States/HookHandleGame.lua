@@ -12,7 +12,8 @@ function HookFishHandleGameState.new()
 	local self = setmetatable({}, HookFishHandleGameState)
 	self.Settings = {
 		NoDelay = false,
-		AlwaysPerfect = false
+		AlwaysPerfect = false,
+		PerfectPerc = 10
 	}
 	self.LastGameTick = 0
 	self.RandomWaitTime = 0
@@ -45,8 +46,8 @@ function HookFishHandleGameState:Run()
 	end
 
 	if self.state == 1 and Pyx.Win32.GetTickCount() - self.LastGameTick > self.RandomWaitTime then -- Time spacebar minigame
-		if self.Settings.NoDelay or self.Settings.AlwaysPerfect or math.random(10) == 10 then -- Make perfects from options or 10% chance
-			if Bot.EnableDebug and Bot.EnableDebugHookHandleGameState then
+		if self.Settings.NoDelay or self.Settings.AlwaysPerfect or math.random(self.Settings.PerfectPerc) == self.Settings.PerfectPerc then -- Make perfects from options or % chance of your choise
+			if (Bot.EnableDebug and Bot.EnableDebugHookHandleGameState) or self.Settings.PerfectPerc ~= 10 then
 				print("Perfect timing!")
 			end
 			BDOLua.Execute("getSelfPlayer():get():SetMiniGameResult(3)")

@@ -61,7 +61,7 @@ function WarehouseState:NeedToRun()
 		end
 
 		if self.Settings.Enabled then
-			if table.length(self:GetItems()) > 0 and (selfPlayer.Inventory.FreeSlots <= 3 or selfPlayer.WeightPercent >= 95) then
+			if table.length(self:GetItems(false)) > 0 and (selfPlayer.Inventory.FreeSlots <= 3 or selfPlayer.WeightPercent >= 95) then
 				if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
 					return true
 				end

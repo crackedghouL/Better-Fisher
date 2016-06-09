@@ -185,7 +185,7 @@ function VendorState:Run()
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
 				print("Sell list done")
 			end
-			self.CurrentSellList = self:GetSellItems()
+			self.CurrentSellList = self:GetSellItems(true)
 			self.state = 3
 		elseif self.Settings.BuyEnabled == true then
 			if Bot.EnableDebug and Bot.EnableDebugVendorState then
@@ -283,13 +283,11 @@ function VendorState:Run()
 end
 
 function VendorState:CanSellGrade(item)
-	if self.Settings.VendorWhite and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_WHITE then
-		return true
-	elseif self.Settings.VendorGreen and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_GREEN then
-		return true
-	elseif self.Settings.VendorBlue and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_BLUE then
-		return true
-	elseif self.Settings.VendorGold and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_GOLD then
+	if 	self.Settings.VendorWhite and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_WHITE or
+		self.Settings.VendorGreen and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_GREEN or
+		self.Settings.VendorBlue and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_BLUE or
+		self.Settings.VendorGold and item.ItemEnchantStaticStatus.Grade == ITEM_GRADE_GOLD
+	then
 		return true
 	end
 
@@ -352,9 +350,9 @@ function VendorState:GetBuyItems(stockUp)
 
 	if selfPlayer then
 		local tmpInventory = {}
-		local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND) -- Check equipped and add to total (for fishing Rods)
+		local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND) -- check equipped and add to total (for fishing Rods)
 
-		if equippedItem ~= nil then
+		if equippedItem ~= nil and equippedItem.ItemEnchantStaticStatus.IsFishingRod then
 			tmpInventory[equippedItem.ItemEnchantStaticStatus.Name] = 1
 		end
 

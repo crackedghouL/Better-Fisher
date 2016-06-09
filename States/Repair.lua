@@ -242,7 +242,10 @@ function RepairState:Run()
 			self.SleepTimer:Start()
 			self.state = 5.5
 			return
+		else
+			self.state = 6
 		end
+		return
 	end
 
 	if self.state == 5.5 then

@@ -54,7 +54,7 @@ function TradeManagerState:NeedToRun()
 		end
 
 		if self.Settings.Enabled then
-			if selfPlayer.Inventory.FreeSlots <= 3 and table.length(self:GetItems()) > 0 and not Looting.IsLooting then
+			if selfPlayer.Inventory.FreeSlots <= 3 and table.length(self:GetItems(false)) > 0 and not Looting.IsLooting then
 				if Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun then
 					return true
 				end

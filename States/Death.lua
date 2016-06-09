@@ -26,11 +26,15 @@ function DeathState.new()
 end
 
 function DeathState:NeedToRun()
-	if Bot.CheckIfLoggedIn() and not GetSelfPlayer().IsAlive then
-		return true
-	end
+	if Bot.CheckIfLoggedIn() then
+		if not GetSelfPlayer().IsAlive then
+			return true
+		end
 
-	return false
+		return false
+	else
+		return false
+	end
 end
 
 function DeathState:Run()

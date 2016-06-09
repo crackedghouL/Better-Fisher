@@ -36,6 +36,8 @@ function AdvancedSettings.DrawAdvancedSettings()
 					_, Bot.Settings.HookFishStateSettings.HookMinSeconds = ImGui.SliderInt("Min seconds##id_guid_delays_option_min_seconds", Bot.Settings.HookFishStateSettings.HookMinSeconds, 1, Bot.Settings.HookFishStateSettings.HookMaxSeconds)
 					_, Bot.Settings.HookFishStateSettings.HookMaxSeconds = ImGui.SliderInt("Max seconds##id_guid_delays_option_max_seconds", Bot.Settings.HookFishStateSettings.HookMaxSeconds, Bot.Settings.HookFishStateSettings.HookMinSeconds, 170)
 				end
+				ImGui.Text("% of \"perfect hook\"")
+				_, Bot.Settings.HookFishStateSettings.HookMinSeconds = ImGui.SliderInt("%##id_guid_delays_option_min_seconds", Bot.Settings.HookFishStateSettings.PerfectPerc, 1, 99)
 				ImGui.TreePop()
 			end
 		end
