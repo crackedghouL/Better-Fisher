@@ -16,6 +16,8 @@ setmetatable(StartFishingState, {
 function StartFishingState.new()
 	local self = setmetatable({}, StartFishingState)
 	self.Settings = {
+		RandomDelayMinSeconds = 1,
+		RandomDelayMaxSeconds = 3,
 		UseMaxEnergy = false,
 		FishingMethod = StartFishingState.SETTINGS_ON_NORMAL_FISHING
 	}
@@ -72,6 +74,8 @@ end
 
 function StartFishingState:Run()
 	local selfPlayer = GetSelfPlayer()
+	local MinSeconds = self.Settings.RandomDelayMinSeconds * 1000
+	local MaxSeconds = self.Settings.RandomDelayMaxSeconds * 1000
 
 	Bot.Stats.LastLootTick = Pyx.Win32.GetTickCount()
 	Bot.SilverStats(false)
@@ -110,7 +114,7 @@ function StartFishingState:Run()
 			self.LastActionTime = Pyx.Win32.GetTickCount()
 		end
 
-		if self.state == 2 and Pyx.Win32.GetTickCount() - self.LastActionTime > math.random(1500, 3000) then
+		if self.state == 2 and Pyx.Win32.GetTickCount() - self.LastActionTime > math.random(MinSeconds, MaxSeconds) then
 			if Bot.EnableDebug and Bot.EnableDebugStartFishingState then
 				print("Fishing...")
 			end

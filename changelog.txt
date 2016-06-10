@@ -201,4 +201,6 @@ Fixed seconds not getting calculated when delay option is active
 
 [0.XX]
 Removed most of the old code, now is more clean
+Fishing Rod is not stored anymore at Warehouse, by default
 Added new option, % of perfect Hooks
+Added new option, Min/Max random seconds between a fish and another one

@@ -618,7 +618,7 @@ function Bot.ConsumablesCustomRunCheck()
 end
 
 function Bot.CustomWarehouseCheck(item)
-	if not table.find(Bot.Settings.WarehouseSettings.IgnoreItemsNamed, item.ItemEnchantStaticStatus.Name) and item.Type ~= 8 then
+	if not table.find(Bot.Settings.WarehouseSettings.IgnoreItemsNamed, item.ItemEnchantStaticStatus.Name) and (item.Type ~= 8 and not item.ItemEnchantStaticStatus.IsFishingRod) then
 		return true
 	end
 

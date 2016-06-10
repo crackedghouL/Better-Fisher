@@ -27,14 +27,20 @@ function AdvancedSettings.DrawAdvancedSettings()
 		ImGui.Spacing()
 
 		if ImGui.CollapsingHeader("Delays", "id_gui_delays_option", true, false) then
+			if ImGui.TreeNode("Start Fishing") then
+				ImGui.Text("")
+				_, Bot.Settings.StartFishingSettings.RandomDelayMinSeconds = ImGui.SliderInt("Min seconds##id_guid_delays_option_start_fishing_min_seconds", Bot.Settings.StartFishingSettings.RandomDelayMinSeconds, 1, Bot.Settings.StartFishingSettings.RandomDelayMinSeconds)
+				_, Bot.Settings.StartFishingSettings.RandomDelayMaxSeconds = ImGui.SliderInt("Max seconds##id_guid_delays_option_start_fishing_max_seconds", Bot.Settings.StartFishingSettings.RandomDelayMaxSeconds, Bot.Settings.StartFishingSettings.RandomDelayMinSeconds, 60)
+				ImGui.TreePop()
+			end
 			if ImGui.TreeNode("Hooking") then
 				_, Bot.Settings.HookFishStateSettings.UseRandomSeconds = ImGui.Checkbox("##id_guid_delays_option_use_random_seconds", Bot.Settings.HookFishStateSettings.UseRandomSeconds)
 				ImGui.SameLine()
 				ImGui.Text("Enable wait random seconds")
 				if Bot.Settings.HookFishStateSettings.UseRandomSeconds then
 					ImGui.Text("When fish hook, the bot wait random seconds from " .. Bot.Settings.HookFishStateSettings.HookMinSeconds .. " and " .. Bot.Settings.HookFishStateSettings.HookMaxSeconds)
-					_, Bot.Settings.HookFishStateSettings.HookMinSeconds = ImGui.SliderInt("Min seconds##id_guid_delays_option_min_seconds", Bot.Settings.HookFishStateSettings.HookMinSeconds, 1, Bot.Settings.HookFishStateSettings.HookMaxSeconds)
-					_, Bot.Settings.HookFishStateSettings.HookMaxSeconds = ImGui.SliderInt("Max seconds##id_guid_delays_option_max_seconds", Bot.Settings.HookFishStateSettings.HookMaxSeconds, Bot.Settings.HookFishStateSettings.HookMinSeconds, 170)
+					_, Bot.Settings.HookFishStateSettings.HookMinSeconds = ImGui.SliderInt("Min seconds##id_guid_delays_option_hook_min_seconds", Bot.Settings.HookFishStateSettings.HookMinSeconds, 1, Bot.Settings.HookFishStateSettings.HookMaxSeconds)
+					_, Bot.Settings.HookFishStateSettings.HookMaxSeconds = ImGui.SliderInt("Max seconds##id_guid_delays_option_hook_max_seconds", Bot.Settings.HookFishStateSettings.HookMaxSeconds, Bot.Settings.HookFishStateSettings.HookMinSeconds, 170)
 				end
 				ImGui.Text("% of \"perfect hook\"")
 				_, Bot.Settings.HookFishStateSettings.HookMinSeconds = ImGui.SliderInt("%##id_guid_delays_option_min_seconds", Bot.Settings.HookFishStateSettings.PerfectPerc, 1, 99)
