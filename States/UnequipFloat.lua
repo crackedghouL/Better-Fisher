@@ -28,10 +28,9 @@ end
 
 function UnequipFloatState:NeedToRun()
 	if Bot.CheckIfLoggedIn() then
-		local selfPlayer = GetSelfPlayer()
-		local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_LEFT_HAND)
+		local equippedItem = GetSelfPlayer():GetEquippedItem(INVENTORY_SLOT_LEFT_HAND)
 
-		if not Bot.CheckIfLoggedIn() or not selfPlayer.IsAlive then
+		if not Bot.CheckIfLoggedIn() or not Bot.CheckIfPlayerIsAlive() then
 			return false
 		end
 
@@ -86,6 +85,7 @@ function UnequipFloatState:NeedToRun()
 			end
 		end
 
+		self:Exit()
 		return equippedItem.Endurance == 0
 	else
 		return false

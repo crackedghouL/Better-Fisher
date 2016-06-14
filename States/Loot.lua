@@ -26,9 +26,7 @@ end
 
 function LootState:NeedToRun()
 	if Bot.CheckIfLoggedIn() then
-		local selfPlayer = GetSelfPlayer()
-
-		if not selfPlayer.IsAlive then
+		if not Bot.CheckIfPlayerIsAlive() then
 			return false
 		end
 

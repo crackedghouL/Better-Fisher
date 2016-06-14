@@ -28,10 +28,9 @@ end
 
 function UnequipFishingRodState:NeedToRun()
 	if Bot.CheckIfLoggedIn() then
-		local selfPlayer = GetSelfPlayer()
-		local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
+		local equippedItem = GetSelfPlayer():GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
-		if not selfPlayer.IsAlive then
+		if not Bot.CheckIfPlayerIsAlive() then
 			return false
 		end
 

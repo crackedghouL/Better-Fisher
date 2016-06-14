@@ -30,7 +30,7 @@ function HookFishState:NeedToRun()
 	if Bot.CheckIfLoggedIn() then
 		local selfPlayer = GetSelfPlayer()
 
-		if not selfPlayer.IsAlive then
+		if not Bot.CheckIfPlayerIsAlive() then
 			return false
 		end
 
@@ -76,7 +76,7 @@ function HookFishState:Run()
 
 	if self.state == 2 then
 		self.LastHookStateTick = Pyx.Win32.GetTickCount()
-		self.RandomWaitTime = math.random(500,1000)
+		self.RandomWaitTime = math.random(500,1500)
 		self.state = 3
 	end
 

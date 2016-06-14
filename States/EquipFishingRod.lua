@@ -36,7 +36,7 @@ function EquipFishingRodState:NeedToRun()
 		local items = selfPlayer.Inventory.Items
 		local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
-		if not selfPlayer.IsAlive then
+		if not Bot.CheckIfPlayerIsAlive() then
 			return false
 		end
 

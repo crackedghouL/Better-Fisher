@@ -15,9 +15,7 @@ end
 
 function MoveToFishingSpotState:NeedToRun()
 	if Bot.CheckIfLoggedIn() then
-		local selfPlayer = GetSelfPlayer()
-
-		if not Bot.CheckIfLoggedIn() or not selfPlayer.IsAlive then
+		if not Bot.CheckIfLoggedIn() or not Bot.CheckIfPlayerIsAlive() then
 			return false
 		end
 

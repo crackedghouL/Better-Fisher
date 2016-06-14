@@ -27,7 +27,7 @@ end
 
 function DeathState:NeedToRun()
 	if Bot.CheckIfLoggedIn() then
-		if not GetSelfPlayer().IsAlive then
+		if not Bot.CheckIfPlayerIsAlive() then
 			return true
 		end
 

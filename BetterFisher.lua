@@ -557,7 +557,19 @@ function Bot.StateComplete(state)
 end
 
 function Bot.CheckIfLoggedIn()
-	if GetSelfPlayer() then
+	local selfPlayer = GetSelfPlayer()
+
+	if selfPlayer then
+		return true
+	end
+
+	return false
+end
+
+function Bot.CheckIfPlayerIsAlive()
+	local selfPlayer = GetSelfPlayer()
+
+	if selfPlayer.IsAlive then
 		return true
 	end
 

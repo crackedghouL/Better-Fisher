@@ -46,7 +46,7 @@ function StartFishingState:NeedToRun()
 		local selfPlayer = GetSelfPlayer()
 		local equippedItem = selfPlayer:GetEquippedItem(INVENTORY_SLOT_RIGHT_HAND)
 
-		if not Bot.CheckIfLoggedIn() or not selfPlayer.IsAlive then
+		if not Bot.CheckIfLoggedIn() or not Bot.CheckIfPlayerIsAlive() then
 			return false
 		end
 
@@ -128,8 +128,8 @@ function StartFishingState:Run()
 				selfPlayer:DoAction("FISHING_START_END_Lv0")
 			end
 
-			self.state = 0
 			self.LastStartFishTickcount = Pyx.Win32.GetTickCount()
+			self.state = 0
 		end
 	end
 end
