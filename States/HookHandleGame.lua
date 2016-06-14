@@ -23,6 +23,7 @@ end
 
 function HookFishHandleGameState:NeedToRun()
 	if Bot.CheckIfLoggedIn() then
+		local selfPlayer = GetSelfPlayer()
 		if not Bot.CheckIfPlayerIsAlive() then
 			return false
 		end
