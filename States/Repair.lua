@@ -31,6 +31,7 @@ function RepairState.new()
 	self.RepairEquipped = true
 	self.RepairInventory = true
 	self.ManualForced = false
+	self.Finished = true
 	self.state = 0
 	return self
 end
@@ -49,6 +50,10 @@ function RepairState:NeedToRun()
 
 		if self.LastUseTimer ~= nil and not self.LastUseTimer:Expired() then
 			return false
+		end
+
+		if self.Finished == false then
+			return true
 		end
 
 		if self.ManualForced and (Navigator.CanMoveTo(self:GetPosition()) or Bot.Settings.UseAutorun) then
@@ -105,6 +110,7 @@ function RepairState:Reset()
 	self.RepairEquipped = true
 	self.RepairInventory = true
 	self.ManualForced = false
+	self.Finished = true
 	self.state = 0
 end
 
@@ -120,6 +126,7 @@ function RepairState:Exit()
 		self.RepairList = {}
 		self.ManualForced = false
 		self.state = 0
+		self.Finished = true
 	end
 end
 
@@ -172,6 +179,7 @@ function RepairState:Run()
 	local npc = npcs[1]
 
 	if self.state == 1 then -- 1 = open npc dialog
+		self.Finished = false
 		npc:InteractNpc()
 		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
@@ -286,6 +294,7 @@ function RepairState:Run()
 		end
 		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
+		self.state = 8
 		return
 	end
 
