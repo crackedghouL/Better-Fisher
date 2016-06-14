@@ -95,7 +95,7 @@ function ProfileEditor.DrawProfileEditor()
 						end
 						ImGui.NextColumn()
 					else
-						if ImGui.SmallButton("Delete") then
+						if ImGui.SmallButton("Delete##-delete-connect-" .. key) then
 							table.remove(ProfileEditor.CurrentProfile.MeshConnects,key)
 						else
 							ImGui.NextColumn()
