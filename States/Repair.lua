@@ -280,13 +280,17 @@ function RepairState:Run()
 	end
 
 	if self.state == 7 then -- 7 = state complete
+		Dialog.ClickExit()
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end
+		self.SleepTimer = PyxTimer:New(2)
+		self.SleepTimer:Start()
+		return
 	end
 
 	self:Exit()
-	return false
+	-- return false
 end
 
 function RepairState:GetItems()

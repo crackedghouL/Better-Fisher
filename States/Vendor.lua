@@ -263,6 +263,7 @@ function VendorState:Run()
 		end
 		self.SleepTimer = PyxTimer:New(2)
 		self.SleepTimer:Start()
+		Dialog.ClickExit()
 		Bot.SilverStats(false)
 		if Bot.Settings.WarehouseSettings.Enabled and Bot.Settings.WarehouseSettings.DepositMethod == Bot.WarehouseState.SETTINGS_ON_DEPOSIT_AFTER_VENDOR then
 			Bot.WarehouseState.ManualForced = true
@@ -273,9 +274,13 @@ function VendorState:Run()
 	end
 
 	if self.state == 6 then -- 6 = state complete
+		Dialog.ClickExit()
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end
+		self.SleepTimer = PyxTimer:New(2)
+		self.SleepTimer:Start()
+		return
 	end
 
 	self:Exit()

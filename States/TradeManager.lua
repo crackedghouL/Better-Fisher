@@ -254,9 +254,13 @@ function TradeManagerState:Run()
 	end
 
 	if self.state == 6 then -- 6 = state complete
+		Dialog.ClickExit()
 		if self.CallWhenCompleted then
 			self.CallWhenCompleted(self)
 		end
+		self.SleepTimer = PyxTimer:New(2)
+		self.SleepTimer:Start()
+		return
 	end
 
 	self:Exit()

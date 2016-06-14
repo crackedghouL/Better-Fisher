@@ -55,7 +55,7 @@ function EquipFishingRodState:NeedToRun()
 		for k,v in pairs(items, function(t,a,b) return t[a].Endurance < t[b].Endurance end) do
 			if v.HasEndurance and (v.Endurance <= 32767 or v.MaxEndurance <= 32767) then
 				if Bot.EnableDebug and Bot.EnableDebugEquipFishignRodState then
-					print(v.ItemEnchantStaticStatus.Name .. " which have durability found")
+					print(v.ItemEnchantStaticStatus.Name .. " which have durability")
 				end
 				self.state = 1
 			end
